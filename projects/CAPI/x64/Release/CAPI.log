@@ -1,0 +1,18 @@
+﻿  CAPI.cpp
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(24): warning C4101: 'error' : variable locale non référencée
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(252): warning C4244: 'argument' : conversion de 'float' en 'unsigned int', perte possible de données
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(355): warning C4267: 'initialisation' : conversion de 'size_t' en 'unsigned int', perte possible de données
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(351): warning C4101: 'inv_freq' : variable locale non référencée
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(352): warning C4101: 'lastValues' : variable locale non référencée
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(350): warning C4101: 'j' : variable locale non référencée
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(350): warning C4101: 'i' : variable locale non référencée
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(373): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17134.0\ucrt\stdio.h(208): note: voir la déclaration de 'fopen'
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(425): warning C4101: 'e' : variable locale non référencée
+e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(460): warning C4018: '<' : incompatibilité signed/unsigned
+     Création de la bibliothèque E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.lib et de l'objet E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.exp
+  LINK : /LTCG spécifié mais aucune génération de code requise ; supprimez /LTCG de la ligne de commande de l'édition de liens pour améliorer les performances de l'éditeur de liens
+  CAPI.vcxproj -> E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.dll
+  E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.dll
+  1 fichier(s) copié(s)
+  " ---> Deployed STK Library 1.0 : "E:\Projects\RnD\Noodle\libs\x64\windows
