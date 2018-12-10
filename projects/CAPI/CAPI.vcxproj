@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -47,7 +47,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -156,6 +156,9 @@
     <ClCompile Include="..\..\src\Blit.cpp" />
     <ClCompile Include="..\..\src\BlitSaw.cpp" />
     <ClCompile Include="..\..\src\BlitSquare.cpp" />
+    <ClCompile Include="..\..\src\Delay.cpp" />
+    <ClCompile Include="..\..\src\DelayA.cpp" />
+    <ClCompile Include="..\..\src\DelayL.cpp" />
     <ClCompile Include="..\..\src\Envelope.cpp" />
     <ClCompile Include="..\..\src\FileLoop.cpp" />
     <ClCompile Include="..\..\src\FileRead.cpp" />
@@ -170,6 +173,7 @@
     <ClCompile Include="..\..\src\SingWave.cpp" />
     <ClCompile Include="..\..\src\Stk.cpp" />
     <ClCompile Include="..\..\src\TwoZero.cpp" />
+    <ClCompile Include="..\..\src\Voicer.cpp" />
     <ClCompile Include="CAPI.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

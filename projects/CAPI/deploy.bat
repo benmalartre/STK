@@ -1,4 +1,4 @@
-SET SRC_DIR=E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release
+SET SRC_DIR=E:\Projects\RnD\STK\projects\CAPI\x64\Release
 SET DST_DIR=E:\Projects\RnD\Noodle\libs\x64\windows
 
 if not exist %DST_DIR%\ mkdir %DST_DIR%

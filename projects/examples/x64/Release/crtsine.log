@@ -1,8 +1,0 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(391,5): warning MSB8028: Le répertoire intermédiaire (x64\Release\) contient des fichiers partagés provenant d'un autre projet (bethree.vcxproj, controlbee.vcxproj). Cela peut entraîner un comportement de nettoyage et de régénération incorrect.
-  RtAudio.cpp
-  SineWave.cpp
-  Stk.cpp
-  crtsine.cpp
-  Génération de code en cours...
-C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(1205,5): warning MSB8012: TargetPath(E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\crtsine.exe) ne correspond pas à la valeur de la propriété OutputFile (E:\Projects\RnD\stk-4.6.0\projects\examples\crtsine.exe) de Linker. Cela peut entraîner une génération incorrecte de votre projet. Pour corriger ce problème, vérifiez que les valeurs des propriétés $(OutDir), $(TargetName) et $(TargetExt) correspondent à la valeur spécifiée dans %(Link.OutputFile).
-  crtsine.vcxproj -> E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\crtsine.exe

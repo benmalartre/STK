@@ -12,6 +12,7 @@
 #include "SineWave.h"
 #include "SingWave.h"
 
+
 // ----------------------------------------------------------------------
 //	STK GENERAL FUNCTIONS
 // ----------------------------------------------------------------------
@@ -52,6 +53,488 @@ int STKGetDevices(RtAudio* DAC)
 		return 0;
 }
 
+//--------------------------------------------------------------------
+// STKGenerator Node Constructor
+//--------------------------------------------------------------------
+STKGenerator::STKGenerator(Type type, float frequency)
+{
+	m_type = type;
+	m_frequency = frequency;
+	init();
+}
+
+//--------------------------------------------------------------------
+// STKGenerator Node Terminate
+//--------------------------------------------------------------------
+void STKGenerator::term()
+{
+	if (m_adsr)delete m_adsr;
+	if (m_asymp)delete m_asymp;
+	if (m_blit)delete m_blit;
+	if (m_blitsaw)delete m_blitsaw;
+	if (m_blitsquare)delete m_blitsquare;
+	if (m_envelope)delete m_envelope;
+	if (m_granulate)delete m_granulate;
+	if (m_modulate)delete m_modulate;
+	if (m_noise)delete m_noise;
+	if (m_sinewave)delete m_sinewave;
+	if (m_singwave)delete m_singwave;
+}
+
+//--------------------------------------------------------------------
+// STKGenerator Node Init
+//--------------------------------------------------------------------
+void STKGenerator::init()
+{
+	switch (m_type)
+	{
+	case ADSR_GENERATOR:
+	{
+		m_adsr = new ADSR();
+		m_adsr->setValue(m_frequency);
+		m_type = ADSR_GENERATOR;
+		m_tickCallback = [this](){ return this->ADSRTickCallback(); };
+		break;
+	}
+
+	case ASYMP_GENERATOR:
+	{
+		m_asymp = new Asymp();
+		m_asymp->setValue(m_frequency);
+		m_type = ASYMP_GENERATOR;
+		m_tickCallback = [this](){ return this->AsympTickCallback(); };
+		break;
+	}
+
+	case BLITSAW_GENERATOR:
+	{
+		m_blitsaw = new BlitSaw(m_frequency);
+		m_type = BLITSAW_GENERATOR;
+		m_tickCallback = [this](){ return this->BlitSawTickCallback(); };
+		break;
+	}
+
+	case BLITSQUARE_GENERATOR:
+	{
+		m_blitsquare = new BlitSquare(m_frequency);
+		m_type = BLITSQUARE_GENERATOR;
+		m_tickCallback = [this](){ return this->BlitSquareTickCallback(); };
+		break;
+	}
+
+	case BLIT_GENERATOR:
+	{
+		m_blit = new Blit(m_frequency);
+		m_type = BLIT_GENERATOR;
+		m_tickCallback = [this](){ return this->BlitTickCallback(); };
+		break;
+	}
+
+	case ENVELOPE_GENERATOR:
+	{
+		m_envelope = new Envelope();
+		m_type = ENVELOPE_GENERATOR;
+		m_tickCallback = [this](){ return this->EnvelopeTickCallback(); };
+		break;
+	}
+
+	case GRANULATE_GENERATOR:
+	{
+		m_granulate = new Granulate();
+		m_type = GRANULATE_GENERATOR;
+		m_tickCallback = [this](){ return this->GranulateTickCallback(); };
+		break;
+	}
+
+	case MODULATE_GENERATOR:
+	{
+		m_modulate = new Modulate();
+		m_type = MODULATE_GENERATOR;
+		m_tickCallback = [this](){ return this->ModulateTickCallback(); };
+		break;
+	}
+
+	case NOISE_GENERATOR:
+	{
+		m_noise = new Noise(m_frequency);
+		m_type = NOISE_GENERATOR;
+		m_tickCallback = [this](){ return this->NoiseTickCallback(); };
+		break;
+	}
+
+	case SINEWAVE_GENERATOR:
+	{
+		m_sinewave = new SineWave();
+		m_sinewave->setFrequency(m_frequency);
+		m_type = SINEWAVE_GENERATOR;
+		m_tickCallback = [this](){ return this->SineWaveTickCallback(); };
+		break;
+	}
+
+	case SINGWAVE_GENERATOR:
+	{
+		/*
+		m_singwave = new SingWave();
+		m_singwave->setFrequency(frequency);
+		m_type = STKGeneratorType::SINGWAVE_GENERATOR;
+		m_tickCallback = [this](){ return this->SingWaveTickCallback(); };
+		break;
+		*/
+	}
+	}
+}
+
+
+//--------------------------------------------------------------------
+// STKGenerator Node Destructor
+//--------------------------------------------------------------------
+STKGenerator::~STKGenerator()
+{
+	term();
+}
+
+//--------------------------------------------------------------------
+// STKGenerator Node Set Frequency
+//--------------------------------------------------------------------
+void STKGenerator::setFrequency(float frequency)
+{
+	if (m_type == SINEWAVE_GENERATOR)
+	{
+		m_sinewave->setFrequency(frequency);
+	}
+}
+
+//--------------------------------------------------------------------
+// STKGenerator Node Reset
+//--------------------------------------------------------------------
+void STKGenerator::reset()
+{
+	switch (m_type)
+	{
+		case SINEWAVE_GENERATOR:
+		{
+			m_sinewave->reset();
+			break;
+		}
+
+		case BLIT_GENERATOR:
+		{
+			m_blit->reset();
+			break;
+		}
+
+		case BLITSAW_GENERATOR:
+		{
+			m_blitsaw->reset();
+			break;
+		}
+
+		case BLITSQUARE_GENERATOR:
+		{
+			m_blitsquare->reset();
+			break;
+		}
+	}
+}
+
+//--------------------------------------------------------------------
+// STKGenerator Set Type
+//--------------------------------------------------------------------
+void STKGenerator::setType(Type type)
+{
+	if (type != m_type)
+	{
+		term();
+		m_type = type;
+		init();
+	}
+}
+
+//--------------------------------------------------------------------
+// STKGenerator Node Tick()
+//--------------------------------------------------------------------
+StkFloat STKGenerator::EnvelopeTickCallback()
+{
+	return m_envelope->tick();
+}
+StkFloat STKGenerator::ADSRTickCallback()
+{
+	return m_adsr->tick();
+}
+StkFloat STKGenerator::AsympTickCallback()
+{
+	return m_asymp->tick();
+}
+StkFloat STKGenerator::NoiseTickCallback()
+{
+	return m_noise->tick();
+}
+
+StkFloat STKGenerator::ModulateTickCallback()
+{
+	return m_modulate->tick();
+}
+
+StkFloat STKGenerator::SingWaveTickCallback()
+{
+	return m_singwave->tick();
+}
+
+StkFloat STKGenerator::SineWaveTickCallback()
+{
+	return m_sinewave->tick();
+}
+
+StkFloat STKGenerator::BlitTickCallback()
+{
+	return m_blit->tick();
+}
+
+StkFloat STKGenerator::BlitSawTickCallback()
+{
+	return m_blitsaw->tick();
+}
+
+StkFloat STKGenerator::BlitSquareTickCallback()
+{
+	return m_blitsquare->tick();
+}
+
+StkFloat STKGenerator::GranulateTickCallback()
+{
+	return m_granulate->tick();
+}
+
+StkFloat STKGenerator::tick(unsigned int channel)
+{
+	return m_tickCallback();
+}
+
+//--------------------------------------------------------------------
+// STKArythmetic Node Constructor
+//--------------------------------------------------------------------
+STKArythmetic::STKArythmetic(STKNode* a, STKNode* b, Mode mode)
+{
+	m_lhs = a;
+	m_rhs = b;
+	m_mode = mode;
+	init();
+}
+
+//--------------------------------------------------------------------
+// STKArythmetic Set Mode
+//--------------------------------------------------------------------
+void STKArythmetic::setMode(Mode mode)
+{
+	if (mode != m_mode)
+	{
+		term();
+		m_mode = mode;
+		init();
+	}
+}
+
+//--------------------------------------------------------------------
+// STKArythmetic Node Init
+//--------------------------------------------------------------------
+void STKArythmetic::init()
+{
+	switch (m_mode)
+	{
+		case Mode::ADD:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickAdd(); };
+			break;
+		}
+		case Mode::SUB:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickSub(); };
+			break;
+		}
+		case Mode::MULTIPLY:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickMultiply(); };
+			break;
+		}
+		case Mode::SCALE:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickScale(); };
+			break;
+		}
+		case Mode::SCALEADD:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickScaleAdd(); };
+			break;
+		}
+		case Mode::SCALESUB:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickScaleSub(); };
+			break;
+		}
+		case Mode::MIX:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickMix(); };
+			break;
+		}
+		case Mode::BLEND:
+		{
+			m_tickCallback = [this](){ return this->ArythmeticTickBlend(); };
+			break;
+		}
+	}
+}
+
+void STKArythmetic::term()
+{
+}
+
+
+//--------------------------------------------------------------------
+// STKArythmetic Node Tick()
+//--------------------------------------------------------------------
+StkFloat STKArythmetic::ArythmeticTickAdd()
+{
+	return m_lhs->tick() + m_rhs->tick();
+}
+
+StkFloat STKArythmetic::ArythmeticTickSub()
+{
+	return m_lhs->tick() - m_rhs->tick();
+}
+
+StkFloat STKArythmetic::ArythmeticTickMultiply()
+{
+	return m_lhs->tick() * m_rhs->tick();
+}
+
+StkFloat STKArythmetic::ArythmeticTickScale()
+{
+	return m_lhs->tick() * m_scalar;
+}
+
+StkFloat STKArythmetic::ArythmeticTickScaleAdd()
+{
+	return m_lhs->tick() + m_scalar * m_rhs->tick();
+}
+
+StkFloat STKArythmetic::ArythmeticTickScaleSub()
+{
+	return m_lhs->tick() - m_scalar * m_rhs->tick();
+}
+
+StkFloat STKArythmetic::ArythmeticTickMix()
+{
+	return (1.0-m_scalar) * m_lhs->tick() + m_scalar * m_rhs->tick();
+}
+
+StkFloat STKArythmetic::ArythmeticTickBlend()
+{
+	return (m_lhs->tick() + m_rhs->tick()) * 0.5f;
+}
+
+StkFloat STKArythmetic::tick(unsigned int channel)
+{
+	return m_tickCallback();
+}
+
+//--------------------------------------------------------------------
+// STKEffect Node Tick()
+//--------------------------------------------------------------------
+StkFloat STKEffect::tick(unsigned int channel)
+{
+	switch (m_type)
+	{
+		case ECHO:
+		{
+			Echo* echo = (Echo*)m_effect;
+			return echo->tick(m_source->tick());
+			break;
+		}
+		case PITSHIFT:
+		{
+			PitShift* pitshift = (PitShift*)m_effect;
+			return pitshift->tick(m_source->tick());
+			break;
+		}
+		case LENTPITSHIFT:
+		{
+			LentPitShift* lentpitshift = (LentPitShift*)m_effect;
+			return lentpitshift->tick(m_source->tick());
+			break;
+		}
+		case CHORUS:
+		{
+			Chorus* chorus = (Chorus*)m_effect;
+			return chorus->tick(m_source->tick());
+			break;
+		}
+		default:
+		{
+			return 0.0;
+		}
+	}
+}
+
+// ----------------------------------------------------------------------
+//	STK GENERATOR ADD GENERATOR NODE
+// ----------------------------------------------------------------------
+STKGenerator* STKAddGenerator(STKGeneratorStream* generator, STKGenerator::Type type, StkFloat frequency, bool isRoot)
+{
+	STKGenerator* node = new STKGenerator(type, frequency);
+
+	generator->m_nodes.push_back(node);
+	if (isRoot)
+		generator->m_roots.push_back(node);
+	return node;
+}
+
+// ----------------------------------------------------------------------
+//	STK GENERATOR ADD ARYTHMETIC NODE
+// ----------------------------------------------------------------------
+STKArythmetic* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
+{
+	STKArythmetic* node = new STKArythmetic(lhs, rhs, mode);
+	generator->m_nodes.push_back(node);
+	if (isRoot)
+		generator->m_roots.push_back(node);
+	return node;
+}
+
+// ----------------------------------------------------------------------
+//	STK GENERATOR ADD EFFECT NODE
+// ----------------------------------------------------------------------
+STKEffect* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNode* source, bool isRoot)
+{
+	STKEffect* node = new STKEffect(source, type);
+	generator->m_nodes.push_back(node);
+	if (isRoot)
+		generator->m_roots.push_back(node);
+	return node;
+}
+
+// ----------------------------------------------------------------------
+//	SETTERS
+// ----------------------------------------------------------------------
+void STKSetGeneratorType(STKGenerator* generator, STKGenerator::Type type)
+{
+	generator->setType(type);
+}
+
+void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmetic::Mode mode)
+{
+	arythmetic->setMode(mode);
+}
+
+void STKSetArythmeticScalar(STKArythmetic* generator, StkFloat scalar)
+{
+	generator->setScalar(scalar);
+}
+
+void STKSetEffectType(STKEffect* effect, STKEffect::Type type)
+{
+
+}
+
 // ----------------------------------------------------------------------
 //	STK GENERATOR STREAM
 // ----------------------------------------------------------------------
@@ -60,236 +543,56 @@ int STKGeneratorStreamTick(void *outputBuffer, void *inputBuffer, unsigned int n
 {	
 	STKGeneratorStream* generator = (STKGeneratorStream *)dataPointer;
 	register StkFloat *samples = (StkFloat *)outputBuffer;
-
-	switch (generator->m_type)
+	unsigned int numRoots = generator->m_roots.size();
+	if (!numRoots)return 0;
+	float weight = 1.0 / numRoots;
+	for (unsigned int i = 0; i < nBufferFrames; i++)
 	{
-	case STKGeneratorType::ADSR_GENERATOR:
-	{
-		ADSR * adsr = (ADSR*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = adsr->tick();
-	}
-	break;
+		*samples = 0;
+		for (unsigned int j = 0; j < numRoots; ++j)
+			*samples += generator->m_roots[j]->tick();
+		*samples *= weight;
+		samples++;
 
-	case STKGeneratorType::ASYMP_GENERATOR:
-	{
-		Asymp * asymp = (Asymp*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = asymp->tick();
-	}
-	break;
-
-	case STKGeneratorType::BLITSAW_GENERATOR:
-	{
-		BlitSaw * blitsaw = (BlitSaw*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = blitsaw->tick();
-	}
-	break;
-
-	case STKGeneratorType::BLITSQUARE_GENERATOR:
-	{
-		BlitSquare * blitsquare = (BlitSquare*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = blitsquare->tick();
-	}
-	break;
-
-	case STKGeneratorType::BLIT_GENERATOR:
-	{
-		Blit * blit = (Blit*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = blit->tick();
-	}
-	break;
-
-	case STKGeneratorType::ENVELOPE_GENERATOR:
-	{
-		Envelope * envelope = (Envelope*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = envelope->tick();
-	}
-	break;
-
-	case STKGeneratorType::GRANULATE_GENERATOR:
-	{
-		Granulate * granulate = (Granulate*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = granulate->tick();
-	}
-	break;
-
-	case STKGeneratorType::MODULATE_GENERATOR:
-	{
-		Modulate * modulate = (Modulate*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = modulate->tick();
-	}
-	break;
-
-	case STKGeneratorType::NOISE_GENERATOR:
-	{
-		Noise * noise = (Noise*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = noise->tick();
-	}
-	break;
-
-	case STKGeneratorType::SINEWAVE_GENERATOR:
-	{
-		SineWave * sinewave = (SineWave*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = sinewave->tick();
-	}
-	break;
-
-	case STKGeneratorType::SINGWAVE_GENERATOR:
-	{
-		SingWave * singwave = (SingWave*)generator->m_generator;
-		for (unsigned int i = 0; i < nBufferFrames; i++)
-			*samples++ = singwave->tick();
-	}
-	break;
-
-	//case STKGeneratorType::SUBNOISE_GENERATOR:
-	//	SineWave * sinewave = (SineWave*)generator->m_generator;
-	//	for (unsigned int i = 0; i < nBufferFrames; i++)
-	//		sinewave->tick();
-	//	break;
 	}
 
 	return 0;
 }
 
-STKGeneratorStream* STKGeneratorStreamSetup(RtAudio* DAC, STKGeneratorType _type, float _frequency)
+STKGeneratorStream* STKGeneratorStreamSetup(RtAudio* DAC, STKGenerator::Type _type, float _frequency)
 {
 	// Set the global sample rate before creating class instances.
 	Stk::setSampleRate(44100.0);
 
 	STKGeneratorStream* generator = new STKGeneratorStream();
 	generator->m_dac = DAC;
-	switch (_type)
-	{
-	case STKGeneratorType::ADSR_GENERATOR:
-	{
-		ADSR* adsr = new ADSR();
-		adsr->setValue(_frequency);
-		generator->m_generator = (Generator*)adsr;
-		generator->m_type = STKGeneratorType::ADSR_GENERATOR;
-		break;
+	
+	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
+	RtAudio::StreamParameters parameters;
+	parameters.deviceId = DAC->getDefaultOutputDevice();
+	parameters.nChannels = 1;
+	RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+	unsigned int bufferFrames = RT_BUFFER_SIZE;
+	try {
+		DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKGeneratorStreamTick, (void *)generator);
+	}
+	catch (RtAudioError &error) {
+		error.printMessage();
+		//delete generator->m_generator;
+		delete generator;
+		return NULL;
 	}
 
-	case STKGeneratorType::ASYMP_GENERATOR:
-	{
-		Asymp * asymp = new Asymp();
-		asymp->setValue(_frequency);
-		generator->m_generator = (Generator*)asymp;
-		generator->m_type = STKGeneratorType::ASYMP_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::BLITSAW_GENERATOR:
-	{
-		BlitSaw * blitsaw = new BlitSaw(_frequency);
-		generator->m_generator = (Generator*)blitsaw;
-		generator->m_type = STKGeneratorType::BLITSAW_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::BLITSQUARE_GENERATOR:
-	{
-		BlitSquare * blitsquare = new BlitSquare(_frequency);
-		generator->m_generator = (Generator*)blitsquare;
-		generator->m_type = STKGeneratorType::BLITSQUARE_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::BLIT_GENERATOR:
-	{
-		Blit * blit = new Blit(_frequency);
-		generator->m_generator = (Generator*)blit;
-		generator->m_type = STKGeneratorType::BLIT_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::ENVELOPE_GENERATOR:
-	{
-		Envelope* envelope = new Envelope();
-		generator->m_generator = (Generator*)envelope;
-		generator->m_type = STKGeneratorType::ENVELOPE_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::GRANULATE_GENERATOR:
-	{
-		Granulate * granulate = new Granulate();
-		generator->m_generator = (Generator*)granulate;
-		generator->m_type = STKGeneratorType::GRANULATE_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::MODULATE_GENERATOR:
-	{
-		Modulate * modulate = new Modulate();
-		generator->m_generator = (Generator*)modulate;
-		generator->m_type = STKGeneratorType::MODULATE_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::NOISE_GENERATOR:
-	{
-		Noise * noise = new Noise(_frequency);
-		generator->m_generator = (Generator*)noise;
-		generator->m_type = STKGeneratorType::NOISE_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::SINEWAVE_GENERATOR:
-	{
-		SineWave * sinewave = new SineWave();
-		sinewave->setFrequency(_frequency);
-		generator->m_generator = (Generator*)sinewave;
-		generator->m_type = STKGeneratorType::SINEWAVE_GENERATOR;
-		break;
-	}
-
-	case STKGeneratorType::SINGWAVE_GENERATOR:
-	{
-		//SingWave * singwave = new SingWave(m_filename);
-		//generator->m_generator = (Generator*)singwave;
-		break;
-	}
-	}
-
-	if (generator->m_generator)
-	{
-		// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-		RtAudio::StreamParameters parameters;
-		parameters.deviceId = DAC->getDefaultOutputDevice();
-		parameters.nChannels = 1;
-		RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-		unsigned int bufferFrames = RT_BUFFER_SIZE;
-		try {
-			DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKGeneratorStreamTick, (void *)generator);
-		}
-		catch (RtAudioError &error) {
-			error.printMessage();
-			delete generator->m_generator;
-			delete generator;
-			return NULL;
-		}
-
-		//generator->m_generator.setFrequency(_frequency);
-		return generator;
-	}
-
-	delete generator;
-	return NULL;
+	return generator;
 }
 
 bool STKGeneratorStreamStart(STKGeneratorStream* _generator)
 {
 	try {
+		
+		//for (std::vector<STKNode*>::iterator it = _generator->m_roots.begin(); it < _generator->m_roots.end(); it++)
+		//	(*it)->reset();
+		
 		_generator->m_dac->startStream();
 	}
 	catch (RtAudioError &error) {
@@ -534,10 +837,10 @@ STKVoicerStream* STKVoicerStreamSetup(RtAudio* DAC, int _nbInstruments)
 	return voicer;
 }
 
-bool STKVoicerStreamStart(STKVoicerStream* _voicer)
+bool STKVoicerStreamStart(STKVoicerStream* voicer)
 {
 	try {
-		_voicer->m_dac->startStream();
+		voicer->m_dac->startStream();
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
@@ -546,10 +849,10 @@ bool STKVoicerStreamStart(STKVoicerStream* _voicer)
 	return true;
 }
 
-bool STKVoicerStreamStop(STKVoicerStream* _voicer)
+bool STKVoicerStreamStop(STKVoicerStream* voicer)
 {
 	try {
-		_voicer->m_dac->stopStream();
+		voicer->m_dac->stopStream();
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
@@ -558,11 +861,11 @@ bool STKVoicerStreamStop(STKVoicerStream* _voicer)
 	return true;
 }
 
-bool STKVoicerStreamClean(STKVoicerStream* _voicer)
+bool STKVoicerStreamClean(STKVoicerStream* voicer)
 {
 	// Shut down the output stream.
 	try {
-		_voicer->m_dac->closeStream();
+		voicer->m_dac->closeStream();
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();

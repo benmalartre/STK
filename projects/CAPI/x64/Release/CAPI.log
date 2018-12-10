@@ -1,18 +1,77 @@
-﻿  CAPI.cpp
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(24): warning C4101: 'error' : variable locale non référencée
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(252): warning C4244: 'argument' : conversion de 'float' en 'unsigned int', perte possible de données
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(355): warning C4267: 'initialisation' : conversion de 'size_t' en 'unsigned int', perte possible de données
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(351): warning C4101: 'inv_freq' : variable locale non référencée
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(352): warning C4101: 'lastValues' : variable locale non référencée
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(350): warning C4101: 'j' : variable locale non référencée
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(350): warning C4101: 'i' : variable locale non référencée
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(373): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.17134.0\ucrt\stdio.h(208): note: voir la déclaration de 'fopen'
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(425): warning C4101: 'e' : variable locale non référencée
-e:\projects\rnd\stk-4.6.0\projects\capi\capi.cpp(460): warning C4018: '<' : incompatibilité signed/unsigned
-     Création de la bibliothèque E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.lib et de l'objet E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.exp
-  LINK : /LTCG spécifié mais aucune génération de code requise ; supprimez /LTCG de la ligne de commande de l'édition de liens pour améliorer les performances de l'éditeur de liens
-  CAPI.vcxproj -> E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.dll
-  E:\Projects\RnD\stk-4.6.0\projects\examples\x64\Release\STK.dll
-  1 fichier(s) copié(s)
-  " ---> Deployed STK Library 1.0 : "E:\Projects\RnD\Noodle\libs\x64\windows
+﻿Build started 10/12/2018 20:49:19.
+     1>Project "E:\Projects\RnD\STK\projects\CAPI\CAPI.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I../../include /I../../src/include /Zi /nologo /W3 /WX- /O2 /D NDEBUG /D WIN32 /D _CONSOLE /D __LITTLE_ENDIAN__ /D __WINDOWS_DS__ /D _WINDLL /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt CAPI.cpp
+         CAPI.cpp
+     1>e:\projects\rnd\stk\include\Stk.h(573): warning C4305: 'initializing' : truncation from 'double' to 'const stk::StkFloat'
+     1>E:\Projects\RnD\STK\include\Asymp.h(33): warning C4305: 'initializing' : truncation from 'double' to 'const stk::StkFloat'
+     1>E:\Projects\RnD\STK\include\BlitSaw.h(119): warning C4244: '=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\BlitSquare.h(142): warning C4244: '=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>e:\projects\rnd\stk\include\Delay.h(40): warning C4267: 'return' : conversion from 'size_t' to 'unsigned long', possible loss of data
+     1>e:\projects\rnd\stk\include\DelayL.h(43): warning C4267: 'return' : conversion from 'size_t' to 'unsigned long', possible loss of data
+     1>E:\Projects\RnD\STK\include\PitShift.h(90): warning C4244: '=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\PitShift.h(91): warning C4244: '=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\PitShift.h(99): warning C4244: '+=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\LentPitShift.h(187): warning C4244: '=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\LentPitShift.h(188): warning C4244: '=' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\LentPitShift.h(194): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\LentPitShift.h(195): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\Chorus.h(114): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\Chorus.h(115): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\Chorus.h(133): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\Chorus.h(134): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\Chorus.h(158): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>E:\Projects\RnD\STK\include\Chorus.h(159): warning C4244: 'argument' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>CAPI.cpp(25): warning C4101: 'error' : unreferenced local variable
+     1>CAPI.cpp(159): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
+     1>CAPI.cpp(427): warning C4244: 'return' : conversion from 'double' to 'stk::StkFloat', possible loss of data
+     1>CAPI.cpp(546): warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>CAPI.cpp(548): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>CAPI.cpp(647): warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>CAPI.cpp(642): warning C4101: 'i' : unreferenced local variable
+     1>CAPI.cpp(643): warning C4101: 'inv_freq' : unreferenced local variable
+     1>CAPI.cpp(644): warning C4101: 'lastValues' : unreferenced local variable
+     1>CAPI.cpp(642): warning C4101: 'j' : unreferenced local variable
+     1>CAPI.cpp(665): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdio.h(211) : see declaration of 'fopen'
+     1>CAPI.cpp(717): warning C4101: 'e' : unreferenced local variable
+     1>CAPI.cpp(752): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.dll" /NOLOGO odbc32.lib odbccp32.lib dsound.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:"E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.lib" /MACHINE:X64 /DLL x64\Release\ADSR.obj
+         x64\Release\Asymp.obj
+         x64\Release\Blit.obj
+         x64\Release\BlitSaw.obj
+         x64\Release\BlitSquare.obj
+         x64\Release\Delay.obj
+         x64\Release\DelayA.obj
+         x64\Release\DelayL.obj
+         x64\Release\Envelope.obj
+         x64\Release\FileLoop.obj
+         x64\Release\FileRead.obj
+         x64\Release\FileWvIn.obj
+         x64\Release\FM.obj
+         x64\Release\Granulate.obj
+         x64\Release\Modulate.obj
+         x64\Release\Noise.obj
+         x64\Release\OnePole.obj
+         x64\Release\RtAudio.obj
+         x64\Release\SineWave.obj
+         x64\Release\SingWave.obj
+         x64\Release\Stk.obj
+         x64\Release\TwoZero.obj
+         x64\Release\Voicer.obj
+         x64\Release\CAPI.obj
+            Creating library E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.lib and object E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.exp
+         LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+         CAPI.vcxproj -> E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.dll
+       PostBuildEvent:
+         call deploy.bat
+         :VCEnd
+         E:\Projects\RnD\STK\projects\CAPI\x64\Release\STK.dll
+         1 fichier(s) copié(s)
+         " ---> Deployed STK Library 1.0 : "E:\Projects\RnD\Noodle\libs\x64\windows
+     1>Done Building Project "E:\Projects\RnD\STK\projects\CAPI\CAPI.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.88
