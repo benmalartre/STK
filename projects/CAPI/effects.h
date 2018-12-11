@@ -89,6 +89,6 @@ private:
 //	STK EFFECT NODE SETTER
 // ----------------------------------------------------------------------
 EXPORT void STKSetEffectType(STKEffect* effect, STKEffect::Type type);
-EXPORT void STKSetEffectScalar(STKEffect* effect, StkFloat scalar, STKEffect::Param param);
+EXPORT void STKSetEffectScalar(STKEffect* effect, STKEffect::Param param, StkFloat scalar);
 
 #endif

@@ -6,6 +6,8 @@ STKEffect::STKEffect(STKNode* source, Type type)
 {
 	m_source = source;
 	m_type = type;
+	m_noutput = 0;
+	m_outidx = 0;
 	init();
 }
 

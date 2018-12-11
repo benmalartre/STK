@@ -57,3 +57,11 @@
 # windows
 */x64/*
 *.obj
+*.sdf
+*.log
+*.tlog
+*.dll
+*.exp
+*.lib
+*.exp
+*.opensdf
