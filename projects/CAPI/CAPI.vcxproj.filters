@@ -87,12 +87,6 @@
     <ClInclude Include="effects.h">
       <Filter>capi</Filter>
     </ClInclude>
-    <ClInclude Include="arythmetic.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="stream.h">
-      <Filter>capi</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\NRev.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -100,6 +94,27 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="envelopes.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\FileLoop.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\FileRead.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\FileWvIn.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="filters.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="streams.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="readers.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="arythmetics.h">
       <Filter>capi</Filter>
     </ClInclude>
   </ItemGroup>
@@ -185,9 +200,6 @@
     <ClCompile Include="..\..\src\FileWvIn.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="arythmetic.cpp">
-      <Filter>capi</Filter>
-    </ClCompile>
     <ClCompile Include="common.cpp">
       <Filter>capi</Filter>
     </ClCompile>
@@ -197,14 +209,47 @@
     <ClCompile Include="effects.cpp">
       <Filter>capi</Filter>
     </ClCompile>
-    <ClCompile Include="stream.cpp">
-      <Filter>capi</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\PitShift.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="envelopes.cpp">
       <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="filters.cpp">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="streams.cpp">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="readers.cpp">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="arythmetics.cpp">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BiQuad.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Fir.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\FormSwep.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Iir.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OneZero.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PoleZero.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\TwoPole.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\TwoZero.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
