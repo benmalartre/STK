@@ -80,6 +80,10 @@ void STKFilter::init()
 			m_tickCallback = [this](){ return this->FilterTickDelayL(); };
 			break;
 		}
+		default:
+		{
+			return;
+		}
 	}
 }
 

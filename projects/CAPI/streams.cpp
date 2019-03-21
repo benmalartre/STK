@@ -187,7 +187,10 @@ int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBuf
 	double streamTime, RtAudioStreamStatus status, void *dataPointer)
 {
 	STKVoicerStream* voicer = (STKVoicerStream *)dataPointer;
-	if (voicer->m_settling == true)goto settle;
+	if (voicer->m_settling == true){
+        voicer->m_dac->abortStream();
+        return 0;   
+    }
 
 	StkFloat  sample, *samples = (StkFloat *)outputBuffer;
 
@@ -196,7 +199,7 @@ int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBuf
 		return 1;
 	}
 
-	for (ULONG i = 0; i<voicer->m_nbInstruments; i++)
+	for (int i = 0; i<voicer->m_nbInstruments; i++)
 	{
 		/*
 		InstrumentData* currentInstru = data->instrumentsData[i];
@@ -245,16 +248,11 @@ int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBuf
 	if (voicer->m_counter>voicer->m_maxTick)
 	{
 		voicer->m_settling = true;
-		goto settle;
+        voicer->m_dac->abortStream();
+        return 0;
 	}
 
 	return 1;
-
-settle:
-	//voicer->m_voicer->silence();
-	voicer->m_dac->abortStream();
-
-	return 0;
 
 }
 

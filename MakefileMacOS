@@ -1,0 +1,119 @@
+# =============================================================
+# PureBasic STK MakefileMacOS
+# =============================================================
+
+LIBRARY_NAME = STK
+
+# make sure these are in your path
+#
+CC          = clang
+C++         = clang++
+LD          = clang++
+
+SRCDIR := .
+DSTDIR := .
+
+# settings
+#
+CFLAGS = -DPLATFORM_DARWIN \
+	 -DCC_GNU_ \
+	 -DOSMac_ \
+	 -DOSMacOSX_ \
+	 -DOSMac_MachO_ \
+	 -DPB_MACOS
+	 -O3 \
+	 -D_LANGUAGE_C_PLUS_PLUS\
+	 -mmacosx-version-min=10.9\
+	 -arch x86_64\
+	 -fPIC\
+	 -DNDEBUG\
+	 -static
+
+C++FLAGS = $(CFLAGS) \
+	   -std=c++11 \
+	   -stdlib=libc++ \
+	   -fno-gnu-keywords \
+	   -fpascal-strings  \
+	   -Wno-deprecated \
+	   -Wpointer-arith \
+	   -Wwrite-strings \
+	   -Wno-long-long
+
+# includes
+#
+STK_INCLUDES = ../../include
+INCLUDES = -I$(STK_INCLUDES)
+
+# sources
+#
+STK_PATH = ../../src
+
+LIBS += -lm 
+
+LIBS_PATH =
+
+LDFLAGS += -shared -Wl,-search_paths_first -Wl,-headerpad_max_install_names $(LIBS)
+
+# infos
+#
+MSG1 = "== Compile $(LIBRARY_NAME)"
+MSG2 = "==  CC      $(CC)"
+MSG3 = "==  C++     $(C++)"
+
+# variable definitions
+#
+SOURCES += $(SRCDIR)/arythmetics.cpp 
+SOURCES += $(SRCDIR)/common.cpp
+SOURCES += $(SRCDIR)/effects.cpp 
+SOURCES += $(SRCDIR)/envelopes.cpp 
+SOURCES += $(SRCDIR)/filters.cpp 
+SOURCES += $(SRCDIR)/generators.cpp
+SOURCES += $(SRCDIR)/readers.cpp 
+SOURCES += $(SRCDIR)/streams.cpp  
+
+OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
+
+DYNAMIC_LIB := $(LIBRARY_NAME).so
+MAKEFILE := $(SRCDIR)/MakefileMacOS
+
+# target specific flags.
+#
+$(OBJECTS): CFLAGS   := $(CFLAGS)
+$(OBJECTS): C++FLAGS := $(C++FLAGS)
+$(OBJECTS): INCLUDES := $(INCLUDES) -I/usr/X11R6/include 
+
+DEPENDS:     INCLUDES := $(INCLUDES)
+
+
+# rules definitions
+#
+.PHONY:	all depend clean print
+
+all:
+	+@$(MAKE) -f $(MAKEFILE) print
+	+@$(MAKE) -f $(MAKEFILE) $(DYNAMIC_LIB)
+
+print:
+	@echo $(MSG1)
+	@echo $(MSG2)
+	@echo $(MSG3)
+
+%.o :	%.c
+	$(CC) -c $(INCLUDES) $(CFLAGS) $< -o $@
+
+%.o :	%.cpp
+	@echo INCLUDES : $(INCLUDES)
+	@echo "Compiling $< ..."
+	$(C++) -c $(INCLUDES) $(C++FLAGS) $< -o $@
+
+%.i :	%.cpp
+	$(C++) -E $(INCLUDES) $(C++FLAGS) $*.cpp > $*.i
+
+$(DYNAMIC_LIB): $(OBJECTS)
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+
+depend:
+	makedepend $(INCLUDES) $(MDFLAGS) -f$(MAKEFILE) $(SOURCES)
+
+clean:
+	rm -rf *.o *.gah *.so

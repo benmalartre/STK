@@ -3,6 +3,11 @@
 
 #include "Socket.h"
 
+#ifdef __APPLE__
+#include <sys/types.h>
+#include <netinet/in.h>
+#endif
+
 namespace stk {
 
 /***************************************************/
