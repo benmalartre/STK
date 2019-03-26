@@ -47,9 +47,11 @@ public:
 	virtual void setHasNoEffect(bool hasnoeffect) = 0;
 	void incrementNumOutput(){ m_noutput++; };
 	void decrementNumOutput(){ m_noutput--; };
+	void setIsRoot(bool isRoot) { m_isroot = isRoot; };
 protected:
 	StkFloat update(StkFloat value);
 	bool m_hasnoeffect;
+	bool m_isroot;
 	int m_noutput;
 	int m_outidx;
 };

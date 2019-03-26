@@ -9,9 +9,12 @@ STKNode* STKAddGenerator(STKGeneratorStream* generator, STKGenerator::Type type,
 	generator->m_nodes.push_back(node);
 	if (isRoot)
 	{
+		node->setIsRoot(true);
 		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
+
+	else node->setIsRoot(false);
 		
 	return node;
 }
@@ -26,9 +29,11 @@ STKNode* STKAddEnvelope(STKGeneratorStream* generator, STKEnvelope::Type type, S
 	generator->m_nodes.push_back(node);
 	if (isRoot)
 	{
+		node->setIsRoot(true);
 		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
+	else node->setIsRoot(false);
 
 	return node;
 }
@@ -45,9 +50,11 @@ STKNode* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mod
 	generator->m_nodes.push_back(node);
 	if (isRoot)
 	{
+		node->setIsRoot(true);
 		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
+	else node->setIsRoot(false);
 		
 	return node;
 }
@@ -63,9 +70,11 @@ STKNode* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNo
 	generator->m_nodes.push_back(node);
 	if (isRoot)
 	{
+		node->setIsRoot(true);
 		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
+	else node->setIsRoot(false);
 		
 	return node;
 }
@@ -81,9 +90,11 @@ STKNode* STKAddFilter(STKGeneratorStream* generator, STKFilter::Type type, STKNo
 	generator->m_nodes.push_back(node);
 	if (isRoot)
 	{
+		node->setIsRoot(true);
 		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
+	else node->setIsRoot(false);
 
 	return node;
 }
