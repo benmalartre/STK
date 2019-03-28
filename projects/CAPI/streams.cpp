@@ -1,16 +1,45 @@
 #include "streams.h"
 
 // ----------------------------------------------------------------------
+//	STK GET NODE STREAM
+// ----------------------------------------------------------------------
+STKGeneratorStream* STKGetStream(STKNode* node){
+	return node->getStream();
+}
+
+// ----------------------------------------------------------------------
+//	STK NODE IS ROOT
+// ----------------------------------------------------------------------
+bool STKIsRoot(STKNode* node){
+	return node->isRoot();
+}
+
+// ----------------------------------------------------------------------
+//	STK SET NODE AS ROOT (or NOT)
+// ----------------------------------------------------------------------
+void STKSetAsRoot(STKNode* node, bool isRoot)
+{
+	if (isRoot){
+		node->setIsRoot(true);
+		node->incrementNumOutput();
+	}
+	else{
+		node->setIsRoot(false);
+		node->decrementNumOutput();
+	}
+}
+
+// ----------------------------------------------------------------------
 //	STK GENERATOR ADD GENERATOR NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddGenerator(STKGeneratorStream* generator, STKGenerator::Type type, StkFloat frequency, bool isRoot)
 {
 	STKNode* node = (STKNode*)new STKGenerator(type, frequency);
-	generator->m_nodes.push_back(node);
+	node->setStream(generator);
+	node->incrementNumOutput();
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
 
@@ -26,11 +55,9 @@ STKNode* STKAddEnvelope(STKGeneratorStream* generator, STKEnvelope::Type type, S
 {
 	STKNode* node = (STKNode*)new STKEnvelope(type, source);
 	source->incrementNumOutput();
-	generator->m_nodes.push_back(node);
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
@@ -47,11 +74,10 @@ STKNode* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mod
 	lhs->incrementNumOutput();
 	rhs->incrementNumOutput();
 
-	generator->m_nodes.push_back(node);
+	node->incrementNumOutput();
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
@@ -67,11 +93,10 @@ STKNode* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNo
 	STKNode* node = (STKNode*)new STKEffect(source, type);
 	
 	source->incrementNumOutput();
-	generator->m_nodes.push_back(node);
+	node->incrementNumOutput();
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
@@ -87,11 +112,10 @@ STKNode* STKAddFilter(STKGeneratorStream* generator, STKFilter::Type type, STKNo
 	STKNode* node = (STKNode*)new STKFilter(source, type);
 
 	source->incrementNumOutput();
-	generator->m_nodes.push_back(node);
+	node->incrementNumOutput();
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		node->incrementNumOutput();
 		generator->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);

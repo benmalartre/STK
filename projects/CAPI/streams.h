@@ -56,6 +56,10 @@ struct STKVoicerStream {
 	bool m_multiInput;
 };
 
+EXPORT bool STKIsRoot(STKNode* node);
+EXPORT void STKSetAsRoot(STKNode* node, bool isRoot);
+EXPORT STKGeneratorStream* STKGetStream(STKNode* node);
+
 // InputStream tick() function
 int STKInputStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *dataPointer);
