@@ -70,19 +70,22 @@ STKNode* STKAddEnvelope(STKGeneratorStream* generator, STKEnvelope::Type type, S
 // ----------------------------------------------------------------------
 STKNode* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
 {
+	/*
 	STKNode* node = (STKNode*)new STKArythmetic(lhs, rhs, mode);
-	lhs->incrementNumOutput();
-	rhs->incrementNumOutput();
+	if(lhs)lhs->incrementNumOutput();
+	if(rhs)rhs->incrementNumOutput();
 
 	node->incrementNumOutput();
 	if (isRoot)
 	{
-		node->setIsRoot(true);
-		generator->m_roots.push_back(node);
+	node->setIsRoot(true);
+	generator->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
-		
+
 	return node;
+	*/ 
+	return NULL;
 }
 
 // ----------------------------------------------------------------------

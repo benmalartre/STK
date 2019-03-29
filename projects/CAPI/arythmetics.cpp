@@ -49,6 +49,8 @@ void STKArythmetic::setHasNoEffect(bool hasnoeffect)
 //--------------------------------------------------------------------
 void STKArythmetic::init()
 {
+	if (!this->m_lhs || !this->m_rhs) return;
+
 	switch (m_mode)
 	{
 		case Mode::ADD:
@@ -163,9 +165,21 @@ StkFloat STKArythmetic::ArythmeticTickHasNoEffect()
 
 StkFloat STKArythmetic::tick(unsigned int channel)
 {
+	if (!m_lhs || !m_rhs) return 0;
 	return m_tickCallback();
 }
 
+void STKArythmetic::setLHS(STKNode* node){
+	if (m_lhs != NULL)term();
+	m_lhs = node;
+	init();
+}
+
+void STKArythmetic::setRHS(STKNode* node){
+	if (m_rhs != NULL)term();
+	m_rhs = node;
+	init();
+}
 
 // ----------------------------------------------------------------------
 //	STK GENERATOR ARYTHMETIC SETTER
@@ -178,4 +192,14 @@ void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmetic::Mode mode)
 void STKSetArythmeticScalar(STKArythmetic* generator, StkFloat scalar)
 {
 	generator->setScalar(scalar);
+}
+
+void STKSetArythmeticLHS(STKArythmetic* arythmetic, STKNode* node)
+{
+	arythmetic->setLHS(node);
+}
+
+void STKSetArythmeticRHS(STKArythmetic* arythmetic, STKNode* node)
+{
+	arythmetic->setRHS(node);
 }

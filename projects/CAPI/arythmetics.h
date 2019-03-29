@@ -29,6 +29,10 @@ public:
 	void setMode(Mode mode);
 	void setScalar(StkFloat scalar){ m_scalar = scalar; };
 	void setHasNoEffect(bool hasnoeffect);
+	void setLHS(STKNode* node);
+	void setRHS(STKNode* node);
+	STKNode* getLHS(){ return m_lhs; };
+	STKNode* getRHS(){ return m_rhs; };
 
 private:
 	inline StkFloat ArythmeticTickAdd();
@@ -50,5 +54,7 @@ private:
 
 EXPORT void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmetic::Mode mode);
 EXPORT void STKSetArythmeticScalar(STKArythmetic* arythmetic, StkFloat scalar);
+EXPORT void STKSetArythmeticLHS(STKArythmetic* arythmetic, STKNode* node);
+EXPORT void STKSetArythmeticRHS(STKArythmetic* arythmetic, STKNode* node);
 
 #endif
