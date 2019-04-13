@@ -129,6 +129,7 @@ inline StkFloat Blit :: tick( void )
 	return lastFrame_[0];
 }
 
+
 inline StkFrames& Blit :: tick( StkFrames& frames, unsigned int channel )
 {
 #if defined(_STK_DEBUG_)

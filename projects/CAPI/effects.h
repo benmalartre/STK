@@ -10,6 +10,7 @@
 #include "PitShift.h"
 #include "LentPitShift.h"
 #include "Chorus.h"
+#include "Moog.h"
 
 class STKEffect : public STKNode{
 public:
@@ -22,7 +23,8 @@ public:
 		ECHO,
 		PITSHIFT,
 		LENTPITSHIFT,
-		CHORUS
+		CHORUS,
+		MOOG
 	};
 
 	enum Param{
@@ -39,8 +41,8 @@ public:
 		DELAY,			// echo delay
 		MAXIMUMDELAY,	// echo maximum delay
 		SHIFT,			// pitshift and lentpitshift 
-		MODDEPTH,		// chorus mod depth	
-		MODFREQUENCY	// chorus mod frequency
+		MODDEPTH,		// chorus/moog mod depth	
+		MODFREQUENCY	// chorus/moog mod frequency
 	};
 
 	StkFloat tick(unsigned int channel = 0);
@@ -67,6 +69,7 @@ private:
 	inline StkFloat EffectTickPitShift();
 	inline StkFloat EffectTickLentPitShift();
 	inline StkFloat EffectTickChorus();
+	inline StkFloat EffectTickMoog();
 	inline StkFloat EffectTickHasNoEffect();
 	std::function<StkFloat()> m_tickCallback;
 	union
@@ -80,6 +83,7 @@ private:
 		PitShift* m_pitshift;
 		LentPitShift* m_lentpitshift;
 		Chorus* m_chorus;
+		Moog* m_moog;
 	};
 	STKNode* m_source;
 	Type m_type;

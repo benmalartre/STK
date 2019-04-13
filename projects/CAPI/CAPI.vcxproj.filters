@@ -117,6 +117,18 @@
     <ClInclude Include="arythmetics.h">
       <Filter>capi</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Moog.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Sampler.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="buffers.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="writers.h">
+      <Filter>capi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ADSR.cpp">
@@ -249,6 +261,24 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\TwoZero.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Moog.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sampler.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="buffers.cpp">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="writers.cpp">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\FileWvOut.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\FileWrite.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

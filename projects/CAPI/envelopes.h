@@ -4,6 +4,7 @@
 #include "common.h"
 #include "Envelope.h"
 #include "ADSR.h"
+#include "Asymp.h"
 
 /*
 
@@ -11,23 +12,24 @@
 class STKEnvelope : public STKNode{
 public:
 	enum Type {
-		ENVELOPE_GENERATOR,
-		ADSR_GENERATOR,
+		ENVELOPE_ENVELOPE,
+		ENVELOPE_ADSR,
+		ENVELOPE_ASYMP
 	};
 
 	enum Param {
-		ATTACK_RATE,
-		ATTACK_TARGET,
-		ATTACK_TIME,
-		DECAY_RATE,
-		DECAY_TIME,
-		SUSTAIN_LEVEL,
-		RELEASE_RATE,
-		RELEASE_TIME,
-		TARGET,
-		VALUE,
-		RATE,
-		TIME
+		ENV_ATTACK_RATE,
+		ENV_ATTACK_TARGET,
+		ENV_ATTACK_TIME,
+		ENV_DECAY_RATE,
+		ENV_DECAY_TIME,
+		ENV_SUSTAIN_LEVEL,
+		ENV_RELEASE_RATE,
+		ENV_RELEASE_TIME,
+		ENV_TARGET,
+		ENV_VALUE,
+		ENV_RATE,
+		ENV_TIME
 	};
 
 	StkFloat tick(unsigned int channel = 0);
@@ -56,6 +58,7 @@ private:
 	};
 	inline StkFloat EnvelopeTickEnvelope();
 	inline StkFloat EnvelopeTickADSR();
+	inline StkFloat EnvelopeTickAsymp();
 	inline StkFloat EnvelopeTickHasNoEffect();
 	std::function<StkFloat()> m_tickCallback;
 	Type m_type;

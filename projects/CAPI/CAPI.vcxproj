@@ -148,12 +148,15 @@
     <ClInclude Include="..\..\include\Generator.h" />
     <ClInclude Include="..\..\include\JCRev.h" />
     <ClInclude Include="..\..\include\LentPitShift.h" />
+    <ClInclude Include="..\..\include\Moog.h" />
     <ClInclude Include="..\..\include\Noise.h" />
     <ClInclude Include="..\..\include\NRev.h" />
     <ClInclude Include="..\..\include\PitShift.h" />
     <ClInclude Include="..\..\include\PRCRev.h" />
+    <ClInclude Include="..\..\include\Sampler.h" />
     <ClInclude Include="..\..\include\Stk.h" />
     <ClInclude Include="arythmetics.h" />
+    <ClInclude Include="buffers.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="effects.h" />
     <ClInclude Include="envelopes.h" />
@@ -161,6 +164,7 @@
     <ClInclude Include="generators.h" />
     <ClInclude Include="readers.h" />
     <ClInclude Include="streams.h" />
+    <ClInclude Include="writers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ADSR.cpp" />
@@ -177,7 +181,9 @@
     <ClCompile Include="..\..\src\Envelope.cpp" />
     <ClCompile Include="..\..\src\FileLoop.cpp" />
     <ClCompile Include="..\..\src\FileRead.cpp" />
+    <ClCompile Include="..\..\src\FileWrite.cpp" />
     <ClCompile Include="..\..\src\FileWvIn.cpp" />
+    <ClCompile Include="..\..\src\FileWvOut.cpp" />
     <ClCompile Include="..\..\src\Fir.cpp" />
     <ClCompile Include="..\..\src\FormSwep.cpp" />
     <ClCompile Include="..\..\src\FreeVerb.cpp" />
@@ -186,6 +192,7 @@
     <ClCompile Include="..\..\src\JCRev.cpp" />
     <ClCompile Include="..\..\src\LentPitShift.cpp" />
     <ClCompile Include="..\..\src\Modulate.cpp" />
+    <ClCompile Include="..\..\src\Moog.cpp" />
     <ClCompile Include="..\..\src\Noise.cpp" />
     <ClCompile Include="..\..\src\NRev.cpp" />
     <ClCompile Include="..\..\src\OnePole.cpp" />
@@ -194,12 +201,14 @@
     <ClCompile Include="..\..\src\PoleZero.cpp" />
     <ClCompile Include="..\..\src\PRCRev.cpp" />
     <ClCompile Include="..\..\src\RtAudio.cpp" />
+    <ClCompile Include="..\..\src\Sampler.cpp" />
     <ClCompile Include="..\..\src\SineWave.cpp" />
     <ClCompile Include="..\..\src\SingWave.cpp" />
     <ClCompile Include="..\..\src\Stk.cpp" />
     <ClCompile Include="..\..\src\TwoPole.cpp" />
     <ClCompile Include="..\..\src\TwoZero.cpp" />
     <ClCompile Include="arythmetics.cpp" />
+    <ClCompile Include="buffers.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="effects.cpp" />
     <ClCompile Include="envelopes.cpp" />
@@ -207,6 +216,7 @@
     <ClCompile Include="generators.cpp" />
     <ClCompile Include="readers.cpp" />
     <ClCompile Include="streams.cpp" />
+    <ClCompile Include="writers.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

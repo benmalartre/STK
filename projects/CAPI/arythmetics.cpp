@@ -5,6 +5,7 @@
 //--------------------------------------------------------------------
 STKArythmetic::STKArythmetic(STKNode* a, STKNode* b, Mode mode)
 {
+	m_volume = 1.0;
 	m_lhs = a;
 	m_rhs = b;
 	m_mode = mode;
@@ -115,47 +116,47 @@ void STKArythmetic::term()
 //--------------------------------------------------------------------
 StkFloat STKArythmetic::ArythmeticTickAdd()
 {
-	return m_lhs->tick() + m_rhs->tick();
+	return (m_lhs->tick() + m_rhs->tick()) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickSub()
 {
-	return m_lhs->tick() - m_rhs->tick();
+	return (m_lhs->tick() - m_rhs->tick()) * m_volume ;
 }
 
 StkFloat STKArythmetic::ArythmeticTickMultiply()
 {
-	return m_lhs->tick() * m_rhs->tick();
+	return (m_lhs->tick() * m_rhs->tick()) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickScale()
 {
-	return m_lhs->tick() * m_scalar;
+	return (m_lhs->tick() * m_scalar) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickScaleAdd()
 {
-	return m_lhs->tick() + m_scalar * m_rhs->tick();
+	return (m_lhs->tick() + m_scalar * m_rhs->tick()) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickScaleSub()
 {
-	return m_lhs->tick() - m_scalar * m_rhs->tick();
+	return (m_lhs->tick() - m_scalar * m_rhs->tick()) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickMix()
 {
-	return (1.0 - m_scalar) * m_lhs->tick() + m_scalar * m_rhs->tick();
+	return ((1.0 - m_scalar) * m_lhs->tick() + m_scalar * m_rhs->tick()) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickBlend()
 {
-	return (m_lhs->tick() + m_rhs->tick()) * 0.5f;
+	return ((m_lhs->tick() + m_rhs->tick()) * 0.5f) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickShift()
 {
-	return m_lhs->tick() + m_scalar;
+	return (m_lhs->tick() + m_scalar) * m_volume;
 }
 
 StkFloat STKArythmetic::ArythmeticTickHasNoEffect()

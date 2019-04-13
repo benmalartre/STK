@@ -1,20 +1,24 @@
 #ifndef STK_STREAM_H
 #define STK_STREAM_H
 
+#include "Stk.h"
+#include <math.h>
 #include "common.h"
 #include "generators.h"
 #include "envelopes.h"
 #include "arythmetics.h"
 #include "effects.h"
 #include "filters.h"
+#include "buffers.h"
 
-struct STKGeneratorStream {
+struct STKStream {
 	RtAudio* m_dac;
 	std::vector<STKNode*> m_nodes;
 	std::vector<STKNode*> m_roots;
 	STKGenerator* m_wave;
 };
 
+/*
 // Input Audio Stream
 struct STKInputStream {
 	RtAudio* m_dac;
@@ -55,47 +59,26 @@ struct STKVoicerStream {
 	bool m_instrumentChange;
 	bool m_multiInput;
 };
-
+*/
 EXPORT bool STKIsRoot(STKNode* node);
 EXPORT void STKSetAsRoot(STKNode* node, bool isRoot);
-EXPORT STKGeneratorStream* STKGetStream(STKNode* node);
-
-// InputStream tick() function
-int STKInputStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-	double streamTime, RtAudioStreamStatus status, void *dataPointer);
-
-EXPORT STKInputStream* STKInputStreamInit(RtAudio* dac, const char* filename);
-EXPORT bool STKInputStreamGet(STKInputStream* stream);
-EXPORT void STKInputStreamTerm(STKInputStream* stream);
-EXPORT bool STKInputStreamSetFile(STKInputStream* stream);
+EXPORT STKStream* STKGetStream(STKNode* node);
 
 // GeneratorStream tick() function
-int STKGeneratorStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *dataPointer);
 
-EXPORT STKGeneratorStream* STKGeneratorStreamSetup(RtAudio* dac);
-EXPORT bool STKGeneratorStreamClean(STKGeneratorStream* generator);
-EXPORT bool STKGeneratorStreamStart(STKGeneratorStream* generator);
-EXPORT bool STKGeneratorStreamStop(STKGeneratorStream* generator);
-EXPORT void STKGeneratorStreamSetFrequency(STKGeneratorStream* generator, float frequency);
+EXPORT STKStream* STKStreamSetup(RtAudio* dac);
+EXPORT bool STKStreamClean(STKStream* stream);
+EXPORT bool STKStreamStart(STKStream* stream);
+EXPORT bool STKStreamStop(STKStream* stream);
+EXPORT void STKStreamSetFrequency(STKStream* stream, float frequency);
 
-EXPORT STKNode* STKAddGenerator(STKGeneratorStream* generator, STKGenerator::Type type, float frequency, bool isRoot = true);
-EXPORT STKNode* STKAddEnvelope(STKGeneratorStream* generator, STKEnvelope::Type type, STKNode* source, bool isRoot = true);
-EXPORT STKNode* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot = true);
-EXPORT STKNode* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNode* source, bool isRoot = true);
-EXPORT STKNode* STKAddFilter(STKGeneratorStream* generator, STKFilter::Type type, STKNode* source, bool isRoot = true);
-
-// VoicerStream tick() function
-int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-	double streamTime, RtAudioStreamStatus status, void *dataPointer);
-
-EXPORT STKVoicerStream* STKVoicerStreamSetup(RtAudio* dac, int nbInstruments);
-EXPORT bool STKVoicerStreamClean(STKVoicerStream* voicer);
-EXPORT bool STKVoicerStreamStart(STKVoicerStream* voicer);
-EXPORT bool STKVoicerStreamStop(STKVoicerStream* voicer);
-
-class STKGeneratorMixer {
-	std::vector<STKGeneratorStream*> m_generators;
-};
+EXPORT STKNode* STKAddGenerator(STKStream* stream, STKGenerator::Type type, float frequency, bool isRoot = true);
+EXPORT STKNode* STKAddEnvelope(STKStream* stream, STKEnvelope::Type type, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot = true);
+EXPORT STKNode* STKAddEffect(STKStream* stream, STKEffect::Type type, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKAddBuffer(STKStream* stream, STKNode* source, bool isRoot = true);
 
 #endif

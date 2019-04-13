@@ -37,7 +37,7 @@ using namespace stk;
 // Global Constants
 #define FORMAT RTAUDIO_FLOAT32
 
-class STKGeneratorStream;
+class STKStream;
 // base class
 class STKNode{
 public:
@@ -50,15 +50,17 @@ public:
 	void decrementNumOutput(){ m_noutput--; };
 	void setIsRoot(bool isRoot) { m_isroot = isRoot; };
 	bool isRoot(){ return m_isroot; };
-	void setStream(STKGeneratorStream* stream) { m_stream = stream; };
-	STKGeneratorStream* getStream(){ return m_stream; };
+	void setStream(STKStream* stream) { m_stream = stream; };
+	void setVolume(StkFloat volume){ m_volume = volume; };
+	STKStream* getStream(){ return m_stream; };
 protected:
 	StkFloat update(StkFloat value);
 	bool m_hasnoeffect;
 	bool m_isroot;
 	int m_noutput;
 	int m_outidx;
-	STKGeneratorStream* m_stream;
+	StkFloat m_volume;
+	STKStream* m_stream;
 
 };
 
@@ -69,5 +71,6 @@ EXPORT void STKSetSampleRate(float rate);
 EXPORT int STKGetDevices(RtAudio* DAC);
 
 EXPORT void STKSetNodeHasNoEffect(STKNode* node, bool hasnoeffect);
+EXPORT void STKSetNodeVolume(STKNode* node, StkFloat volume);
 
 #endif

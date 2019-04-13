@@ -117,7 +117,7 @@ long Skini :: parseString( std::string& line, Message& message )
 
   // Valid SKINI messages must have at least three fields (type, time,
   // and channel).
-  if ( tokens.size() < 3 ) return message.type;
+  if (tokens.size() < 3) return message.type;
 
   // Determine message type.
   int iSkini = 0;
@@ -131,7 +131,7 @@ long Skini :: parseString( std::string& line, Message& message )
     handleError( StkError::WARNING );
     return message.type;
   }
-  
+
   // Found the type.
   message.type = skini_msgs[iSkini].type;
 
@@ -155,6 +155,7 @@ long Skini :: parseString( std::string& line, Message& message )
   int iValue = 0;
   unsigned int iToken = iValue + 3; //rgh: MIDI extension argument counts are different from regular MIDI
   long dataType = skini_msgs[iSkini].data2;
+
   while ( dataType != NOPE ) {
 
 //    if ( tokens.size() <= (unsigned int) (iValue+3) ) { //rgh: test iToken rather than always testing iValue+3

@@ -5,6 +5,7 @@
 STKEffect::STKEffect(STKNode* source, Type type)
 {
 	m_source = source;
+	m_volume = 1.0f;
 	m_type = type;
 	m_noutput = 0;
 	m_outidx = 0;
@@ -80,6 +81,12 @@ void STKEffect::init()
 			m_tickCallback = [this](){ return this->EffectTickChorus(); };
 			break;
 		}
+		case Type::MOOG:
+		{
+			m_moog = new Moog();
+			m_tickCallback = [this](){ return this->EffectTickMoog(); };
+			break;
+		}
 	}
 }
 
@@ -96,57 +103,64 @@ void STKEffect::term()
 //--------------------------------------------------------------------
 StkFloat STKEffect::EffectTickEnvelope()
 {
-	if (m_outidx == 0) return update(m_envelope->tick() * m_source->tick());
-	else return update(m_envelope->lastOut() * m_source->tick());
+	if (m_outidx == 0) return update(m_envelope->tick() * m_source->tick()) * m_volume;
+	else return update(m_envelope->lastOut() * m_source->tick()) * m_volume;
 }
 
 StkFloat STKEffect::EffectTickPRCRev()
 {
-	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()));
-	else return update(m_prcrev->lastOut());
+	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
+	else return update(m_prcrev->lastOut())* m_volume;
 }
 
 StkFloat STKEffect::EffectTickJCRev()
 {
-	if (m_outidx == 0) return update(m_jcrev->tick(m_source->tick()));
-	else return update(m_jcrev->lastOut());
+	if (m_outidx == 0) return update(m_jcrev->tick(m_source->tick()))* m_volume;
+	else return update(m_jcrev->lastOut())* m_volume;
 }
 
 StkFloat STKEffect::EffectTickNRev()
 {
-	if (m_outidx == 0) return update(m_nrev->tick(m_source->tick()));
-	else return update(m_nrev->lastOut());
+	if (m_outidx == 0) return update(m_nrev->tick(m_source->tick()))* m_volume;
+	else return update(m_nrev->lastOut())* m_volume;
 }
 
 StkFloat STKEffect::EffectTickFreeVerb()
 {
-	if (m_outidx == 0) return update(m_freeverb->tick(m_source->tick()));
-	else return update(m_freeverb->lastOut());
+	if (m_outidx == 0) return update(m_freeverb->tick(m_source->tick()))* m_volume;
+	else return update(m_freeverb->lastOut())* m_volume;
 }
 
 StkFloat STKEffect::EffectTickEcho()
 {
-	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()));
-	else return update(m_prcrev->lastOut());
-	return m_echo->tick(m_source->tick());
+	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
+	else return update(m_prcrev->lastOut())* m_volume;
+	return m_echo->tick(m_source->tick())* m_volume;
 }
 
 StkFloat STKEffect::EffectTickPitShift()
 {
-	if (m_outidx == 0) return update(m_pitshift->tick(m_source->tick()));
-	else return update(m_pitshift->lastOut());
+	if (m_outidx == 0) return update(m_pitshift->tick(m_source->tick()))* m_volume;
+	else return update(m_pitshift->lastOut())* m_volume;
 }
 
 StkFloat STKEffect::EffectTickLentPitShift()
 {
-	if (m_outidx == 0) return update(m_lentpitshift->tick(m_source->tick()));
-	else return update(m_lentpitshift->tick(m_source->tick()));
+	if (m_outidx == 0) return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
+	else return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
 }
 
 StkFloat STKEffect::EffectTickChorus()
 {
-	if (m_outidx == 0) return update(m_chorus->tick(m_source->tick()));
-	else return update(m_chorus->lastOut());
+	if (m_outidx == 0) return update(m_chorus->tick(m_source->tick()))* m_volume;
+	else return update(m_chorus->lastOut())* m_volume;
+
+}
+
+StkFloat STKEffect::EffectTickMoog()
+{
+	if (m_outidx == 0) return update(m_moog->tick(m_source->tick()))* m_volume;
+	else return update(m_moog->lastOut())* m_volume;
 
 }
 

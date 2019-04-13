@@ -6,6 +6,7 @@
 STKEnvelope::STKEnvelope(Type type, STKNode* source)
 {
 	m_noutput = 0;
+	m_volume = 1.0f;
 	m_outidx = 0;
 	m_type = type;
 	m_source = source;
@@ -28,19 +29,19 @@ void STKEnvelope::init()
 {
 	switch (m_type)
 	{
-		case ADSR_GENERATOR:
+		case ENVELOPE_ADSR:
 		{
 			m_adsr = new ADSR();
 			m_adsr->setValue(m_frequency);
-			m_type = ADSR_GENERATOR;
+			m_type = ENVELOPE_ADSR;
 			m_tickCallback = [this](){ return this->EnvelopeTickADSR(); };
 			break;
 		}
 
-		case ENVELOPE_GENERATOR:
+		case ENVELOPE_ENVELOPE:
 		{
 			m_envelope = new Envelope();
-			m_type = ENVELOPE_GENERATOR;
+			m_type = ENVELOPE_ENVELOPE;
 			m_tickCallback = [this](){ return this->EnvelopeTickEnvelope(); };
 			break;
 		}
@@ -64,12 +65,12 @@ void STKEnvelope::reset()
 {
 	switch (m_type)
 	{
-		case ENVELOPE_GENERATOR:
+	case ENVELOPE_ENVELOPE:
 		{
 			m_envelope->setValue(0);
 			break;
 		}
-		case ADSR_GENERATOR:
+	case ENVELOPE_ADSR:
 		{
 			m_adsr->setValue(0);
 			break;
@@ -97,12 +98,12 @@ void STKEnvelope::keyOn()
 {
 	switch(m_type)
 	{
-		case ENVELOPE_GENERATOR:
+	case ENVELOPE_ENVELOPE:
 		{
 			m_envelope->keyOn();
 			break;
 		}
-		case ADSR_GENERATOR:
+	case ENVELOPE_ADSR:
 		{
 			m_adsr->keyOn();
 			break;
@@ -118,12 +119,12 @@ void STKEnvelope::keyOff()
 {
 	switch (m_type)
 	{
-		case ENVELOPE_GENERATOR:
+	case ENVELOPE_ENVELOPE:
 		{
 			m_envelope->keyOff();
 			break;
 		}
-		case ADSR_GENERATOR:
+	case ENVELOPE_ADSR:
 		{
 			m_adsr->keyOff();
 			break;
@@ -137,25 +138,25 @@ void STKEnvelope::keyOff()
 void STKEnvelope::setScalar(Param param, StkFloat scalar)
 {
 	switch (m_type){
-		case ADSR_GENERATOR:
+		case ENVELOPE_ADSR:
 		{
-			if (param == ATTACK_RATE)m_adsr->setAttackRate(scalar);
-			else if (param == ATTACK_TARGET)m_adsr->setAttackTarget(scalar);
-			else if (param == ATTACK_TIME)m_adsr->setAttackTime(scalar);
-			else if (param == DECAY_RATE)m_adsr->setDecayRate(scalar);
-			else if (param == DECAY_TIME)m_adsr->setDecayTime(scalar);
-			else if (param == SUSTAIN_LEVEL)m_adsr->setSustainLevel(scalar);
-			else if (param == RELEASE_RATE)m_adsr->setReleaseRate(scalar);
-			else if (param == RELEASE_TIME)m_adsr->setReleaseTime(scalar);
-			else if (param == TARGET)m_adsr->setTarget(scalar);
-			else if (param == VALUE)m_adsr->setValue(scalar);
+			if (param == ENV_ATTACK_RATE)m_adsr->setAttackRate(scalar);
+			else if (param == ENV_ATTACK_TARGET)m_adsr->setAttackTarget(scalar);
+			else if (param == ENV_ATTACK_TIME)m_adsr->setAttackTime(scalar);
+			else if (param == ENV_DECAY_RATE)m_adsr->setDecayRate(scalar);
+			else if (param == ENV_DECAY_TIME)m_adsr->setDecayTime(scalar);
+			else if (param == ENV_SUSTAIN_LEVEL)m_adsr->setSustainLevel(scalar);
+			else if (param == ENV_RELEASE_RATE)m_adsr->setReleaseRate(scalar);
+			else if (param == ENV_RELEASE_TIME)m_adsr->setReleaseTime(scalar);
+			else if (param == ENV_TARGET)m_adsr->setTarget(scalar);
+			else if (param == ENV_VALUE)m_adsr->setValue(scalar);
 		}
-		case ENVELOPE_GENERATOR:
+		case ENVELOPE_ENVELOPE:
 		{
-			if (param == RATE)m_envelope->setRate(scalar);
-			else if (param == TIME)m_envelope->setTime(scalar);
-			else if (param == TARGET)m_envelope->setTarget(scalar);
-			else if (param == VALUE)m_envelope->setValue(scalar);
+			if (param == ENV_RATE)m_envelope->setRate(scalar);
+			else if (param == ENV_TIME)m_envelope->setTime(scalar);
+			else if (param == ENV_TARGET)m_envelope->setTarget(scalar);
+			else if (param == ENV_VALUE)m_envelope->setValue(scalar);
 		}
 	}
 }
@@ -184,13 +185,13 @@ void STKEnvelope::setHasNoEffect(bool hasnoeffect)
 //--------------------------------------------------------------------
 StkFloat STKEnvelope::EnvelopeTickEnvelope()
 {
-	if (m_outidx==0)return update(m_source->tick() * m_envelope->tick());
-	else return update(m_source->tick() + m_envelope->lastOut());
+	if (m_outidx == 0)return update(m_source->tick() * m_envelope->tick())*m_volume;
+	else return update(m_source->tick() + m_envelope->lastOut())*m_volume;
 }
 StkFloat STKEnvelope::EnvelopeTickADSR()
 {
-	if (m_outidx == 0)return update(m_source->tick() * m_adsr->tick());
-	else return update(m_source->tick() + m_adsr->lastOut());
+	if (m_outidx == 0)return update(m_source->tick() * m_adsr->tick())*m_volume;
+	else return update(m_source->tick() + m_adsr->lastOut())*m_volume;
 }
 
 StkFloat STKEnvelope::EnvelopeTickHasNoEffect()

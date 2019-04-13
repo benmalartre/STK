@@ -3,9 +3,10 @@
 //--------------------------------------------------------------------
 // STKGenerator Node Constructor
 //--------------------------------------------------------------------
-STKGenerator::STKGenerator(Type type, float frequency)
+STKGenerator::STKGenerator(Type type, StkFloat frequency)
 {
 	m_noutput = 0;
+	m_volume = 1.0;
 	m_outidx = 0;
 	m_type = type;
 	m_frequency = frequency;
@@ -203,33 +204,39 @@ void STKGenerator::setScalar(Param param, StkFloat scalar)
 			else if (param == TAU)m_asymp->setTau(scalar);
 			else if (param == TIME)m_asymp->setTime(scalar);
 			else if (param == VALUE)m_asymp->setValue(scalar);
+			break;
 		}
 		case NOISE_GENERATOR:
 		{
 			if(param == SEED)m_noise->setSeed((unsigned)scalar);
+			break;
 		}
 		case BLIT_GENERATOR:
 		{
 			if (param == FREQUENCY)m_blit->setFrequency(scalar);
 			else if (param == PHASE)m_blit->setPhase(scalar);
 			else if (param == HARMONICS)m_blit->setHarmonics((unsigned)scalar);
+			break;
 		}
 		case BLITSAW_GENERATOR:
 		{
 			if (param == FREQUENCY)m_blitsaw->setFrequency(scalar);
 			else if (param == HARMONICS)m_blitsaw->setHarmonics((unsigned)scalar);
+			break;
 		}
 		case BLITSQUARE_GENERATOR:
 		{
 			if (param == FREQUENCY)m_blitsquare->setFrequency(scalar);
 			else if (param == PHASE)m_blitsquare->setPhase(scalar);
 			else if (param == HARMONICS)m_blitsquare->setHarmonics((unsigned)scalar);
+			break;
 		}
 		case SINEWAVE_GENERATOR:
 		{
 			if (param == FREQUENCY)m_sinewave->setFrequency(scalar);
 			else if (param == PHASE)m_sinewave->addPhase(scalar);
 			else if (param == PHASEOFFSET)m_sinewave->addPhase(scalar);
+			break;
 		}
 		/*
 		case SINGWAVE_GENERATOR:
@@ -240,7 +247,6 @@ void STKGenerator::setScalar(Param param, StkFloat scalar)
 		}
 		*/
 	}
-	
 }
 
 //--------------------------------------------------------------------
@@ -287,36 +293,36 @@ StkFloat STKGenerator::GranulateTickCallback()
 */
 StkFloat STKGenerator::GeneratorTickAsymp()
 {
-	if (m_outidx == 0)return update(m_asymp->tick());
+	if (m_outidx == 0)return update(m_asymp->tick()*m_volume);
 	else return update(m_asymp->lastOut());
 }
 StkFloat STKGenerator::GeneratorTickNoise()
 {
-	if (m_outidx == 0)return update(m_noise->tick());
+	if (m_outidx == 0)return update(m_noise->tick()*m_volume);
 	else return update(m_noise->lastOut());
 }
 
 StkFloat STKGenerator::GeneratorTickBlit()
 {
-	if (m_outidx == 0)return update(m_blit->tick());
+	if (m_outidx == 0)return update(m_blit->tick()*m_volume);
 	else return update(m_blit->lastOut());
 }
 
 StkFloat STKGenerator::GeneratorTickBlitSaw()
 {
-	if (m_outidx == 0)return update(m_blitsaw->tick());
+	if (m_outidx == 0)return update(m_blitsaw->tick()*m_volume);
 	else return update(m_blitsaw->lastOut());
 }
 
 StkFloat STKGenerator::GeneratorTickBlitSquare()
 {
-	if (m_outidx == 0)return update(m_blitsquare->tick());
+	if (m_outidx == 0)return update(m_blitsquare->tick()*m_volume);
 	else return update(m_blitsquare->lastOut());
 }
 
 StkFloat STKGenerator::GeneratorTickSineWave()
 {
-	if (m_outidx == 0)return update(m_sinewave->tick());
+	if (m_outidx == 0)return update(m_sinewave->tick()*m_volume);
 	else return update(m_sinewave->lastOut());
 }
 

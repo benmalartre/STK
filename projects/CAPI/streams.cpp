@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------
 //	STK GET NODE STREAM
 // ----------------------------------------------------------------------
-STKGeneratorStream* STKGetStream(STKNode* node){
+STKStream* STKGetStream(STKNode* node){
 	return node->getStream();
 }
 
@@ -30,17 +30,17 @@ void STKSetAsRoot(STKNode* node, bool isRoot)
 }
 
 // ----------------------------------------------------------------------
-//	STK GENERATOR ADD GENERATOR NODE
+//	STK ADD GENERATOR NODE
 // ----------------------------------------------------------------------
-STKNode* STKAddGenerator(STKGeneratorStream* generator, STKGenerator::Type type, StkFloat frequency, bool isRoot)
+STKNode* STKAddGenerator(STKStream* stream, STKGenerator::Type type, StkFloat frequency, bool isRoot)
 {
 	STKNode* node = (STKNode*)new STKGenerator(type, frequency);
-	node->setStream(generator);
+	node->setStream(stream);
 	node->incrementNumOutput();
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		generator->m_roots.push_back(node);
+		stream->m_roots.push_back(node);
 	}
 
 	else node->setIsRoot(false);
@@ -49,16 +49,16 @@ STKNode* STKAddGenerator(STKGeneratorStream* generator, STKGenerator::Type type,
 }
 
 // ----------------------------------------------------------------------
-//	STK GENERATOR ADD ENVELOPE NODE
+//	STK ADD ENVELOPE NODE
 // ----------------------------------------------------------------------
-STKNode* STKAddEnvelope(STKGeneratorStream* generator, STKEnvelope::Type type, STKNode* source, bool isRoot)
+STKNode* STKAddEnvelope(STKStream* stream, STKEnvelope::Type type, STKNode* source, bool isRoot)
 {
 	STKNode* node = (STKNode*)new STKEnvelope(type, source);
 	source->incrementNumOutput();
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		generator->m_roots.push_back(node);
+		stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
 
@@ -66,11 +66,10 @@ STKNode* STKAddEnvelope(STKGeneratorStream* generator, STKEnvelope::Type type, S
 }
 
 // ----------------------------------------------------------------------
-//	STK GENERATOR ADD ARYTHMETIC NODE
+//	STK ADD ARYTHMETIC NODE
 // ----------------------------------------------------------------------
-STKNode* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
+STKNode* STKAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
 {
-	/*
 	STKNode* node = (STKNode*)new STKArythmetic(lhs, rhs, mode);
 	if(lhs)lhs->incrementNumOutput();
 	if(rhs)rhs->incrementNumOutput();
@@ -79,19 +78,19 @@ STKNode* STKAddArythmetic(STKGeneratorStream* generator, STKArythmetic::Mode mod
 	if (isRoot)
 	{
 	node->setIsRoot(true);
-	generator->m_roots.push_back(node);
+	stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
 
 	return node;
-	*/ 
+	
 	return NULL;
 }
 
 // ----------------------------------------------------------------------
-//	STK GENERATOR ADD EFFECT NODE
+//	STK ADD EFFECT NODE
 // ----------------------------------------------------------------------
-STKNode* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNode* source, bool isRoot)
+STKNode* STKAddEffect(STKStream* stream, STKEffect::Type type, STKNode* source, bool isRoot)
 {
 	STKNode* node = (STKNode*)new STKEffect(source, type);
 	
@@ -100,7 +99,7 @@ STKNode* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNo
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		generator->m_roots.push_back(node);
+		stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
 		
@@ -110,7 +109,7 @@ STKNode* STKAddEffect(STKGeneratorStream* generator, STKEffect::Type type, STKNo
 // ----------------------------------------------------------------------
 //	STK GENERATOR ADD FILTER NODE
 // ----------------------------------------------------------------------
-STKNode* STKAddFilter(STKGeneratorStream* generator, STKFilter::Type type, STKNode* source, bool isRoot)
+STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, bool isRoot)
 {
 	STKNode* node = (STKNode*)new STKFilter(source, type);
 
@@ -119,8 +118,27 @@ STKNode* STKAddFilter(STKGeneratorStream* generator, STKFilter::Type type, STKNo
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		generator->m_roots.push_back(node);
+		stream->m_roots.push_back(node);
 	}
+	else node->setIsRoot(false);
+
+	return node;
+}
+
+// ----------------------------------------------------------------------
+//	STK ADD Buffer NODE
+// ----------------------------------------------------------------------
+STKNode* STKAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
+{
+	STKNode* node = (STKNode*)new STKBuffer(previous);
+	node->setStream(stream);
+	node->incrementNumOutput();
+	if (isRoot)
+	{
+		node->setIsRoot(true);
+		stream->m_roots.push_back(node);
+	}
+
 	else node->setIsRoot(false);
 
 	return node;
@@ -129,19 +147,19 @@ STKNode* STKAddFilter(STKGeneratorStream* generator, STKFilter::Type type, STKNo
 // ----------------------------------------------------------------------
 //	STK GENERATOR STREAM
 // ----------------------------------------------------------------------
-int STKGeneratorStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-	double streamTime, RtAudioStreamStatus status, void *dataPointer)
+int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+	double streamTime, RtAudioStreamStatus status, void *data)
 {	
-	STKGeneratorStream* generator = (STKGeneratorStream *)dataPointer;
+	STKStream* stream = (STKStream *)data;
 	StkFloat *samples = (StkFloat *)outputBuffer;
-	unsigned int numRoots = generator->m_roots.size();
+	unsigned int numRoots = stream->m_roots.size();
 	if (!numRoots)return 0;
 	float weight = 1.0 / numRoots;
 	for (unsigned int i = 0; i < nBufferFrames; i++)
 	{
 		*samples = 0;
 		for (unsigned int j = 0; j < numRoots; ++j)
-			*samples += generator->m_roots[j]->tick();
+			*samples += stream->m_roots[j]->tick();
 		*samples *= weight;
 		samples++;
 
@@ -150,13 +168,10 @@ int STKGeneratorStreamTick(void *outputBuffer, void *inputBuffer, unsigned int n
 	return 0;
 }
 
-STKGeneratorStream* STKGeneratorStreamSetup(RtAudio* DAC)
+STKStream* STKStreamSetup(RtAudio* DAC)
 {
-	// Set the global sample rate before creating class instances.
-	Stk::setSampleRate(44100.0);
-
-	STKGeneratorStream* generator = new STKGeneratorStream();
-	generator->m_dac = DAC;
+	STKStream* stream = new STKStream();
+	stream->m_dac = DAC;
 	
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
@@ -165,26 +180,26 @@ STKGeneratorStream* STKGeneratorStreamSetup(RtAudio* DAC)
 	RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 	try {
-		DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKGeneratorStreamTick, (void *)generator);
+		DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKStreamTick, (void *)stream);
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
 		//delete generator->m_generator;
-		delete generator;
+		delete stream;
 		return NULL;
 	}
 
-	return generator;
+	return stream;
 }
 
-bool STKGeneratorStreamStart(STKGeneratorStream* _generator)
+bool STKStreamStart(STKStream* stream)
 {
 	try {
 		
 		//for (std::vector<STKNode*>::iterator it = _generator->m_roots.begin(); it < _generator->m_roots.end(); it++)
 		//	(*it)->reset();
 		
-		_generator->m_dac->startStream();
+		stream->m_dac->startStream();
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
@@ -193,10 +208,10 @@ bool STKGeneratorStreamStart(STKGeneratorStream* _generator)
 	return true;
 }
 
-bool STKGeneratorStreamStop(STKGeneratorStream* _generator)
+bool STKStreamStop(STKStream* stream)
 {
 	try {
-		_generator->m_dac->stopStream();
+		stream->m_dac->stopStream();
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
@@ -205,11 +220,11 @@ bool STKGeneratorStreamStop(STKGeneratorStream* _generator)
 	return true;
 }
 
-bool STKGeneratorStreamClean(STKGeneratorStream* _generator)
+bool STKStreamClean(STKStream* stream)
 {
 	// Shut down the output stream.
 	try {
-		_generator->m_dac->closeStream();
+		stream->m_dac->closeStream();
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
@@ -218,6 +233,7 @@ bool STKGeneratorStreamClean(STKGeneratorStream* _generator)
 	return true;
 }
 
+/*
 // ----------------------------------------------------------------------
 //	STK VOICER STREAM
 // ----------------------------------------------------------------------
@@ -239,7 +255,7 @@ int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBuf
 
 	for (int i = 0; i<voicer->m_nbInstruments; i++)
 	{
-		/*
+		
 		InstrumentData* currentInstru = data->instrumentsData[i];
 		if (!currentInstru->enable)
 		{
@@ -272,7 +288,7 @@ int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBuf
 		{
 		data->voicer->noteOff((LONG)currentInstru->noteTag,64.0);
 		}
-		*/
+		
 	}
 
 	for (unsigned int i = 0; i<nBufferFrames; i++)
@@ -356,4 +372,4 @@ bool STKVoicerStreamClean(STKVoicerStream* voicer)
 	}
 	return true;
 }
-
+*/

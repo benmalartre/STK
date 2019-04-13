@@ -130,7 +130,7 @@ void FileWvOut :: tick( const StkFrames& frames )
 
     for ( j=0; j<nChannels; j++ ) {
       data_[iData_] = frames[iFrames++];
-      clipTest( data_[iData_++] );
+      //clipTest( data_[iData_++] );
     }
 
     this->incrementFrame();

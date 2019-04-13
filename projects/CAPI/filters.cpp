@@ -5,6 +5,7 @@
 STKFilter::STKFilter(STKNode* source, Type type)
 {
 	m_source = source;
+	m_volume = 1.0f;
 	m_type = type;
 	m_noutput = 0;
 	m_outidx = 0;
@@ -101,62 +102,62 @@ void STKFilter::term()
 //--------------------------------------------------------------------
 StkFloat STKFilter::FilterTickOneZero()
 {
-	if (m_outidx == 0) return update(m_onezero->tick(m_source->tick()));
-	else return update(m_onezero->lastOut());
+	if (m_outidx == 0) return update(m_onezero->tick(m_source->tick()))*m_volume;
+	else return update(m_onezero->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickOnePole()
 {
-	if (m_outidx == 0) return update(m_onepole->tick(m_source->tick()));
-	else return update(m_onepole->lastOut());
+	if (m_outidx == 0) return update(m_onepole->tick(m_source->tick()))*m_volume;
+	else return update(m_onepole->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickPoleZero()
 {
-	if (m_outidx == 0) return update(m_polezero->tick(m_source->tick()));
-	else return update(m_polezero->lastOut());
+	if (m_outidx == 0) return update(m_polezero->tick(m_source->tick()))*m_volume;
+	else return update(m_polezero->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickTwoZero()
 {
-	if (m_outidx == 0) return update(m_twozero->tick(m_source->tick()));
-	else return update(m_twozero->lastOut());
+	if (m_outidx == 0) return update(m_twozero->tick(m_source->tick()))*m_volume;
+	else return update(m_twozero->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickTwoPole()
 {
-	if (m_outidx == 0) return update(m_twopole->tick(m_source->tick()));
-	else return update(m_twopole->lastOut());
+	if (m_outidx == 0) return update(m_twopole->tick(m_source->tick()))*m_volume;
+	else return update(m_twopole->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickBiQuad()
 {
-	if (m_outidx == 0) return update(m_biquad->tick(m_source->tick()));
-	else return update(m_biquad->lastOut());
+	if (m_outidx == 0) return update(m_biquad->tick(m_source->tick()))*m_volume;
+	else return update(m_biquad->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickFormSwep()
 {
-	if (m_outidx == 0) return update(m_formswep->tick(m_source->tick()));
-	else return update(m_formswep->lastOut());
+	if (m_outidx == 0) return update(m_formswep->tick(m_source->tick()))*m_volume;
+	else return update(m_formswep->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickDelay()
 {
-	if (m_outidx == 0) return update(m_delay->tick(m_source->tick()));
-	else return update(m_delay->lastOut());
+	if (m_outidx == 0) return update(m_delay->tick(m_source->tick()))*m_volume;
+	else return update(m_delay->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickDelayA()
 {
-	if (m_outidx == 0) return update(m_delaya->tick(m_source->tick()));
-	else return update(m_delaya->lastOut());
+	if (m_outidx == 0) return update(m_delaya->tick(m_source->tick()))*m_volume;
+	else return update(m_delaya->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickDelayL()
 {
-	if (m_outidx == 0) return update(m_delayl->tick(m_source->tick()));
-	else return update(m_delayl->lastOut());
+	if (m_outidx == 0) return update(m_delayl->tick(m_source->tick()))*m_volume;
+	else return update(m_delayl->lastOut())*m_volume;
 }
 
 StkFloat STKFilter::FilterTickHasNoEffect()
