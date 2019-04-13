@@ -156,14 +156,16 @@ SOURCES += $(STK_PATH)/VoicForm.cpp
 SOURCES += $(STK_PATH)/Whistle.cpp
 SOURCES += $(STK_PATH)/Wurley.cpp
 
-SOURCES += $(SRCDIR)/arythmetics.cpp 
 SOURCES += $(SRCDIR)/common.cpp
+SOURCES += $(SRCDIR)/arythmetics.cpp 
+SOURCES += $(SRCDIR)/buffers.cpp
+SOURCES += $(SRCDIR)/generators.cpp
+SOURCES += $(SRCDIR)/readers.cpp 
+SOURCES += $(SRCDIR)/streams.cpp
 SOURCES += $(SRCDIR)/effects.cpp 
 SOURCES += $(SRCDIR)/envelopes.cpp 
 SOURCES += $(SRCDIR)/filters.cpp 
-SOURCES += $(SRCDIR)/generators.cpp
-SOURCES += $(SRCDIR)/readers.cpp 
-SOURCES += $(SRCDIR)/streams.cpp  
+SOURCES += $(SRCDIR)/writers.cpp 
 
 OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
 
