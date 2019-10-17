@@ -159,8 +159,7 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 	{
 		*samples = 0;
 		for (unsigned int j = 0; j < numRoots; ++j)
-			*samples += stream->m_roots[j]->tick();
-		*samples *= weight;
+			*samples += stream->m_roots[j]->tick() * weight;
 		samples++;
 
 	}
@@ -184,7 +183,6 @@ STKStream* STKStreamSetup(RtAudio* DAC)
 	}
 	catch (RtAudioError &error) {
 		error.printMessage();
-		//delete generator->m_generator;
 		delete stream;
 		return NULL;
 	}
@@ -210,14 +208,17 @@ bool STKStreamStart(STKStream* stream)
 
 bool STKStreamStop(STKStream* stream)
 {
-	try {
-		stream->m_dac->stopStream();
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		return false;
-	}
-	return true;
+    if(stream->m_dac){
+        try {
+            stream->m_dac->stopStream();
+        }
+        catch (RtAudioError &error) {
+            error.printMessage();
+            return false;
+        }
+	    return true;
+    }
+    else return false;
 }
 
 bool STKStreamClean(STKStream* stream)
@@ -231,6 +232,11 @@ bool STKStreamClean(STKStream* stream)
 		return false;
 	}
 	return true;
+}
+
+int STKStreamNumRoots(STKStream* stream)
+{
+    return stream->m_roots.size();
 }
 
 /*

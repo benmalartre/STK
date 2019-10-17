@@ -68,6 +68,10 @@ MSG1 = "== Compile $(LIBRARY_NAME)"
 MSG2 = "==  CC      $(CC)"
 MSG3 = "==  C++     $(C++)"
 
+# deploy
+#
+DEST = /Users/benmalartre/Documents/RnD/PureBasic/Noodle/libs/x64/macosx
+
 # variable definitions
 #
 SOURCES = $(STK_PATH)/ADSR.cpp
@@ -183,7 +187,7 @@ DEPENDS:     INCLUDES := $(INCLUDES)
 
 # rules definitions
 #
-.PHONY:	all depend clean print
+.PHONY:	all depend clean print test deploy
 
 all:
 	+@$(MAKE) -f $(MAKEFILE) print
@@ -193,6 +197,25 @@ print:
 	@echo $(MSG1)
 	@echo $(MSG2)
 	@echo $(MSG3)
+
+test:
+	+@make -f $(SRCDIR)/MakefileMacOS
+	#
+	@echo "_______________________________________________________________"
+	@echo "		Test STK Noodle Library :"
+	@echo "		Here : $(DEST)"
+	#
+	@cp STK.so $(DEST)
+	
+deploy:
+	+@make -f $(SRCDIR)/MakefileMacOS clean
+	+@make -f $(SRCDIR)/MakefileMacOS
+	#
+	@echo "_______________________________________________________________"
+	@echo "		Deploy STK Noodle Library :"
+	@echo "		Here : $(DEST)"
+	#
+	@cp STK.so $(DEST)
 
 %.o :	%.c
 	$(CC) -c $(INCLUDES) $(CFLAGS) $< -o $@

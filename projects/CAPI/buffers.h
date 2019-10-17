@@ -34,7 +34,7 @@ struct STKCircularBuffer{
 		if (m_idx >= m_rate){
 			m_idx = 0;
 			m_phase++;
-			if (m_phase = CIRCULAR_BUFFER_PHASES)
+			if (m_phase == CIRCULAR_BUFFER_PHASES)
 			{
 				m_phase = 0;
 			}

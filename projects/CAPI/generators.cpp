@@ -1,10 +1,21 @@
 #include "generators.h"
+#include <cstdlib>
 
 //--------------------------------------------------------------------
 // STKGenerator Node Constructor
 //--------------------------------------------------------------------
 STKGenerator::STKGenerator(Type type, StkFloat frequency)
 {
+    m_asymp = NULL;
+    m_noise = NULL;
+    m_blit = NULL;
+    m_blitsaw = NULL;
+    m_blitsquare = NULL;
+    m_sinewave = NULL;
+    m_singwave = NULL;
+    m_modulate = NULL;
+    m_granulate = NULL;
+
 	m_noutput = 0;
 	m_volume = 1.0;
 	m_outidx = 0;
@@ -18,19 +29,14 @@ STKGenerator::STKGenerator(Type type, StkFloat frequency)
 //--------------------------------------------------------------------
 void STKGenerator::term()
 {
-	/*
-	if (m_adsr)delete m_adsr;
-	if (m_envelope)delete m_envelope;
-	if (m_granulate)delete m_granulate;
-	if (m_modulate)delete m_modulate;
-	*/
+
 	if (m_asymp)delete m_asymp;
 	if (m_noise)delete m_noise;
 	if (m_blit)delete m_blit;
 	if (m_blitsaw)delete m_blitsaw;
 	if (m_blitsquare)delete m_blitsquare;
-	//if (m_singwave)delete m_singwave;
 	if (m_sinewave)delete m_sinewave;
+    //if (m_singwave)delete m_singwave;
 }
 
 //--------------------------------------------------------------------
@@ -40,40 +46,6 @@ void STKGenerator::init()
 {
 	switch (m_type)
 	{
-		/*
-	case ADSR_GENERATOR:
-	{
-		m_adsr = new ADSR();
-		m_adsr->setValue(m_frequency);
-		m_type = ADSR_GENERATOR;
-		m_tickCallback = [this](){ return this->ADSRTickCallback(); };
-		break;
-	}
-
-	case ENVELOPE_GENERATOR:
-	{
-		m_envelope = new Envelope();
-		m_type = ENVELOPE_GENERATOR;
-		m_tickCallback = [this](){ return this->EnvelopeTickCallback(); };
-		break;
-	}
-
-	case GRANULATE_GENERATOR:
-	{
-		m_granulate = new Granulate();
-		m_type = GRANULATE_GENERATOR;
-		m_tickCallback = [this](){ return this->GranulateTickCallback(); };
-		break;
-	}
-
-	case MODULATE_GENERATOR:
-	{
-		m_modulate = new Modulate();
-		m_type = MODULATE_GENERATOR;
-		m_tickCallback = [this](){ return this->ModulateTickCallback(); };
-		break;
-	}
-	*/
 	case ASYMP_GENERATOR:
 	{
 		m_asymp = new Asymp();
@@ -122,7 +94,7 @@ void STKGenerator::init()
 		m_tickCallback = [this](){ return this->GeneratorTickSineWave(); };
 		break;
 	}
-		/*
+/*
 	case SINGWAVE_GENERATOR:
 	{
 		m_singwave = new SingWave();
@@ -131,7 +103,7 @@ void STKGenerator::init()
 		m_tickCallback = [this](){ return this->SingWaveTickCallback(); };
 		break;
 	}
-	*/
+*/
 	}
 }
 
@@ -152,6 +124,16 @@ void STKGenerator::reset()
 	m_outidx = 0;
 	switch (m_type)
 	{
+        case ASYMP_GENERATOR:
+        {
+            break;
+        }
+            
+        case NOISE_GENERATOR:
+        {
+            break;
+        }
+            
 		case SINEWAVE_GENERATOR:
 		{
 			m_sinewave->reset();
@@ -352,4 +334,8 @@ void STKSetGeneratorType(STKGenerator* generator, STKGenerator::Type type)
 void STKSetGeneratorScalar(STKGenerator* generator, STKGenerator::Param param, StkFloat scalar)
 {
 	generator->setScalar(param, scalar);
+}
+
+int STKGetGeneratorType(STKGenerator* node){
+    return (int)node->getType();
 }

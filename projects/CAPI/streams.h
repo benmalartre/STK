@@ -73,6 +73,7 @@ EXPORT bool STKStreamClean(STKStream* stream);
 EXPORT bool STKStreamStart(STKStream* stream);
 EXPORT bool STKStreamStop(STKStream* stream);
 EXPORT void STKStreamSetFrequency(STKStream* stream, float frequency);
+EXPORT int STKStreamNumRoots(STKStream* stream);
 
 EXPORT STKNode* STKAddGenerator(STKStream* stream, STKGenerator::Type type, float frequency, bool isRoot = true);
 EXPORT STKNode* STKAddEnvelope(STKStream* stream, STKEnvelope::Type type, STKNode* source, bool isRoot = true);
