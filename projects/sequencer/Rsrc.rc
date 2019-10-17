@@ -1,0 +1,332 @@
+//Gagah1 generated Resource Script
+//for Dev-C++ 4.9.5.0
+
+#include <afxres.h>
+#include "Resource.h"
+
+/////////////////////////
+//
+//Bitmap
+//
+
+IDB_CLAVIER BITMAP DISCARDABLE "Resource/Clavier.bmp"
+IDB_BLOCCMD BITMAP DISCARDABLE "Resource/BlocCmd.bmp"
+IDB_BLOCBTN BITMAP DISCARDABLE "Resource/Boutons.bmp"
+IDB_MUTE BITMAP DISCARDABLE "Resource/Mute.bmp"
+IDB_PAN BITMAP DISCARDABLE "Resource/Pan.bmp"
+IDB_TOOLBOX2 BITMAP DISCARDABLE "Resource/ToolBox2.bmp"
+IDB_SLIDER BITMAP DISCARDABLE "Resource/Slider.bmp"
+IDB_KNOB1 BITMAP DISCARDABLE "Resource/Knob1.bmp"
+IDB_KNOB2 BITMAP DISCARDABLE "Resource/Knob2.bmp"
+IDB_LED BITMAP DISCARDABLE "Resource/Led.bmp"
+
+/////////////////////////
+//
+//Icon
+//
+
+IDI_SPHINX ICON DISCARDABLE "Resource/Sphinx.ico"
+
+/////////////////////////
+//
+//Cursor
+//
+
+IDC_HAND2 CURSOR DISCARDABLE "Resource/Hand2.cur"
+IDC_CHISEL CURSOR DISCARDABLE "Resource/Chisel.cur"
+IDC_STICK CURSOR DISCARDABLE "Resource/Stick.cur"
+IDC_RUBBER CURSOR DISCARDABLE "Resource/Rubber.cur"
+
+/////////////////////////
+//
+//Menu
+//
+
+
+IDM_MENU  MENU DISCARDABLE
+BEGIN
+  POPUP " Fichier "
+  BEGIN
+    MENUITEM " Nouveau",   		IDM_FILENEW
+    MENUITEM " Ouvrir",   	   IDM_FILEOPEN
+    MENUITEM " Enregistrer ",        IDM_FILESAVE, GRAYED
+    MENUITEM " Enregistrer sous ...",      IDM_FILESAVEAS, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM " Fermer projet",         IDM_FILECLOSE, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM " Importer",          IDM_FILEIMPORT
+    MENUITEM " Exporter en fichier MIDI ",        IDM_FILEEXPORT, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM " Convertir en temps réel en fichier WAVE  ",       IDM_FILEWAVEIN, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM " Quitter ",          IDM_FILEEXIT
+  END
+  POPUP " Edition ", GRAYED
+  BEGIN
+    MENUITEM " Annuler ",        IDM_CANCEL, GRAYED
+    MENUITEM " Répéter ",        IDM_RESUME, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM " Séléctionner tout ",         IDM_SELECTALL
+  END
+  POPUP " Options ", GRAYED
+  BEGIN
+    MENUITEM " Changement signature ",        IDM_SIGNATURE
+    MENUITEM " Réglage tempo ",           IDM_TEMPO
+    MENUITEM " Réglage métronome ",          IDM_CLICK
+    MENUITEM SEPARATOR
+    MENUITEM " Inserer une piste ",          IDM_NEWTRACK, GRAYED
+    MENUITEM " Supprimer piste ",          IDM_DELETETRACK, GRAYED
+    MENUITEM SEPARATOR
+    MENUITEM " Informations séquence ",        IDM_INFOPATTERN
+    MENUITEM " Périphériques MIDI ",          IDM_MIDIDEVICE
+    MENUITEM " Options d'enregistrement ",        IDM_MIDIOPTION
+  END
+  POPUP " Vue ", GRAYED
+  BEGIN
+    MENUITEM " Afficher grille ",          IDM_GRID, CHECKED
+    MENUITEM " Fond blanc ",            IDM_WHITEBACKGROUND
+    MENUITEM SEPARATOR
+    MENUITEM " Couleur objet ",       IDM_OBJECTCOLOR
+  END
+  POPUP " Fenêtre ", GRAYED
+  BEGIN
+    MENUITEM " Ouvrir fenêtre arrangement ",        IDM_WNDARRANGE
+    MENUITEM " Ouvrir bloc de commande ",        IDM_WNDCOMMAND
+    MENUITEM " Ouvrir fenêtre liste d'évenement  ",        IDM_WNDLIST
+    MENUITEM " Ouvrir fenêtre matricielle ",        IDM_WNDMATRIX
+    MENUITEM " Ouvrir fenêtre mixeur ",         IDM_WNDMIXER
+  END
+  POPUP " Aide "
+  BEGIN
+    MENUITEM " Rubrique d'aide ",         IDM_HELPFILE
+    MENUITEM " A propos de ... ",         IDM_ABOUTHELP
+  END
+END
+
+IDM_MENUHELP  MENU DISCARDABLE
+BEGIN
+  POPUP " Sommaire "
+  BEGIN
+    POPUP " Séquence "
+    BEGIN
+      MENUITEM " Séléctionner une séquence ",                     20010
+      MENUITEM " Créer une séquence ",                            20011
+      MENUITEM " Déplacer ou redimensionner une séquence ",       20012
+      MENUITEM " Supprimer une séquence ",                        20013
+      MENUITEM " Dupliquer une séquence ",                        20014
+      MENUITEM " Fusionner deux séquences ",                      20015
+      MENUITEM " Diviser une séquence ",                          20016
+      MENUITEM " Editer le nom d'une séquence ",                  20017
+    END
+    POPUP " Tempo "
+    BEGIN
+      MENUITEM " Insérer un tempo ",                              20018
+      MENUITEM " Modifier ou supprimer un tempo ",                20019
+    END      
+  END
+  MENUITEM " Précédent ",   IDM_HELP_BACK
+  MENUITEM " Suivant ",    IDM_HELP_NEXT
+END
+
+/////////////////////////
+//
+//DialogBox
+//
+
+IDD_DLGFORMAT DIALOG DISCARDABLE 0, 0, 120, 85
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Format midi"
+FONT 8,"MS Sans Serif"
+BEGIN
+  GROUPBOX     "", IDC_STATIC, 10, 2, 100, 57
+  LTEXT        "Séléctionnez le format d'enregistrement du fichier midi :", IDC_STATIC, 20, 10, 80, 28
+  COMBOBOX     IDC_FORMAT, 20, 40, 80, 50, CBS_DROPDOWNLIST
+  DEFPUSHBUTTON   "OK", IDOK, 10, 65, 49, 14
+  PUSHBUTTON   "Annuler", IDCANCEL, 61, 65, 49, 14
+END
+
+IDD_DLGPATH DIALOG DISCARDABLE 0, 0, 380, 360
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Séléctionner un instrument"
+FONT 8,"MS Sans Serif"
+BEGIN
+END
+
+IDD_DLGWAVEIN DIALOG DISCARDABLE 0, 0, 200, 180
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Enregistrement en fichier WAVE"
+FONT 8,"MS Sans Serif"
+BEGIN
+  GROUPBOX     " Format d'enregistrement ", IDC_STATIC, 10, 5, 180, 75
+  LTEXT        "Taux d'échantillonnage:", IDC_STATIC, 20, 23, 90, 10
+  COMBOBOX     IDC_FREQUENCY, 110, 23, 70, 75, CBS_DROPDOWNLIST
+  LTEXT        "Résolution:", IDC_STATIC, 20, 41, 90, 10
+  COMBOBOX     IDC_RESOLUTION, 110, 41, 70, 36, CBS_DROPDOWNLIST
+  AUTOCHECKBOX "   Enregistrement stéréo", IDC_MODE, 20, 59, 100, 10
+  
+  GROUPBOX     " Taille d'enregistrement ", IDC_STATIC, 10, 85, 180, 75
+  LTEXT        "Debut position", IDC_STATIC, 20, 100, 70, 10
+  LTEXT        "Fin position", IDC_STATIC, 110, 100, 70, 10
+  LTEXT        IDC_STARTEDIT, 20, 115, 70, 12, SS_SUNKEN|SS_CENTER|SS_CENTERIMAGE
+  LTEXT        IDC_ENDEDIT, 110, 115, 70, 12, SS_SUNKEN|SS_CENTER|SS_CENTERIMAGE
+  CONTROL      "",IDC_PROGRESS,"msctls_progress32",PGS_HORZ,20,137,160,12
+  DEFPUSHBUTTON   "Lancer", IDOK, 60, 163, 60, 14
+  PUSHBUTTON   "Fermer", IDCANCEL, 125, 163, 60, 14
+END
+
+IDD_DLGCLICK DIALOG DISCARDABLE 0, 0, 200, 123
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Métronome"
+FONT 8,"MS Sans Serif"
+BEGIN
+  GROUPBOX     " Temps ", IDC_STATIC, 5, 2, 93, 75, BS_CENTER
+  AUTOCHECKBOX "Activer", IDC_ACTIVE1, 15, 15, 50, 10, BS_RIGHTBUTTON 
+  LTEXT        "Note:", IDC_STATIC, 15, 30, 40, 10
+  COMBOBOX     IDC_NOTE1, 55, 30, 40, 75, CBS_DROPDOWNLIST|WS_VSCROLL
+  LTEXT        "Velocité:", IDC_STATIC, 15, 45, 40, 10
+  COMBOBOX     IDC_VELOCITY1, 55, 45, 40, 75, CBS_DROPDOWNLIST|WS_VSCROLL
+  LTEXT        "Canal:", IDC_STATIC, 15, 60, 40, 10
+  COMBOBOX     IDC_CHANNEL1, 55, 60, 40, 155, CBS_DROPDOWNLIST
+  
+  GROUPBOX     " Mesures ", IDC_STATIC, 102, 2, 93, 75, BS_CENTER
+  AUTOCHECKBOX "Activer", IDC_ACTIVE2, 112, 15, 50, 10, BS_RIGHTBUTTON
+  LTEXT        "Note:", IDC_STATIC, 112, 30, 40, 10
+  COMBOBOX     IDC_NOTE2, 152, 30, 40, 75, CBS_DROPDOWNLIST|WS_VSCROLL
+  LTEXT        "Velocité:", IDC_STATIC, 112, 45, 40, 10
+  COMBOBOX     IDC_VELOCITY2, 152, 45, 40, 75, CBS_DROPDOWNLIST|WS_VSCROLL
+  LTEXT        "Canal:", IDC_STATIC, 112, 60, 40, 10
+  COMBOBOX     IDC_CHANNEL2, 152, 60, 40, 155, CBS_DROPDOWNLIST
+  AUTOCHECKBOX " Sauvegarder ces valeurs", IDC_INCLUDE, 15, 82, 150, 10
+  
+  DEFPUSHBUTTON   "OK", IDOK, 70, 105, 60, 14
+END
+
+IDD_DLGINFO DIALOG DISCARDABLE 0, 0, 340, 158
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Informations séquence"
+FONT 8,"MS Sans Serif"
+BEGIN
+  CONTROL      "",IDC_STATIC,"static",WS_DLGFRAME,5,5,330,130
+  LTEXT        "Parole:", IDC_STATIC, 15, 15, 50, 10
+  EDITTEXT     IDC_LYRIC, 65, 15, 260, 12, ES_AUTOHSCROLL
+  LTEXT        "Copyright:", IDC_STATIC, 15, 35, 50, 10
+  EDITTEXT     IDC_COPYRIGHT, 65, 35, 260, 12, ES_AUTOHSCROLL
+  LTEXT        "Commentaire:", IDC_STATIC, 15, 55, 50, 10
+  EDITTEXT     IDC_TEXT, 65, 55, 260, 12, ES_AUTOHSCROLL
+  LTEXT        "Marqueur:", IDC_STATIC, 15, 75, 50, 10
+  EDITTEXT     IDC_MARKER, 65, 75, 260, 12, ES_AUTOHSCROLL
+  LTEXT        "Spécial:", IDC_STATIC, 15, 95, 50, 10
+  EDITTEXT     IDC_CUEPOINT, 65, 95, 260, 12, ES_AUTOHSCROLL
+  AUTOCHECKBOX " Inclure les informations dans le fichier MIDI", IDC_INCLUDE, 15, 115, 150, 10
+  DEFPUSHBUTTON   "OK", IDOK, 180, 140, 70, 14
+  PUSHBUTTON   "Annuler", IDCANCEL, 255, 140, 70, 14
+END
+
+IDD_DLGDEVICE DIALOG DISCARDABLE 0, 0, 230, 95
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Périphérique MIDI"
+FONT 8,"MS Sans Serif"
+BEGIN
+  CONTROL      "",IDC_STATIC,"static",WS_DLGFRAME,5,5,220,68
+  LTEXT        "Périphérique MidiOut:", IDC_STATIC, 15, 10, 100, 10
+  COMBOBOX     IDC_CBMIDIOUT, 15, 20, 200, 100, CBS_DROPDOWNLIST|WS_VSCROLL
+  LTEXT        "Périphérique MidiIn:", IDC_STATIC, 15, 40, 100, 10
+  COMBOBOX     IDC_CBMIDIIN, 15, 50, 200, 100, CBS_DROPDOWNLIST|WS_VSCROLL  
+  DEFPUSHBUTTON   "OK", IDOK, 80, 78, 70, 14
+  PUSHBUTTON   "Annuler", IDCANCEL, 155, 78, 70, 14
+END
+
+IDD_DLGRECORD DIALOG DISCARDABLE 0, 0, 350, 168
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Options d'enregistrement"
+FONT 8,"MS Sans Serif"
+BEGIN
+  CONTROL      "",IDC_STATIC,"static",WS_DLGFRAME,5,5,340,140
+  AUTORADIOBUTTON " Enregistrement sur une seule piste séléctionnée",IDC_ONETRACK,20,20,180,10
+  AUTORADIOBUTTON " Démixage automatique sur une ou plusieures pistes",IDC_MORETRACK,20,35,180,10
+  GROUPBOX     " Pistes ", IDC_STATIC, 12, 10, 230, 45
+  
+  AUTOCHECKBOX " Activer le métronome en enregistrement", IDC_ONCLICK, 20, 70, 180, 10
+  AUTOCHECKBOX " Fusionner le nouvel enregistrement avec la séquence écrasée",IDC_FUSION,20,85,210,10
+  GROUPBOX     " Autres ", IDC_STATIC, 12, 60, 230, 45
+  
+  AUTOCHECKBOX "Quantiser  ", IDC_ONQUANTISE, 70, 122, 50, 10, BS_RIGHTBUTTON
+  COMBOBOX     IDC_CBQUANTISE, 135, 120, 35, 100, CBS_DROPDOWNLIST|WS_VSCROLL
+  GROUPBOX     " Quantisation ", IDC_STATIC, 12, 110, 230, 30
+  
+  AUTOCHECKBOX " Note", IDC_FILTER_NOTE, 255, 25, 70, 10
+  AUTOCHECKBOX " Key Pressure", IDC_FILTER_KEYPRESS, 255, 40, 70, 10
+  AUTOCHECKBOX " Controllers", IDC_FILTER_CTRLCHANGE, 255, 55, 70, 10
+  AUTOCHECKBOX " Program Change", IDC_FILTER_PRGMCHANGE, 255, 70, 70, 10
+  AUTOCHECKBOX " Channel Pressure", IDC_FILTER_CHANPRESS, 255, 85, 70, 10
+  AUTOCHECKBOX " Pitch Bend", IDC_FILTER_PITCHBEND, 255, 100, 70, 10
+  AUTOCHECKBOX " SysEx", IDC_FILTER_SYSEX, 255, 115, 70, 10
+  GROUPBOX     " Filtres ", IDC_STATIC, 245, 10, 93, 130
+  
+  DEFPUSHBUTTON   "OK", IDOK, 190, 150, 70, 14
+  PUSHBUTTON   "Annuler", IDCANCEL, 265, 150, 70, 14
+END
+
+IDD_DLGHELP DIALOG DISCARDABLE 0, 0, 270, 168
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|DS_CENTER|WS_SYSMENU
+CAPTION "Conseil d'aide"
+MENU  IDM_MENUHELP
+FONT 8,"MS Sans Serif"
+BEGIN
+  LTEXT        "", IDC_EDITHELP, 0, 0, 270, 100, SS_SUNKEN
+  PUSHBUTTON   "Fermer", IDCANCEL, 190, 120, 70, 15
+END
+
+STRINGTABLE DISCARDABLE
+BEGIN
+  30010, "\n\tSELECTIONNER UNE SEQUENCE.\n\n**Choisissez l'outil 'pointeur' dans la fenetre "\
+  "arrangement.\n**Positionnez le pointeur de la souris sur une séquence qu'on veut "\
+  "séléctionner et cliquez sur le bouton gauche de la souris.\n**NB: on peut séléctionner "\
+  "plusieures séquences en appuyant en même temps sur la touche 'SHIFT'."
+  
+  30011, "\n\tCREER UNE SEQUENCE.\n\n**Si vous utilisez un clavier midi, "\
+  "la séquence est créée automatiquement après avoir enregistrer un morceau.\n"\
+  "**Sinon, dans la fenêtre arrangement, choisissez l'outil 'pointeur' puis cliquez "\
+  "sur le bouton droite de la souris à l'endroit où vous voulez créer la séquence."
+  
+  30012, "\n\tDEPLACER UNE SEQUENCE.\n\n**Choisissez l'outil 'pointeur' dans la fenêtre "\
+  "arrangement.\n**Séléctionner une ou plusieures séquences. Le curseur change en forme "\
+  "de main.\n**Faites glisser la séquence jusqu'à l'endroit voulu.\n"\
+  "\n\tREDIMENSIONNER UNE SEQUENCE.\n\n**Comme auparavant, mais en choisissant l'extremité "\
+  "d'une séquence."
+  
+  30013, "\n\tSUPPRIMER UNE SEQUENCE.\n\n**Séléctionner une ou plusieures séquénces.\n"\
+  "**Appuyer sur la touche 'SUPPR' pour supprimer les séquences séléctionnées.\n"\
+  "**NB: en utilisant l'outil 'gomme', on peut supprimer une séquence en cliquant dessus."
+  
+  30014, "\n\tDUPLIQUER UNE SEQUENCE.\n\n**Choisissez l'outil 'pointeur'.\n"\
+  "**Appuyez sur la touche 'CTRL' et cliquez en même temps sur le bouton gauche de la souris.\n"\
+  "**Faites glisser à l'endroit voulu la séquence qu'on vient de dupliquer."
+  
+  30015, "\n\tFUSIONNER DEUX SEQUENCES.\n\n**Choisissez l'outil 'Colle'.\n"\
+  "**Cliquez sur le bouton gauche de la souris sur une séquence pour fusionner avec "\
+  "celle de droite.\n**NB: pour fusionner plusieures séquences, appuyez sur la touche 'SHIFT'."
+  
+  30016, "\n\tDIVISER UNE SEQUENCE.\n\n**Choisissez l'outil 'ciseaux'.\n"\
+  "**Cliquez sur le bouton gauche de la souris sur une séquence qu'on veut diviser."
+  
+  30017, "\n\tEDITER LE NOM D'UNE SEQUENCE.\n\n**Choisissez l'outil 'Croche'.\n"\
+  "**Cliquez sur une séquence qu'on veut éditer le nom. (une zone de texte apparait).\n"\
+  "**Saisissez le nom de la séquence.\n**Validez sur la touche 'ENTR'."
+  
+  30018, "\n\tINSERER UN TEMPO.\n\n**La façon la plus précise pour insérer un nouveau "\
+  "tempo est à partir de la fenêtre 'Editeur Tempo'.\n**Choisissez 'Reglage tempo' dans le menu "\
+  "'options', une fenêtre 'Editeur tempo' s'ouvre.\n**Cliquez sur un endroit bien précis avec "\
+  "le bouton droite de la souris. Un objet tempo est créé.\n**NB: Vous pouvez déplacer ou modifier "\
+  "ce tempo après.\n\nUne autre façon est à partir du 'bloc de commande': double-cliquez "\
+  "sur le tempo, une zone de texte apparait et saisissez la valeur du tempo."
+  
+  30019, "\n\tMODIFIER LA VALEUR D'UN TEMPO.\n\n**Choisissez 'Reglage tempo' dans le menu "\
+  "'otions', une fenêtre 'Editeur tempo' s'ouvre.\n**Séléctionnez le tempo qu'on veut modifier.\n"\
+  "**Faites glisser vers le haut ou vers le bas l'extremité haut du tempo pour modifier "\
+  "sa valeur. Vers la gauche ou la droite pour déplacer à l'endroit voulu."
+  
+  30100, "\n\tINTRODUCTION.\n\nSPHINX 1.0 est un séquenceur midi à 16 canaux. Tous les "\
+  "fichiers midi de format 0 et de format 1 sont acceptés. Il fait un démixage automatique "\
+  "selon le canal concerné.\nSPHINX 1.0 est un freeware.\nAmusez-vous bien!\n\nGagah1."
+END
