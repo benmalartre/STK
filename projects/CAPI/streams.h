@@ -10,6 +10,7 @@
 #include "effects.h"
 #include "filters.h"
 #include "buffers.h"
+#include "readers.h"
 
 struct STKStream {
 	RtAudio* m_dac;
@@ -68,7 +69,7 @@ EXPORT STKStream* STKGetStream(STKNode* node);
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *dataPointer);
 
-EXPORT STKStream* STKStreamSetup(RtAudio* dac);
+EXPORT STKStream* STKStreamSetup(RtAudio* dac, int numChannels);
 EXPORT bool STKStreamClean(STKStream* stream);
 EXPORT bool STKStreamStart(STKStream* stream);
 EXPORT bool STKStreamStop(STKStream* stream);
@@ -81,5 +82,7 @@ EXPORT STKNode* STKAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, ST
 EXPORT STKNode* STKAddEffect(STKStream* stream, STKEffect::Type type, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKAddBuffer(STKStream* stream, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKAddReader(STKStream* stream, const char* filename, bool isRoot = true);
+
 
 #endif

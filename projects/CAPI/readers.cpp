@@ -5,24 +5,48 @@
 //--------------------------------------------------------------------
 STKReader::STKReader()
 {
+    m_file = NULL;
+    m_loop = NULL;
 	m_noutput = 0;
 	m_volume = 1.0;
 	m_outidx = 0;
-	m_mode = FILELOOP;
+	m_mode = FILEWVIN;
 	m_filename = "";
-	init();
+    init();
 }
 
 //--------------------------------------------------------------------
-// STKGenerator Node Terminate
+// STKReader Node Destructor
 //--------------------------------------------------------------------
-void STKReader::term()
+STKReader::~STKReader()
 {
-	
+    term();
 }
 
 //--------------------------------------------------------------------
-// STKGenerator Node Init
+// STKReader Node Reset
+//--------------------------------------------------------------------
+void STKReader::reset(){
+    
+    m_outidx = 0;
+    switch (m_mode)
+    {
+        case FILEWVIN:
+        {
+            m_file->reset();
+            break;
+        }
+            
+        case FILELOOP:
+        {
+            m_loop->reset();
+            break;
+        }
+    }
+}
+
+//--------------------------------------------------------------------
+// STKReader Node Init
 //--------------------------------------------------------------------
 void STKReader::init()
 {
@@ -47,62 +71,142 @@ void STKReader::init()
 }
 
 //--------------------------------------------------------------------
-// STKGenerator Node Reset
+// STKReader Node Term
 //--------------------------------------------------------------------
-	void STKReader::reset(){
-
-	m_outidx = 0;
-	switch (m_mode)
-	{
-		case FILEWVIN:
-		{
-			m_file->reset();
-			break;
-		}
-
-		case FILELOOP:
-		{
-			m_loop->reset();
-			break;
-		}
-	}
-}
-
-
-//--------------------------------------------------------------------
-// STKGenerator Node Destructor
-//--------------------------------------------------------------------
-STKReader::~STKReader()
+void STKReader::term()
 {
-	term();
+    m_tickCallback = [this](){return this->ReaderTickHasNoEffect();};
+    if(m_mode == FILEWVIN && m_file){
+        m_file->closeFile();
+        delete m_file;
+    }
+    if(m_mode == FILELOOP && m_loop){
+        m_loop->closeFile();
+        delete m_loop;
+    }
 }
 
+//--------------------------------------------------------------------
+// STKReader Functions
+//--------------------------------------------------------------------
 StkFloat STKReader::tick(unsigned int channel )
 {
-	return 0;
+	return m_tickCallback();
 }
 
-// functions
-void STKReader::setFile(std::string filename)
+void STKReader::setFile(const char* filename)
 {
+    m_filename = std::string(filename);
 	switch (m_mode)
 	{
 		case FILEWVIN:
 		{
 			if (m_file->isOpen())m_file->closeFile();
-			m_file->openFile(filename);
+			m_file->openFile(m_filename, false);
+            StkFloat fileSampleRate = m_file->getFileRate();
+            if ( Stk::sampleRate() != fileSampleRate )m_file->setRate( fileSampleRate/ Stk::sampleRate() );
+            
 			break;
 		}
 
 		case FILELOOP:
 		{
-			m_loop->openFile(filename);
+            if (m_file->isOpen())m_file->closeFile();
+			m_loop->openFile(m_filename, false);
+            StkFloat fileSampleRate = m_loop->getFileRate();
+            if ( Stk::sampleRate() != fileSampleRate)m_loop->setRate( fileSampleRate / Stk::sampleRate() );
+            
+            break;
 		}
 	}
+   
 };
+
+StkFloat STKReader::getFileSampleRate(){
+    switch(m_mode)
+    {
+        case FILEWVIN:
+        {
+            if(m_file && m_file->isOpen())
+                return m_file->getFileRate();
+            else return -1.0f;
+            break;
+        }
+        case FILELOOP:
+        {
+            FileWvIn* file = (FileWvIn*)m_loop;
+            if(m_loop && file->isOpen())
+                return m_loop->getFileRate();
+            else return -1.0f;
+        }
+    }
+    
+}
+
 void STKReader::setScalar(Param param, StkFloat scalar)
 {
-
+    switch(m_mode)
+    {
+        case FILEWVIN:
+        {
+            switch(param){
+                case RATE:
+                {
+                    m_file->setRate(scalar);
+                    break;
+                }
+                case FREQUENCY:{
+                    break;
+                }
+                case STKReader::ADD_TIME:
+                {
+                    m_file->addTime(scalar);
+                    break;
+                }
+                case STKReader::ADD_PHASE:
+                {
+                    break;
+                }
+                case STKReader::ADD_PHASE_OFFSET:
+                {
+                    break;
+                }
+            }
+            break;
+        }
+        case STKReader::FILELOOP:
+        {
+            switch(param)
+            {
+                case STKReader::RATE:
+                {
+                    m_loop->setRate(scalar);
+                    break;
+                }
+                case STKReader::FREQUENCY:
+                {
+                    m_loop->setFrequency(scalar);
+                    break;
+                }
+                case STKReader::ADD_TIME:
+                {
+                    m_loop->addTime(scalar);
+                    break;
+                }
+                case STKReader::ADD_PHASE:
+                {
+                    m_loop->addPhase(scalar);
+                    break;
+                }
+                case STKReader::ADD_PHASE_OFFSET:
+                {
+                    m_loop->addPhaseOffset(scalar);
+                    break;
+                }
+            }
+            break;
+        }
+    }
 }
 //--------------------------------------------------------------------
 // STKEffect Set Has No Effect
@@ -138,19 +242,34 @@ StkFloat STKReader::ReaderTickFileLoop()
 	if (m_outidx == 0)return update(m_loop->tick()*m_volume);
 	else return update(m_loop->lastOut());
 }
-
-
+//--------------------------------------------------------------------
+// EXPORTED FUNCTIONS
+//--------------------------------------------------------------------
 void STKSetReaderMode(STKReader* reader, STKReader::Mode mode)
 {
-
+    reader->term();
+    reader->setMode(mode);
+    reader->init();
+    reader->setFile(reader->getFileName());
 }
 
 void STKSetReaderScalar(STKReader* reader, STKReader::Param param, StkFloat scalar)
 {
-
+    reader->setScalar(param, scalar);
 }
 
 void STKSetReaderFilename(STKReader* reader, const char* filename)
 {
-	reader->setFile((std::string)filename);
+    reader->term();
+    reader->init();
+
+	reader->setFile(filename);
+}
+
+void STKResetReader(STKReader* reader){
+    reader->reset();
+}
+
+StkFloat STKGetReaderFileSampleRate(STKReader* reader){
+    return reader->getFileSampleRate();
 }

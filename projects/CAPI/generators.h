@@ -29,10 +29,12 @@ public:
 		BLIT_GENERATOR,
 		BLITSAW_GENERATOR,
 		BLITSQUARE_GENERATOR,
-		SINEWAVE_GENERATOR/*,
+		SINEWAVE_GENERATOR
+        /*,
         SINGWAVE_GENERATOR,
 		MODULATE_GENERATOR,
-		GRANULATE_GENERATOR*/
+		GRANULATE_GENERATOR
+        */
 	};
 
 	enum Param {
@@ -64,8 +66,8 @@ public:
 	void setHasNoEffect(bool hasnoeffect);
 
 private:
-	//union
-	//{
+	union
+	{
 		Asymp* m_asymp;
 		Noise* m_noise;
 		Blit* m_blit;
@@ -75,7 +77,7 @@ private:
 		SingWave* m_singwave;
 		Modulate* m_modulate;
 		Granulate* m_granulate;
-	//};
+	};
 	inline StkFloat GeneratorTickAsymp();
 	inline StkFloat GeneratorTickNoise();
 	inline StkFloat GeneratorTickBlit();

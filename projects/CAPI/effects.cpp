@@ -208,16 +208,19 @@ void STKEffect::setScalar( StkFloat scalar, Param param)
 		{
 			if (param == T60)m_prcrev->setT60(scalar);
 			else if (param == MIX)m_prcrev->setEffectMix(scalar);
+            break;
 		}
 		case JCREV:
 		{
 			if (param == T60)m_jcrev->setT60(scalar);
 			else if (param == MIX)m_jcrev->setEffectMix(scalar);
+            break;
 		}
 		case NREV:
 		{
 			if (param == T60)m_nrev->setT60(scalar);
 			else if (param == MIX)m_nrev->setEffectMix(scalar);
+            break;
 		}
 		case FREEVERB:
 		{
@@ -226,29 +229,38 @@ void STKEffect::setScalar( StkFloat scalar, Param param)
 			else if (param == DAMPING)m_freeverb->setDamping(scalar);
 			else if (param == WIDTH)m_freeverb->setWidth(scalar);
 			else if (param == MODE)m_freeverb->setMode((bool)scalar);
+            break;
 		}
 		case ECHO:
 		{
 			if (param == DELAY)m_echo->setDelay(scalar);
 			else if (param == MAXIMUMDELAY)m_echo->setMaximumDelay(scalar);
 			else if (param == MIX)m_echo->setEffectMix(scalar);
+            break;
 		}
 		case PITSHIFT:
 		{
 			if (param == SHIFT)m_pitshift->setShift(scalar);
 			else if (param == MIX)m_pitshift->setEffectMix(scalar);
+            break;
 		}
 		case LENTPITSHIFT:
 		{
 			if (param == SHIFT)m_lentpitshift->setShift(scalar);
 			else if (param == MIX)m_lentpitshift->setEffectMix(scalar);
+            break;
 		}
 		case CHORUS:
 		{
 			if (param == MODDEPTH)m_chorus->setModDepth(scalar);
 			else if (param == MODFREQUENCY)m_chorus->setModFrequency(scalar);
 			else if (param == MIX)m_chorus->setEffectMix(scalar);
+            break;
 		}
+        case MOOG:
+        {
+            break;
+        }
 	}
 }
 

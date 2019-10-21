@@ -15,23 +15,33 @@ public:
 	};
 
 	enum Param {
-
+        RATE,
+        FREQUENCY,
+        ADD_TIME,
+        ADD_PHASE,
+        ADD_PHASE_OFFSET
 	};
-
-	StkFloat tick(unsigned int channel = 0);
+    
 	// constructor
 	STKReader();
 	// destructor 
 	~STKReader();
+    
 	// overrides
 	void reset();
 	void init();
 	void term();
+    
 	// functions
-	void setFile(std::string filename);
+    StkFloat tick(unsigned int channel = 0);
+	void setFile(const char* filename);
 	void setScalar(Param param, StkFloat scalar);
 	void setHasNoEffect(bool hasnoeffect);
-
+    void setMode(Mode mode){m_mode = mode;};
+    Mode getMode(){return m_mode;};
+    const char* getFileName(){return m_filename.c_str();};
+    StkFloat getFileSampleRate();
+    
 private:
 	std::function<StkFloat()> m_tickCallback;
 	float m_frequency;
@@ -50,5 +60,6 @@ private:
 EXPORT void STKSetReaderMode(STKReader* reader, STKReader::Mode mode);
 EXPORT void STKSetReaderScalar(STKReader* reader, STKReader::Param param, StkFloat scalar);
 EXPORT void STKSetReaderFilename(STKReader* reader, const char* filename);
-
+EXPORT void STKResetReader(STKReader* reader);
+EXPORT StkFloat STKGetReaderFileSampleRate(STKReader* reader);
 #endif

@@ -126,7 +126,7 @@ STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, 
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD Buffer NODE
+//	STK ADD BUFFER NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 {
@@ -145,6 +145,27 @@ STKNode* STKAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 }
 
 // ----------------------------------------------------------------------
+//    STK ADD READER NODE
+// ----------------------------------------------------------------------
+STKNode* STKAddReader(STKStream* stream, const char* filename, bool isRoot)
+{
+    STKReader* reader = new STKReader();
+    STKNode* node = static_cast<STKNode*>(reader);
+    node->setStream(stream);
+    node->incrementNumOutput();
+    if (isRoot)
+    {
+        node->setIsRoot(true);
+        stream->m_roots.push_back(node);
+    }
+    
+    else node->setIsRoot(false);
+    reader->setFile(filename);
+    return node;
+    
+}
+
+// ----------------------------------------------------------------------
 //	STK GENERATOR STREAM
 // ----------------------------------------------------------------------
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
@@ -152,7 +173,7 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 {	
 	STKStream* stream = (STKStream *)data;
 	StkFloat *samples = (StkFloat *)outputBuffer;
-	unsigned int numRoots = stream->m_roots.size();
+	size_t numRoots = stream->m_roots.size();
 	if (!numRoots)return 0;
 	float weight = 1.0 / numRoots;
 	for (unsigned int i = 0; i < nBufferFrames; i++)
@@ -167,15 +188,15 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 	return 0;
 }
 
-STKStream* STKStreamSetup(RtAudio* DAC)
+STKStream* STKStreamSetup(RtAudio* DAC, int numChannels)
 {
 	STKStream* stream = new STKStream();
 	stream->m_dac = DAC;
-	
+
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
 	parameters.deviceId = DAC->getDefaultOutputDevice();
-	parameters.nChannels = 1;
+	parameters.nChannels = numChannels;
 	RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 	try {
@@ -236,7 +257,7 @@ bool STKStreamClean(STKStream* stream)
 
 int STKStreamNumRoots(STKStream* stream)
 {
-    return stream->m_roots.size();
+    return (int)stream->m_roots.size();
 }
 
 /*

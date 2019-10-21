@@ -54,7 +54,7 @@ public:
 	void setVolume(StkFloat volume){ m_volume = volume; };
 	STKStream* getStream(){ return m_stream; };
 protected:
-	StkFloat update(StkFloat value);
+    StkFloat update(StkFloat value);
 	bool m_hasnoeffect;
 	bool m_isroot;
 	int m_noutput;

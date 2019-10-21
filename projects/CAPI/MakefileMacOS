@@ -21,6 +21,7 @@ CFLAGS = -DPLATFORM_DARWIN \
 	 -DOSMacOSX_ \
 	 -DOSMac_MachO_ \
 	 -D__MACOSX_CORE__\
+	 -D__LITTLE_ENDIAN__\
 	 -O3 \
 	 -D_LANGUAGE_C_PLUS_PLUS\
 	 -mmacosx-version-min=10.9\
