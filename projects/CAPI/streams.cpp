@@ -1,5 +1,22 @@
 #include "streams.h"
 
+/*
+void STKStream::addNode(STKNode* node){
+    m_nodes.push_back(node);
+    size_t numNodes = m_nodes.size();
+    m_nodes.resize(numNodes+1);
+    m_nodes[numNodes] = node;
+}
+
+void STKStream::addRoot(STKNode* node){
+    m_roots.push_back(node);
+    size_t numRoots = m_roots.size();
+    m_roots.resize(numRoots+1);
+ m_roots[numRoots] = node;
+}
+*/
+
+
 // ----------------------------------------------------------------------
 //	STK GET NODE STREAM
 // ----------------------------------------------------------------------
@@ -37,15 +54,14 @@ STKNode* STKAddGenerator(STKStream* stream, STKGenerator::Type type, StkFloat fr
 	STKNode* node = (STKNode*)new STKGenerator(type, frequency);
 	node->setStream(stream);
 	node->incrementNumOutput();
-    stream->m_nodes.push_back(node);
 	if (isRoot)
 	{
 		node->setIsRoot(true);
-		stream->m_roots.push_back(node);
+        stream->m_roots.push_back(node);
+        //stream->addRoot(node);
 	}
-
 	else node->setIsRoot(false);
-		
+    //stream->addNode(node);
 	return node;
 }
 
@@ -62,7 +78,6 @@ STKNode* STKAddEnvelope(STKStream* stream, STKEnvelope::Type type, STKNode* sour
 		stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
-
 	return node;
 }
 
@@ -82,7 +97,6 @@ STKNode* STKAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, STKNode* 
 	    stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
-
 	return node;
 }
 
@@ -101,12 +115,11 @@ STKNode* STKAddEffect(STKStream* stream, STKEffect::Type type, STKNode* source, 
 		stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
-		
 	return node;
 }
 
 // ----------------------------------------------------------------------
-//	STK GENERATOR ADD FILTER NODE
+//	STK ADD FILTER NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, bool isRoot)
 {
@@ -120,7 +133,6 @@ STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, 
 		stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
-
 	return node;
 }
 
@@ -137,9 +149,7 @@ STKNode* STKAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 		node->setIsRoot(true);
 		stream->m_roots.push_back(node);
 	}
-
 	else node->setIsRoot(false);
-
 	return node;
 }
 
@@ -207,14 +217,14 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 {	
 	STKStream* stream = (STKStream *)data;
 	StkFloat *samples = (StkFloat *)outputBuffer;
-	size_t numRoots = stream->m_roots.size();
+    size_t numRoots = stream->m_roots.size();
 	if (!numRoots)return 0;
 	float weight = 1.0 / numRoots;
 	for (unsigned int i = 0; i < nBufferFrames; i++)
 	{
 		*samples = 0;
-		for (unsigned int j = 0; j < numRoots; ++j)
-			*samples += stream->m_roots[j]->tick() * weight;
+        for (unsigned int j = 0; j < stream->m_roots.size(); ++j)
+                *samples += stream->m_roots[j]->tick() * weight;
 		samples++;
 
 	}

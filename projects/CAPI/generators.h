@@ -53,6 +53,7 @@ public:
 	StkFloat tick(unsigned int channel = 0);
 	// constructor
 	STKGenerator(Type type, StkFloat frequency=440.0f);
+    STKGenerator(const STKGenerator& other);
 	// destructor 
 	~STKGenerator();
 	// overrides

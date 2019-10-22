@@ -15,13 +15,12 @@ RtAudio* STKInit()
 	catch (RtAudioError &error) {
 		return NULL;
 	}
-	
 }
 
 void STKTerm(RtAudio* DAC)
 {
-	//DAC->closeStream();
-	//delete DAC;
+	DAC->closeStream();
+	delete DAC;
 }
 
 void STKSetSampleRate(float _rate)

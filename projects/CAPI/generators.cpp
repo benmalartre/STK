@@ -26,6 +26,15 @@ STKGenerator::STKGenerator(Type type, StkFloat frequency)
 }
 
 //--------------------------------------------------------------------
+// STKGenerator Node Copy Constructor
+//--------------------------------------------------------------------
+STKGenerator::STKGenerator(const STKGenerator& other)
+{
+    
+}
+    
+
+//--------------------------------------------------------------------
 // STKGenerator Node Destructor
 //--------------------------------------------------------------------
 STKGenerator::~STKGenerator()
