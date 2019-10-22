@@ -86,5 +86,6 @@ EXPORT STKNode* STKAddBuffer(STKStream* stream, STKNode* source, bool isRoot = t
 EXPORT STKNode* STKAddReader(STKStream* stream, const char* filename, bool isRoot = true);
 
 EXPORT void STKRemoveNode(STKStream* stream, STKNode* node);
+EXPORT void STKRemoveAllNodes(STKStream* stream);
 
 #endif

@@ -37,6 +37,7 @@ STKNode* STKAddGenerator(STKStream* stream, STKGenerator::Type type, StkFloat fr
 	STKNode* node = (STKNode*)new STKGenerator(type, frequency);
 	node->setStream(stream);
 	node->incrementNumOutput();
+    stream->m_nodes.push_back(node);
 	if (isRoot)
 	{
 		node->setIsRoot(true);
@@ -77,14 +78,12 @@ STKNode* STKAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, STKNode* 
 	node->incrementNumOutput();
 	if (isRoot)
 	{
-	node->setIsRoot(true);
-	stream->m_roots.push_back(node);
+	    node->setIsRoot(true);
+	    stream->m_roots.push_back(node);
 	}
 	else node->setIsRoot(false);
 
 	return node;
-	
-	return NULL;
 }
 
 // ----------------------------------------------------------------------
@@ -170,15 +169,34 @@ STKNode* STKAddReader(STKStream* stream, const char* filename, bool isRoot)
 // ----------------------------------------------------------------------
 void STKRemoveNode(STKStream* stream, STKNode* node)
 {
-    for (int i=0;i<stream->m_roots.size();++i)
+    
+    for (int n=0;n<stream->m_roots.size();++n)
     {
-        if(stream->m_roots[i] == node)stream->m_roots.erase(stream->m_roots.begin()+i);
+        if(stream->m_roots[n] == node)stream->m_roots.erase(stream->m_roots.begin()+n);
     }
-    for (int i=0;i<stream->m_nodes.size();++i)
+    
+    for (int n=0;n<stream->m_nodes.size();++n)
     {
-        if(stream->m_nodes[i] == node)stream->m_nodes.erase(stream->m_nodes.begin()+i);
+        if(stream->m_nodes[n] == node)stream->m_nodes.erase(stream->m_nodes.begin()+n);
     }
+    
     delete node;
+}
+
+void STKRemoveAllNode(STKStream* stream)
+{
+    
+    for (int n=0;n<stream->m_roots.size();++n)
+    {
+        stream->m_roots.erase(stream->m_roots.begin()+n);
+    }
+    
+    for (int n=0;n<stream->m_nodes.size();++n)
+    {
+        STKNode* node = stream->m_nodes[n];
+        stream->m_nodes.erase(stream->m_nodes.begin()+n);
+        delete node;
+    }
 }
 
 // ----------------------------------------------------------------------
