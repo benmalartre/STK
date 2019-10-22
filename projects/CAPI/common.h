@@ -41,6 +41,8 @@ class STKStream;
 // base class
 class STKNode{
 public:
+    STKNode(){};
+    virtual ~STKNode(){};
 	virtual StkFloat tick(unsigned int channel = 0) = 0;
 	virtual void reset() = 0;
 	virtual void init() = 0;

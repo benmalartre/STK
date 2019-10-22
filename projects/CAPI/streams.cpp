@@ -166,6 +166,22 @@ STKNode* STKAddReader(STKStream* stream, const char* filename, bool isRoot)
 }
 
 // ----------------------------------------------------------------------
+//    STK REMOVE NODE
+// ----------------------------------------------------------------------
+void STKRemoveNode(STKStream* stream, STKNode* node)
+{
+    for (int i=0;i<stream->m_roots.size();++i)
+    {
+        if(stream->m_roots[i] == node)stream->m_roots.erase(stream->m_roots.begin()+i);
+    }
+    for (int i=0;i<stream->m_nodes.size();++i)
+    {
+        if(stream->m_nodes[i] == node)stream->m_nodes.erase(stream->m_nodes.begin()+i);
+    }
+    delete node;
+}
+
+// ----------------------------------------------------------------------
 //	STK GENERATOR STREAM
 // ----------------------------------------------------------------------
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,

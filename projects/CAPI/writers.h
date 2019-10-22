@@ -8,15 +8,19 @@
 
 class STKWriter : public STKNode{
 public:
-	enum Mode {
-
+	enum Format {
+        RAW,
+        WAVE,
+        SND,
+        AIFF,
+        MAT
 	};
 
 	enum Param {
 
 	};
 
-	StkFloat tick(unsigned int channel = 0);
+	
 	// constructor
 	STKWriter();
 	// destructor 
@@ -26,17 +30,18 @@ public:
 	void init();
 	void term();
 	// functions
-	void setFile(std::string filename);
-	void setScalar(Param param, StkFloat scalar);
+    StkFloat tick(unsigned int channel = 0);
+	void setFile(const char* filename);
 	void setHasNoEffect(bool hasnoeffect);
 
 private:
 	std::function<StkFloat()> m_tickCallback;
+    int m_format;
 	FileWvOut m_file;
 	std::string m_filename;
 };
 
-EXPORT void STKSetWriterMode(STKWriter* writer, STKWriter::Mode mode);
+EXPORT void STKSetWriterFormat(STKWriter* writer, STKWriter::Format format);
 EXPORT void STKSetWriterScalar(STKWriter* writer, STKWriter::Param param, StkFloat scalar);
 
 #endif

@@ -3,6 +3,7 @@
 
 #include "Stk.h"
 #include <math.h>
+#include <vector>
 #include "common.h"
 #include "generators.h"
 #include "envelopes.h"
@@ -84,5 +85,6 @@ EXPORT STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* s
 EXPORT STKNode* STKAddBuffer(STKStream* stream, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKAddReader(STKStream* stream, const char* filename, bool isRoot = true);
 
+EXPORT void STKRemoveNode(STKStream* stream, STKNode* node);
 
 #endif
