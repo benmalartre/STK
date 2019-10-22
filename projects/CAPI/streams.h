@@ -4,7 +4,6 @@
 #include "Stk.h"
 #include <math.h>
 #include <vector>
-#include <map>
 #include "common.h"
 #include "generators.h"
 #include "envelopes.h"
@@ -14,25 +13,62 @@
 #include "buffers.h"
 #include "readers.h"
 
-class STKStream {
-public:
-	RtAudio* m_dac;
-	std::vector<STKNode*> m_roots;
+struct STKStream {
+    RtAudio* m_dac;
     std::vector<STKNode*> m_nodes;
-    
-    /*
-    void addNode(STKNode* node);
-    void addRoot(STKNode* node);
-    */
+    std::vector<STKNode*> m_roots;
+    STKGenerator* m_wave;
 };
 
+/*
+ // Input Audio Stream
+ struct STKInputStream {
+ RtAudio* m_dac;
+ unsigned int m_nbChannels;
+ unsigned int m_sampleRate;
+ unsigned int m_bufferBytes, m_nbFrames;
+ RtAudio::StreamParameters m_iParams, m_oParams;
+ StkFloat* m_buffer;
+ float m_data[2];
+ FILE* m_file;
+ unsigned int m_mode;
+ float m_frequency;
+ float m_volume;
+ bool m_initialized;
+ };
+ 
+ // VoicerStream
+ struct STKVoicerStream {
+ RtAudio* m_dac;
+ std::vector<Instrmnt*> m_instruments;
+ std::vector<Generator*> m_generators;
+ int m_channels;
+ int m_maxTick;
+ 
+ Voicer* m_voicer;
+ int m_nbVoices;
+ bool m_enable;
+ StkFloat m_frequency;
+ StkFloat m_volume;
+ StkFloat m_timeCurrent;
+ StkFloat m_timeLast;
+ int m_nbInstruments;
+ StkFloat m_t60;
+ int m_counter;
+ bool m_settling;
+ int m_currentVoice;
+ int m_sampler;
+ bool m_instrumentChange;
+ bool m_multiInput;
+ };
+ */
 EXPORT bool STKIsRoot(STKNode* node);
 EXPORT void STKSetAsRoot(STKNode* node, bool isRoot);
 EXPORT STKStream* STKGetStream(STKNode* node);
 
 // GeneratorStream tick() function
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-	double streamTime, RtAudioStreamStatus status, void *dataPointer);
+                  double streamTime, RtAudioStreamStatus status, void *dataPointer);
 
 EXPORT STKStream* STKStreamSetup(RtAudio* dac, int numChannels);
 EXPORT bool STKStreamClean(STKStream* stream);

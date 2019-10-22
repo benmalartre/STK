@@ -1,156 +1,146 @@
 #include "streams.h"
 
-/*
-void STKStream::addNode(STKNode* node){
-    m_nodes.push_back(node);
-    size_t numNodes = m_nodes.size();
-    m_nodes.resize(numNodes+1);
-    m_nodes[numNodes] = node;
-}
-
-void STKStream::addRoot(STKNode* node){
-    m_roots.push_back(node);
-    size_t numRoots = m_roots.size();
-    m_roots.resize(numRoots+1);
- m_roots[numRoots] = node;
-}
-*/
-
-
 // ----------------------------------------------------------------------
-//	STK GET NODE STREAM
+//    STK GET NODE STREAM
 // ----------------------------------------------------------------------
 STKStream* STKGetStream(STKNode* node){
-	return node->getStream();
+    return node->getStream();
 }
 
 // ----------------------------------------------------------------------
-//	STK NODE IS ROOT
+//    STK NODE IS ROOT
 // ----------------------------------------------------------------------
 bool STKIsRoot(STKNode* node){
-	return node->isRoot();
+    return node->isRoot();
 }
 
 // ----------------------------------------------------------------------
-//	STK SET NODE AS ROOT (or NOT)
+//    STK SET NODE AS ROOT (or NOT)
 // ----------------------------------------------------------------------
 void STKSetAsRoot(STKNode* node, bool isRoot)
 {
-	if (isRoot){
-		node->setIsRoot(true);
-		node->incrementNumOutput();
-	}
-	else{
-		node->setIsRoot(false);
-		node->decrementNumOutput();
-	}
+    if (isRoot){
+        node->setIsRoot(true);
+        node->incrementNumOutput();
+    }
+    else{
+        node->setIsRoot(false);
+        node->decrementNumOutput();
+    }
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD GENERATOR NODE
+//    STK ADD GENERATOR NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddGenerator(STKStream* stream, STKGenerator::Type type, StkFloat frequency, bool isRoot)
 {
-	STKNode* node = (STKNode*)new STKGenerator(type, frequency);
-	node->setStream(stream);
-	node->incrementNumOutput();
-	if (isRoot)
-	{
-		node->setIsRoot(true);
+    STKNode* node = (STKNode*)new STKGenerator(type, frequency);
+    node->setStream(stream);
+    node->incrementNumOutput();
+    stream->m_nodes.push_back(node);
+    if (isRoot)
+    {
+        node->setIsRoot(true);
         stream->m_roots.push_back(node);
-        //stream->addRoot(node);
-	}
-	else node->setIsRoot(false);
-    //stream->addNode(node);
-	return node;
+    }
+    
+    else node->setIsRoot(false);
+    
+    return node;
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD ENVELOPE NODE
+//    STK ADD ENVELOPE NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddEnvelope(STKStream* stream, STKEnvelope::Type type, STKNode* source, bool isRoot)
 {
-	STKNode* node = (STKNode*)new STKEnvelope(type, source);
-	source->incrementNumOutput();
-	if (isRoot)
-	{
-		node->setIsRoot(true);
-		stream->m_roots.push_back(node);
-	}
-	else node->setIsRoot(false);
-	return node;
+    STKNode* node = (STKNode*)new STKEnvelope(type, source);
+    source->incrementNumOutput();
+    if (isRoot)
+    {
+        node->setIsRoot(true);
+        stream->m_roots.push_back(node);
+    }
+    else node->setIsRoot(false);
+    
+    return node;
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD ARYTHMETIC NODE
+//    STK ADD ARYTHMETIC NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
 {
-	STKNode* node = (STKNode*)new STKArythmetic(lhs, rhs, mode);
-	if(lhs)lhs->incrementNumOutput();
-	if(rhs)rhs->incrementNumOutput();
-
-	node->incrementNumOutput();
-	if (isRoot)
-	{
-	    node->setIsRoot(true);
-	    stream->m_roots.push_back(node);
-	}
-	else node->setIsRoot(false);
-	return node;
+    STKNode* node = (STKNode*)new STKArythmetic(lhs, rhs, mode);
+    if(lhs)lhs->incrementNumOutput();
+    if(rhs)rhs->incrementNumOutput();
+    
+    node->incrementNumOutput();
+    if (isRoot)
+    {
+        node->setIsRoot(true);
+        stream->m_roots.push_back(node);
+    }
+    else node->setIsRoot(false);
+    
+    return node;
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD EFFECT NODE
+//    STK ADD EFFECT NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddEffect(STKStream* stream, STKEffect::Type type, STKNode* source, bool isRoot)
 {
-	STKNode* node = (STKNode*)new STKEffect(source, type);
-	
-	source->incrementNumOutput();
-	node->incrementNumOutput();
-	if (isRoot)
-	{
-		node->setIsRoot(true);
-		stream->m_roots.push_back(node);
-	}
-	else node->setIsRoot(false);
-	return node;
+    STKNode* node = (STKNode*)new STKEffect(source, type);
+    
+    source->incrementNumOutput();
+    node->incrementNumOutput();
+    if (isRoot)
+    {
+        node->setIsRoot(true);
+        stream->m_roots.push_back(node);
+    }
+    else node->setIsRoot(false);
+    
+    return node;
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD FILTER NODE
+//    STK GENERATOR ADD FILTER NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, bool isRoot)
 {
-	STKNode* node = (STKNode*)new STKFilter(source, type);
-
-	source->incrementNumOutput();
-	node->incrementNumOutput();
-	if (isRoot)
-	{
-		node->setIsRoot(true);
-		stream->m_roots.push_back(node);
-	}
-	else node->setIsRoot(false);
-	return node;
+    STKNode* node = (STKNode*)new STKFilter(source, type);
+    
+    source->incrementNumOutput();
+    node->incrementNumOutput();
+    if (isRoot)
+    {
+        node->setIsRoot(true);
+        stream->m_roots.push_back(node);
+    }
+    else node->setIsRoot(false);
+    
+    return node;
 }
 
 // ----------------------------------------------------------------------
-//	STK ADD BUFFER NODE
+//    STK ADD BUFFER NODE
 // ----------------------------------------------------------------------
 STKNode* STKAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 {
-	STKNode* node = (STKNode*)new STKBuffer(previous);
-	node->setStream(stream);
-	node->incrementNumOutput();
-	if (isRoot)
-	{
-		node->setIsRoot(true);
-		stream->m_roots.push_back(node);
-	}
-	else node->setIsRoot(false);
-	return node;
+    STKNode* node = (STKNode*)new STKBuffer(previous);
+    node->setStream(stream);
+    node->incrementNumOutput();
+    if (isRoot)
+    {
+        node->setIsRoot(true);
+        stream->m_roots.push_back(node);
+    }
+    
+    else node->setIsRoot(false);
+    
+    return node;
 }
 
 // ----------------------------------------------------------------------
@@ -210,65 +200,65 @@ void STKRemoveAllNode(STKStream* stream)
 }
 
 // ----------------------------------------------------------------------
-//	STK GENERATOR STREAM
+//    STK GENERATOR STREAM
 // ----------------------------------------------------------------------
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-	double streamTime, RtAudioStreamStatus status, void *data)
-{	
-	STKStream* stream = (STKStream *)data;
-	StkFloat *samples = (StkFloat *)outputBuffer;
+                  double streamTime, RtAudioStreamStatus status, void *data)
+{
+    STKStream* stream = (STKStream *)data;
+    StkFloat *samples = (StkFloat *)outputBuffer;
     size_t numRoots = stream->m_roots.size();
-	if (!numRoots)return 0;
-	float weight = 1.0 / numRoots;
-	for (unsigned int i = 0; i < nBufferFrames; i++)
-	{
-		*samples = 0;
-        for (unsigned int j = 0; j < stream->m_roots.size(); ++j)
-                *samples += stream->m_roots[j]->tick() * weight;
-		samples++;
-
-	}
-
-	return 0;
+    if (!numRoots)return 0;
+    float weight = 1.0 / numRoots;
+    for (unsigned int i = 0; i < nBufferFrames; i++)
+    {
+        *samples = 0;
+        for (unsigned int j = 0; j < numRoots; ++j)
+            *samples += stream->m_roots[j]->tick() * weight;
+        samples++;
+        
+    }
+    
+    return 0;
 }
 
 STKStream* STKStreamSetup(RtAudio* DAC, int numChannels)
 {
-	STKStream* stream = new STKStream();
-	stream->m_dac = DAC;
-
-	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-	RtAudio::StreamParameters parameters;
-	parameters.deviceId = DAC->getDefaultOutputDevice();
-	parameters.nChannels = numChannels;
-	RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-	unsigned int bufferFrames = RT_BUFFER_SIZE;
-	try {
-		DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKStreamTick, (void *)stream);
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		delete stream;
-		return NULL;
-	}
-
-	return stream;
+    STKStream* stream = new STKStream();
+    stream->m_dac = DAC;
+    
+    // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
+    RtAudio::StreamParameters parameters;
+    parameters.deviceId = DAC->getDefaultOutputDevice();
+    parameters.nChannels = numChannels;
+    RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+    unsigned int bufferFrames = RT_BUFFER_SIZE;
+    try {
+        DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKStreamTick, (void *)stream);
+    }
+    catch (RtAudioError &error) {
+        error.printMessage();
+        delete stream;
+        return NULL;
+    }
+    
+    return stream;
 }
 
 bool STKStreamStart(STKStream* stream)
 {
-	try {
-		
-		//for (std::vector<STKNode*>::iterator it = _generator->m_roots.begin(); it < _generator->m_roots.end(); it++)
-		//	(*it)->reset();
-		
-		stream->m_dac->startStream();
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		return false;
-	}
-	return true;
+    try {
+        
+        //for (std::vector<STKNode*>::iterator it = _generator->m_roots.begin(); it < _generator->m_roots.end(); it++)
+        //    (*it)->reset();
+        
+        stream->m_dac->startStream();
+    }
+    catch (RtAudioError &error) {
+        error.printMessage();
+        return false;
+    }
+    return true;
 }
 
 bool STKStreamStop(STKStream* stream)
@@ -281,22 +271,22 @@ bool STKStreamStop(STKStream* stream)
             error.printMessage();
             return false;
         }
-	    return true;
+        return true;
     }
     else return false;
 }
 
 bool STKStreamClean(STKStream* stream)
 {
-	// Shut down the output stream.
-	try {
-		stream->m_dac->closeStream();
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		return false;
-	}
-	return true;
+    // Shut down the output stream.
+    try {
+        stream->m_dac->closeStream();
+    }
+    catch (RtAudioError &error) {
+        error.printMessage();
+        return false;
+    }
+    return true;
 }
 
 int STKStreamNumRoots(STKStream* stream)
@@ -305,142 +295,142 @@ int STKStreamNumRoots(STKStream* stream)
 }
 
 /*
-// ----------------------------------------------------------------------
-//	STK VOICER STREAM
-// ----------------------------------------------------------------------
-int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-	double streamTime, RtAudioStreamStatus status, void *dataPointer)
-{
-	STKVoicerStream* voicer = (STKVoicerStream *)dataPointer;
-	if (voicer->m_settling == true){
-        voicer->m_dac->abortStream();
-        return 0;   
-    }
-
-	StkFloat  sample, *samples = (StkFloat *)outputBuffer;
-
-	if (voicer->m_nbInstruments == 0)
-	{
-		return 1;
-	}
-
-	for (int i = 0; i<voicer->m_nbInstruments; i++)
-	{
-		
-		InstrumentData* currentInstru = data->instrumentsData[i];
-		if (!currentInstru->enable)
-		{
-			data->instruments[i]->noteOff(64.0);
-			//data->instruments[i]->s
-			continue;
-		}
-
-		if (currentInstru->changeInstrument)
-		{
-			//Application().LogMessage(L"Change Instrument ID "+(CString)i +" Called...");
-			data->voicer->removeInstrument(data->instruments[i]);
-			delete data->instruments[i];
-
-			Instrmnt* instrmnt = voiceByNumber3(currentInstru->instrumentCurrent);
-			if (instrmnt == NULL)
-				instrmnt = voiceByNumber3(7);
-			data->voicer->addInstrument(instrmnt, i);
-			data->instruments[i] = instrmnt;
-
-		}
-
-		//data->instruments[i]->setFrequency(currentInstru->frequency);
-		if (currentInstru->noteOn)
-		{
-			currentInstru->noteTag = data->voicer->noteOn(currentInstru->note, currentInstru->volume, i);
-			currentInstru->noteOn = false;
-		}
-		else
-		{
-		data->voicer->noteOff((LONG)currentInstru->noteTag,64.0);
-		}
-		
-	}
-
-	for (unsigned int i = 0; i<nBufferFrames; i++)
-	{
-		sample = voicer->m_volume * voicer->m_voicer->tick();
-		*samples++ = sample;
-	}
-
-	voicer->m_counter++;
-
-	if (voicer->m_counter>voicer->m_maxTick)
-	{
-		voicer->m_settling = true;
-        voicer->m_dac->abortStream();
-        return 0;
-	}
-
-	return 1;
-
-}
-
-
-STKVoicerStream* STKVoicerStreamSetup(RtAudio* DAC, int _nbInstruments)
-{
-	// Set the global sample rate before creating class instances.
-	Stk::setSampleRate(44100.0);
-
-	STKVoicerStream* voicer = new STKVoicerStream();
-	voicer->m_dac = DAC;
-	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-	RtAudio::StreamParameters parameters;
-	parameters.deviceId = voicer->m_dac->getDefaultOutputDevice();
-	parameters.nChannels = 1;
-	RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-	unsigned int bufferFrames = RT_BUFFER_SIZE;
-	try {
-		voicer->m_dac->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKVoicerStreamTick, (void *)&voicer->m_instruments[0]);
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		delete voicer;
-		return NULL;
-	}
-
-	return voicer;
-}
-
-bool STKVoicerStreamStart(STKVoicerStream* voicer)
-{
-	try {
-		voicer->m_dac->startStream();
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		return false;
-	}
-	return true;
-}
-
-bool STKVoicerStreamStop(STKVoicerStream* voicer)
-{
-	try {
-		voicer->m_dac->stopStream();
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		return false;
-	}
-	return true;
-}
-
-bool STKVoicerStreamClean(STKVoicerStream* voicer)
-{
-	// Shut down the output stream.
-	try {
-		voicer->m_dac->closeStream();
-	}
-	catch (RtAudioError &error) {
-		error.printMessage();
-		return false;
-	}
-	return true;
-}
-*/
+ // ----------------------------------------------------------------------
+ //    STK VOICER STREAM
+ // ----------------------------------------------------------------------
+ int STKVoicerStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+ double streamTime, RtAudioStreamStatus status, void *dataPointer)
+ {
+ STKVoicerStream* voicer = (STKVoicerStream *)dataPointer;
+ if (voicer->m_settling == true){
+ voicer->m_dac->abortStream();
+ return 0;
+ }
+ 
+ StkFloat  sample, *samples = (StkFloat *)outputBuffer;
+ 
+ if (voicer->m_nbInstruments == 0)
+ {
+ return 1;
+ }
+ 
+ for (int i = 0; i<voicer->m_nbInstruments; i++)
+ {
+ 
+ InstrumentData* currentInstru = data->instrumentsData[i];
+ if (!currentInstru->enable)
+ {
+ data->instruments[i]->noteOff(64.0);
+ //data->instruments[i]->s
+ continue;
+ }
+ 
+ if (currentInstru->changeInstrument)
+ {
+ //Application().LogMessage(L"Change Instrument ID "+(CString)i +" Called...");
+ data->voicer->removeInstrument(data->instruments[i]);
+ delete data->instruments[i];
+ 
+ Instrmnt* instrmnt = voiceByNumber3(currentInstru->instrumentCurrent);
+ if (instrmnt == NULL)
+ instrmnt = voiceByNumber3(7);
+ data->voicer->addInstrument(instrmnt, i);
+ data->instruments[i] = instrmnt;
+ 
+ }
+ 
+ //data->instruments[i]->setFrequency(currentInstru->frequency);
+ if (currentInstru->noteOn)
+ {
+ currentInstru->noteTag = data->voicer->noteOn(currentInstru->note, currentInstru->volume, i);
+ currentInstru->noteOn = false;
+ }
+ else
+ {
+ data->voicer->noteOff((LONG)currentInstru->noteTag,64.0);
+ }
+ 
+ }
+ 
+ for (unsigned int i = 0; i<nBufferFrames; i++)
+ {
+ sample = voicer->m_volume * voicer->m_voicer->tick();
+ *samples++ = sample;
+ }
+ 
+ voicer->m_counter++;
+ 
+ if (voicer->m_counter>voicer->m_maxTick)
+ {
+ voicer->m_settling = true;
+ voicer->m_dac->abortStream();
+ return 0;
+ }
+ 
+ return 1;
+ 
+ }
+ 
+ 
+ STKVoicerStream* STKVoicerStreamSetup(RtAudio* DAC, int _nbInstruments)
+ {
+ // Set the global sample rate before creating class instances.
+ Stk::setSampleRate(44100.0);
+ 
+ STKVoicerStream* voicer = new STKVoicerStream();
+ voicer->m_dac = DAC;
+ // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
+ RtAudio::StreamParameters parameters;
+ parameters.deviceId = voicer->m_dac->getDefaultOutputDevice();
+ parameters.nChannels = 1;
+ RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+ unsigned int bufferFrames = RT_BUFFER_SIZE;
+ try {
+ voicer->m_dac->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKVoicerStreamTick, (void *)&voicer->m_instruments[0]);
+ }
+ catch (RtAudioError &error) {
+ error.printMessage();
+ delete voicer;
+ return NULL;
+ }
+ 
+ return voicer;
+ }
+ 
+ bool STKVoicerStreamStart(STKVoicerStream* voicer)
+ {
+ try {
+ voicer->m_dac->startStream();
+ }
+ catch (RtAudioError &error) {
+ error.printMessage();
+ return false;
+ }
+ return true;
+ }
+ 
+ bool STKVoicerStreamStop(STKVoicerStream* voicer)
+ {
+ try {
+ voicer->m_dac->stopStream();
+ }
+ catch (RtAudioError &error) {
+ error.printMessage();
+ return false;
+ }
+ return true;
+ }
+ 
+ bool STKVoicerStreamClean(STKVoicerStream* voicer)
+ {
+ // Shut down the output stream.
+ try {
+ voicer->m_dac->closeStream();
+ }
+ catch (RtAudioError &error) {
+ error.printMessage();
+ return false;
+ }
+ return true;
+ }
+ */

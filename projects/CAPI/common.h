@@ -1,6 +1,6 @@
 
 #ifndef STK_COMMON_H
-#define STK_COMMON_H 
+#define STK_COMMON_H
 #include "Stk.h"
 #include "Generator.h"
 #include "Instrmnt.h"
@@ -19,10 +19,10 @@ using namespace stk;
 
 #if defined(_WIN32) || defined( __WINDOWS_ASIO__ ) || defined( __WINDOWS_DS__ ) || defined( __WINDOWS_WASAPI__ )
 #include <windows.h>
-#define SLEEP( milliseconds ) Sleep( (DWORD) milliseconds ) 
+#define SLEEP( milliseconds ) Sleep( (DWORD) milliseconds )
 
 #if defined(STATIC_LIB)
-#define EXPORT extern "C" 
+#define EXPORT extern "C"
 #else
 #define EXPORT extern "C" __declspec(dllexport)
 #endif
@@ -31,7 +31,7 @@ using namespace stk;
 #include <string.h>
 #include <stdio.h>
 #define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
-#define EXPORT extern "C" 
+#define EXPORT extern "C"
 #endif
 
 // Global Constants
@@ -41,31 +41,29 @@ class STKStream;
 // base class
 class STKNode{
 public:
-    
     STKNode(){};
-    STKNode(const STKNode& node){};
     virtual ~STKNode(){};
-	virtual StkFloat tick(unsigned int channel = 0) = 0;
-	virtual void reset() = 0;
-	virtual void init() = 0;
-	virtual void term() = 0;
-	virtual void setHasNoEffect(bool hasnoeffect) = 0;
-	void incrementNumOutput(){ m_noutput++; };
-	void decrementNumOutput(){ m_noutput--; };
-	void setIsRoot(bool isRoot) { m_isroot = isRoot; };
-	bool isRoot(){ return m_isroot; };
-	void setStream(STKStream* stream) { m_stream = stream; };
-	void setVolume(StkFloat volume){ m_volume = volume; };
-	STKStream* getStream(){ return m_stream; };
+    virtual StkFloat tick(unsigned int channel = 0) = 0;
+    virtual void reset() = 0;
+    virtual void init() = 0;
+    virtual void term() = 0;
+    virtual void setHasNoEffect(bool hasnoeffect) = 0;
+    void incrementNumOutput(){ m_noutput++; };
+    void decrementNumOutput(){ m_noutput--; };
+    void setIsRoot(bool isRoot) { m_isroot = isRoot; };
+    bool isRoot(){ return m_isroot; };
+    void setStream(STKStream* stream) { m_stream = stream; };
+    void setVolume(StkFloat volume){ m_volume = volume; };
+    STKStream* getStream(){ return m_stream; };
 protected:
     StkFloat update(StkFloat value);
-	bool m_hasnoeffect;
-	bool m_isroot;
-	int m_noutput;
-	int m_outidx;
-	StkFloat m_volume;
-	STKStream* m_stream;
-
+    bool m_hasnoeffect;
+    bool m_isroot;
+    int m_noutput;
+    int m_outidx;
+    StkFloat m_volume;
+    STKStream* m_stream;
+    
 };
 
 // General functions
