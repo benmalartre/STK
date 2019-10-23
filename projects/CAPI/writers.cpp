@@ -21,10 +21,13 @@ void STKWriter::init(){};
 void STKWriter::term(){};
 
 // functions
-void STKWriter::setFile(const char* filename)
+void STKWriter::setFile(std::string filename)
 {
 };
+void STKWriter::setScalar(Param param, StkFloat scalar)
+{
 
+}
 void STKWriter::setHasNoEffect(bool hasnoeffect){};
 
 /*
@@ -37,7 +40,7 @@ private:
 
 };
 */
-void STKSetWriterFormat(STKWriter* reader, STKWriter::Format format)
+void STKSetWriterMode(STKWriter* reader, STKWriter::Mode mode)
 {
 
 }

@@ -1,0 +1,33 @@
+dependencies: \
+  /Users/benmalartre/Documents/RnD/STK/projects/CAPI/generators.cpp \
+  /Users/benmalartre/Documents/RnD/STK/projects/CAPI/generators.h \
+  /Users/benmalartre/Documents/RnD/STK/projects/CAPI/common.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Stk.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Generator.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Instrmnt.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Voicer.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Effect.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Echo.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Delay.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Filter.h \
+  /Users/benmalartre/Documents/RnD/STK/include/PitShift.h \
+  /Users/benmalartre/Documents/RnD/STK/include/DelayL.h \
+  /Users/benmalartre/Documents/RnD/STK/include/LentPitShift.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Chorus.h \
+  /Users/benmalartre/Documents/RnD/STK/include/SineWave.h \
+  /Users/benmalartre/Documents/RnD/STK/include/RtAudio.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Envelope.h \
+  /Users/benmalartre/Documents/RnD/STK/include/ADSR.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Asymp.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Noise.h \
+  /Users/benmalartre/Documents/RnD/STK/include/SingWave.h \
+  /Users/benmalartre/Documents/RnD/STK/include/FileLoop.h \
+  /Users/benmalartre/Documents/RnD/STK/include/FileWvIn.h \
+  /Users/benmalartre/Documents/RnD/STK/include/WvIn.h \
+  /Users/benmalartre/Documents/RnD/STK/include/FileRead.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Modulate.h \
+  /Users/benmalartre/Documents/RnD/STK/include/OnePole.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Blit.h \
+  /Users/benmalartre/Documents/RnD/STK/include/BlitSaw.h \
+  /Users/benmalartre/Documents/RnD/STK/include/BlitSquare.h \
+  /Users/benmalartre/Documents/RnD/STK/include/Granulate.h

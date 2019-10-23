@@ -11,14 +11,6 @@ STKBuffer::STKBuffer(STKNode* source)
 }
 
 //--------------------------------------------------------------------
-// STKBuffer Node Destructor
-//--------------------------------------------------------------------
-STKBuffer::~STKBuffer()
-{
-    term();
-}
-
-//--------------------------------------------------------------------
 // STKBuffer Set Has No Effect
 //--------------------------------------------------------------------
 void STKBuffer::setHasNoEffect(bool hasnoeffect)

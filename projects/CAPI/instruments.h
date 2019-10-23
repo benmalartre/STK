@@ -113,12 +113,12 @@ private:
 	std::function<StkFloat()> m_tickCallback;
 	union
 	{
-		Clarinet* m_clarinet;
-		BlowHole* m_blowhole;
-		Saxophony* m_saxophony;
-		Flute* m_flute;
-		Brass* m_brass;
-		BlowBotl* m_blowbotl;
+		Clarinet* m_onezero;
+		OnePole* m_onepole;
+		PoleZero* m_polezero;
+		TwoZero* m_twozero;
+		TwoPole* m_twopole;
+		BiQuad* m_biquad;
 		FormSwep* m_formswep;
 		Delay* m_delay;
 		DelayL* m_delayl;

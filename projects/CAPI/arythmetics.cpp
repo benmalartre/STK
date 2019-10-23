@@ -13,14 +13,6 @@ STKArythmetic::STKArythmetic(STKNode* a, STKNode* b, Mode mode)
 }
 
 //--------------------------------------------------------------------
-// STKArythmetic Node Constructor
-//--------------------------------------------------------------------
-STKArythmetic::~STKArythmetic()
-{
-    term();
-}
-
-//--------------------------------------------------------------------
 // STKArythmetic Set Mode
 //--------------------------------------------------------------------
 void STKArythmetic::setMode(Mode mode)

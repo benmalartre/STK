@@ -4,226 +4,177 @@
 //--------------------------------------------------------------------
 // STKGenerator Node Constructor
 //--------------------------------------------------------------------
-STKGenerator::STKGenerator(Type type, StkFloat frequency)
+STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency)
 {
+    STKGenerator* generator = new STKGenerator();
+    generator->m_generator.m_asymp = NULL;
+    generator->m_generator.m_noise = NULL;
+    generator->m_generator.m_blit = NULL;
+    generator->m_generator.m_blitsaw = NULL;
+    generator->m_generator.m_blitsquare = NULL;
+    generator->m_generator.m_sinewave = NULL;
+    generator->m_generator.m_singwave = NULL;
+    generator->m_generator.m_modulate = NULL;
+    generator->m_generator.m_granulate = NULL;
     
-    m_asymp = NULL;
-    m_noise = NULL;
-    m_blit = NULL;
-    m_blitsaw = NULL;
-    m_blitsquare = NULL;
-    m_sinewave = NULL;
-    m_singwave = NULL;
-    m_modulate = NULL;
-    m_granulate = NULL;
+	generator->m_noutput = 0;
+	generator->m_volume = 1.0;
+	generator->m_outidx = 0;
+    generator->m_type = GENERATOR;
     
-	m_noutput = 0;
-	m_volume = 1.0;
-	m_outidx = 0;
-	m_type = type;
-	m_frequency = frequency;
-	init();
+	generator->m_gentype = type;
+	generator->m_frequency = frequency;
+	STKGeneratorInit(generator);
+    return generator;
 }
-
-//--------------------------------------------------------------------
-// STKGenerator Node Copy Constructor
-//--------------------------------------------------------------------
-STKGenerator::STKGenerator(const STKGenerator& other)
-{
-    
-}
-    
 
 //--------------------------------------------------------------------
 // STKGenerator Node Destructor
 //--------------------------------------------------------------------
-STKGenerator::~STKGenerator()
+void STKGeneratorDelete(STKGenerator* generator)
 {
-    term();
+    STKGeneratorTerm(generator);
+    delete generator;
+}
+
+
+//--------------------------------------------------------------------
+// STKGenerator Node Init
+//--------------------------------------------------------------------
+void STKGeneratorInit(STKGenerator* generator)
+{
+    switch (generator->m_type)
+    {
+        case GENERATOR_ASYMP:
+        {
+            generator->m_generator.m_asymp = new Asymp();
+            generator->m_generator.m_asymp->setValue(generator->m_frequency);
+            generator->m_gentype = GENERATOR_ASYMP;
+            generator->m_tickCallback = [generator](){ return STKGeneratorTickAsymp(); };
+            break;
+        }
+        case GENERATOR_NOISE:
+        {
+            generator->m_generator.m_noise = new Noise(m_frequency);
+            generator->m_type = NOISE_GENERATOR;
+            generator->m_tickCallback = [generator](){ return STKGeneratorTickNoise(); };
+            break;
+        }
+            
+        case GENERATOR_ BLITSAW:
+        {
+            generator->m_generator.m_blitsaw = new BlitSaw(m_frequency);
+            generator->m_type = BLITSAW_GENERATOR;
+            generator->m_tickCallback = [generator](){ return STKGeneratorTickBlitSaw(); };
+            break;
+        }
+            
+        case BLITSQUARE_GENERATOR:
+        {
+            generator->m_generator.m_blitsquare = new BlitSquare(m_frequency);
+            generator->m_type = BLITSQUARE_GENERATOR;
+            generator->m_tickCallback = [generator](){ return STKGeneratorTickBlitSquare(); };
+            break;
+        }
+            
+        case BLIT_GENERATOR:
+        {
+            generator->m_generator.m_blit = new Blit(m_frequency);
+            generator->m_type = BLIT_GENERATOR;
+            generator->m_tickCallback = [generator](){ return STKGeneratorTickBlit(); };
+            break;
+        }
+            
+        case SINEWAVE_GENERATOR:
+        {
+            generator->m_generator.m_sinewave = new SineWave();
+            generator->m_sinewave->setFrequency(m_frequency);
+            generator->m_type = SINEWAVE_GENERATOR;
+            generator->m_tickCallback = [generator](){ return STKGeneratorTickSineWave(); };
+            break;
+        }
+    }
 }
 
 //--------------------------------------------------------------------
 // STKGenerator Node Terminate
 //--------------------------------------------------------------------
-void STKGenerator::term()
+void STKGeneratorTerm(STKGenerator* generator)
 {
-    switch(m_type)
+    switch(generator->m_type)
     {
         case ASYMP_GENERATOR:
         {
-	        if (m_asymp)delete m_asymp;
+	        if (generator->m_generator.m_asymp)delete generator->m_generator.m_asymp;
             break;
         }
         case NOISE_GENERATOR:
         {
-	        if (m_noise)delete m_noise;
+	        if (generator->m_generator.m_noise)delete generator->m_generator.m_noise;
             break;
         }
         case BLIT_GENERATOR:
         {
-            if (m_blit)delete m_blit;
+            if (generator->m_generator.m_blit)delete generator->m_generator.m_blit;
             break;
         }
         case BLITSAW_GENERATOR:
         {
-            if (m_blitsaw)delete m_blitsaw;
+            if (generator->m_generator.m_blitsaw)delete generator->m_generator.m_blitsaw;
             break;
         }
         case BLITSQUARE_GENERATOR:
         {
-	        if (m_blitsquare)delete m_blitsquare;
+	        if (generator->m_generator.m_blitsquare)delete generator->m_generator.m_blitsquare;
             break;
         }
         case SINEWAVE_GENERATOR:
         {
-            if (m_sinewave)delete m_sinewave;
+            if (generator->m_generator.m_sinewave)delete generator->m_generator.m_sinewave;
             break;
         }
-        /*
-        case SINGWAVE_GENERATOR:
-        {
-            if (m_singwave)delete m_singwave;
-            break;
-        }
-        case MODULATE_GENERATOR:
-        {
-            if (m_modulate)delete m_modulate;
-            break;
-        }
-        case GRANULATE_GENERATOR:
-        {
-            if (m_granulate)delete m_granulate;
-            break;
-        }
-        */
-    }
-}
-
-//--------------------------------------------------------------------
-// STKGenerator Node Init
-//--------------------------------------------------------------------
-void STKGenerator::init()
-{
-	switch (m_type)
-	{
-        case ASYMP_GENERATOR:
-        {
-            m_asymp = new Asymp();
-            m_asymp->setValue(m_frequency);
-            m_type = ASYMP_GENERATOR;
-            m_tickCallback = [this](){ return this->GeneratorTickAsymp(); };
-            break;
-        }
-        case NOISE_GENERATOR:
-        {
-            m_noise = new Noise(m_frequency);
-            m_type = NOISE_GENERATOR;
-            m_tickCallback = [this](){ return this->GeneratorTickNoise(); };
-            break;
-        }
-            
-        case BLITSAW_GENERATOR:
-        {
-            m_blitsaw = new BlitSaw(m_frequency);
-            m_type = BLITSAW_GENERATOR;
-            m_tickCallback = [this](){ return this->GeneratorTickBlitSaw(); };
-            break;
-        }
-            
-        case BLITSQUARE_GENERATOR:
-        {
-            m_blitsquare = new BlitSquare(m_frequency);
-            m_type = BLITSQUARE_GENERATOR;
-            m_tickCallback = [this](){ return this->GeneratorTickBlitSquare(); };
-            break;
-        }
-            
-        case BLIT_GENERATOR:
-        {
-            m_blit = new Blit(m_frequency);
-            m_type = BLIT_GENERATOR;
-            m_tickCallback = [this](){ return this->GeneratorTickBlit(); };
-            break;
-        }
-            
-        case SINEWAVE_GENERATOR:
-        {
-            m_sinewave = new SineWave();
-            m_sinewave->setFrequency(m_frequency);
-            m_type = SINEWAVE_GENERATOR;
-            m_tickCallback = [this](){ return this->GeneratorTickSineWave(); };
-            break;
-        }
-        /*
-        case SINGWAVE_GENERATOR:
-            {
-            m_singwave = new SingWave();
-            m_singwave->setFrequency(frequency);
-            m_type = STKGeneratorType::SINGWAVE_GENERATOR;
-            m_tickCallback = [this](){ return this->SingWaveTickCallback(); };
-            break;
-        }
-             
-        case MODULATE_GENERATOR:
-        {
-            m_modulate = new Modulate();
-            m_modulate->setFrequency(frequency);
-            m_type = STKGeneratorType::SINGWAVE_MODULATE;
-            m_tickCallback = [this](){ return this->ModulateTickCallback(); };
-            break;
-        }
-             
-        case GRANULATE_GENERATOR:
-        {
-            m_granulate = new Granulate();
-            m_granulate->setFrequency(frequency);
-            m_type = STKGeneratorType::GRANULATE_GENERATOR;
-            m_tickCallback = [this](){ return this->GranulateTickCallback(); };
-            break;
-        }
-        */
     }
 }
 
 //--------------------------------------------------------------------
 // STKGenerator Node Reset
 //--------------------------------------------------------------------
-void STKGenerator::reset()
+void STKGeneratorReset(STKGenerator* generator)
 {
-	m_outidx = 0;
-	switch (m_type)
+	generator->m_outidx = 0;
+	switch (generator->m_type)
 	{
-        case ASYMP_GENERATOR:
+        case GENERATOR_ASYMP:
         {
             break;
         }
             
-        case NOISE_GENERATOR:
+        case GENERATOR_NOISE:
         {
             break;
         }
 
-		case BLITSAW_GENERATOR:
+		case GENERATOR_BLITSAW:
 		{
-			m_blitsaw->reset();
+			generator->m_generator.m_blitsaw->reset();
 			break;
 		}
 
 		case BLITSQUARE_GENERATOR:
 		{
-			m_blitsquare->reset();
+			generator->m_generator.m_blitsquare->reset();
 			break;
 		}
             
         case SINEWAVE_GENERATOR:
         {
-            m_sinewave->reset();
+            generator->m_generator.m_sinewave->reset();
             break;
         }
             
-        case BLIT_GENERATOR:
+        case GENERATOR_BLIT:
         {
-            m_blit->reset();
+            generator->m_generator.m_blit->reset();
             break;
         }
 	}
@@ -232,89 +183,81 @@ void STKGenerator::reset()
 //--------------------------------------------------------------------
 // STKGenerator Set Type
 //--------------------------------------------------------------------
-void STKGenerator::setType(Type type)
+void STKGeneratorSetType(STKGenerator* generator, STKGeneratorType type)
 {
-	if (type != m_type)
+	if (generator->m_gentype != type)
 	{
-		term();
-		m_type = type;
-		init();
+		STKGeneratorTerm(generator);
+		generator->m_gentype = type;
+		STKGeneratorInit(generator);
 	}
 }
 
 //--------------------------------------------------------------------
 // STKGenerator Set Scalar
 //--------------------------------------------------------------------
-void STKGenerator::setScalar(Param param, StkFloat scalar)
+void STKGeneratorSetScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar)
 {
-	switch (m_type){
-		case ASYMP_GENERATOR:
+	switch (generator->m_type){
+		case GENERATOR_ASYMP:
 		{
-			if (param == T60)m_asymp->setT60(scalar);
-			else if (param == TARGET)m_asymp->setTarget(scalar);
-			else if (param == TAU)m_asymp->setTau(scalar);
-			else if (param == TIME)m_asymp->setTime(scalar);
-			else if (param == VALUE)m_asymp->setValue(scalar);
+			if (param == T60)generator->m_generator.m_asymp->setT60(scalar);
+			else if (param == TARGET)generator->m_generator.m_asymp->setTarget(scalar);
+			else if (param == TAU)generator->m_generator.m_asymp->setTau(scalar);
+			else if (param == TIME)generator->m_generator.m_asymp->setTime(scalar);
+			else if (param == VALUE)generator->m_generator.m_asymp->setValue(scalar);
 			break;
 		}
-		case NOISE_GENERATOR:
+		case GENERATOR_NOISE:
 		{
-			if(param == SEED)m_noise->setSeed((unsigned)scalar);
+			if(param == SEED)generator->m_generator.m_noise->setSeed((unsigned)scalar);
 			break;
 		}
-		case BLITSAW_GENERATOR:
+		case GENERATOR_BLITSAW:
 		{
-			if (param == FREQUENCY)m_blitsaw->setFrequency(scalar);
-			else if (param == HARMONICS)m_blitsaw->setHarmonics((unsigned)scalar);
+			if (param == FREQUENCY)generator->m_generator.m_blitsaw->setFrequency(scalar);
+			else if (param == HARMONICS)generator->m_generator.m_blitsaw->setHarmonics((unsigned)scalar);
 			break;
 		}
-		case BLITSQUARE_GENERATOR:
+		case GENERATORBLITSQUARE:
 		{
-			if (param == FREQUENCY)m_blitsquare->setFrequency(scalar);
-			else if (param == PHASE)m_blitsquare->setPhase(scalar);
-			else if (param == HARMONICS)m_blitsquare->setHarmonics((unsigned)scalar);
+			if (param == FREQUENCY)generator->m_generator.m_blitsquare->setFrequency(scalar);
+			else if (param == PHASE)generator->m_generator.m_blitsquare->setPhase(scalar);
+			else if (param == HARMONICS)generator->m_generator.m_blitsquare->setHarmonics((unsigned)scalar);
 			break;
 		}
-        case BLIT_GENERATOR:
+        case GENERATOR_BLIT:
         {
-            if (param == FREQUENCY)m_blit->setFrequency(scalar);
-            else if (param == PHASE)m_blit->setPhase(scalar);
-            else if (param == HARMONICS)m_blit->setHarmonics((unsigned)scalar);
+            if (param == FREQUENCY)generator->m_generator.m_blit->setFrequency(scalar);
+            else if (param == PHASE)generator->m_generator.m_blit->setPhase(scalar);
+            else if (param == HARMONICS)generator->m_generator.m_blit->setHarmonics((unsigned)scalar);
             break;
         }
-		case SINEWAVE_GENERATOR:
+		case GENERATOR_SINEWAVE:
 		{
-			if (param == FREQUENCY)m_sinewave->setFrequency(scalar);
-			else if (param == PHASE)m_sinewave->addPhase(scalar);
-			else if (param == PHASEOFFSET)m_sinewave->addPhase(scalar);
+			if (param == FREQUENCY)generator->m_generator.m_sinewave->setFrequency(scalar);
+			else if (param == PHASE)generator->m_generator.m_sinewave->addPhase(scalar);
+			else if (param == PHASEOFFSET)generator->m_generator.m_sinewave->addPhase(scalar);
 			break;
 		}
-		/*
-		case SINGWAVE_GENERATOR:
-		{
-			if (param == FREQUENCY)m_singwave->setFrequency(scalar);
-			else if (param == PHASE)m_singwave->se(scalar);
-			else if (param == PHASEOFFSET)m_singwave->addPhase(scalar);
-		}
-		*/
 	}
 }
 
 //--------------------------------------------------------------------
 // STKEffect Set Has No Effect
 //--------------------------------------------------------------------
-void STKGenerator::setHasNoEffect(bool hasnoeffect)
+void STKGeneratorSetHasNoEffect(STKGenerator* generator, bool hasnoeffect)
 {
-	if (hasnoeffect != m_hasnoeffect)
+	if (hasnoeffect != generator->m_hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			m_tickCallback = [this](){return this->GeneratorTickHasNoEffect(); };
+			generator->m_tickCallback = [generator](){return STKGeneratorTickHasNoEffect(); };
 		}
 		else
 		{
-			term();
-			init();
+			STKGeneratorTerm(generator);
+			STKGeneratorInit(generator);
 		}
 	}
 }
@@ -322,76 +265,75 @@ void STKGenerator::setHasNoEffect(bool hasnoeffect)
 //--------------------------------------------------------------------
 // STKGenerator Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKGenerator::GeneratorTickAsymp()
+StkFloat STKGeneratorTickAsymp(STKGenerator* g)
 {
-	if (m_outidx == 0)return update(m_asymp->tick()*m_volume);
-	else return update(m_asymp->lastOut());
+	if (g->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_asymp->tick()*g->m_volume);
+	else
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_asymp->lastOut());
 }
-StkFloat STKGenerator::GeneratorTickNoise()
+StkFloat STKGeneratorTickNoise(STKGenerator* g)
 {
-	if (m_outidx == 0)return update(m_noise->tick()*m_volume);
-	else return update(m_noise->lastOut());
-}
-
-StkFloat STKGenerator::GeneratorTickBlitSaw()
-{
-	if (m_outidx == 0)return update(m_blitsaw->tick()*m_volume);
-	else return update(m_blitsaw->lastOut());
+	if (g->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_noise->tick()*g->m_volume);
+	else
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_noise->lastOut());
 }
 
-StkFloat STKGenerator::GeneratorTickBlitSquare()
+StkFloat STKGeneratorTickBlitSaw(STKGenerator* g)
 {
-	if (m_outidx == 0)return update(m_blitsquare->tick()*m_volume);
-	else return update(m_blitsquare->lastOut());
+	if (g->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_blitsaw->tick()*g->m_volume);
+	else
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_blitsaw->lastOut());
 }
 
-StkFloat STKGenerator::GeneratorTickBlit()
+StkFloat STKGeneratorTickBlitSquare(STKGenerator* g)
 {
-    if (m_outidx == 0)return update(m_blit->tick()*m_volume);
-    else return update(m_blit->lastOut());
+	if (g->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_blitsquare->tick()*g->m_volume);
+	else
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_blitsquare->lastOut());
 }
 
-StkFloat STKGenerator::GeneratorTickSineWave()
+StkFloat STKGeneratorTickBlit(STKGenerator* g)
 {
-	if (m_outidx == 0)return update(m_sinewave->tick()*m_volume);
-	else return update(m_sinewave->lastOut());
+    if (g->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_blit->tick()*g->m_volume);
+    else
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_blit->lastOut());
 }
-/*
-StkFloat STKGenerator::ModulateTickCallback()
+
+StkFloat STKGeneratorTickSineWave(STKGenerator* g)
 {
-    return m_modulate->tick();
+	if (g->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_sinewave->tick()*g->m_volume);
+	else
+        return STKNodeUpdate((STKNode*)g, g->m_generator.m_sinewave->lastOut());
 }
-StkFloat STKGenerator::GranulateTickCallback()
-{
-    return m_granulate->tick();
-}
-StkFloat STKGenerator::SingWaveTickCallback()
-{
-	return m_singwave->tick();
-}
-*/
-StkFloat STKGenerator::GeneratorTickHasNoEffect()
+
+StkFloat STKGeneratorTickHasNoEffect()
 {
 	return 0;
 }
-StkFloat STKGenerator::tick(unsigned int channel)
+StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel)
 {
-	return m_tickCallback();
+	return g->m_tickCallback();
 }
 
 // ----------------------------------------------------------------------
 //	SETTERS
 // ----------------------------------------------------------------------
-void STKSetGeneratorType(STKGenerator* generator, STKGenerator::Type type)
+void STKSetGeneratorType(STKGenerator* generator, STKGeneratorType type)
 {
-	generator->setType(type);
+	STKGeneratorSetType(generator, type);
 }
 
-void STKSetGeneratorScalar(STKGenerator* generator, STKGenerator::Param param, StkFloat scalar)
+void STKSetGeneratorScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar)
 {
-	generator->setScalar(param, scalar);
+	STKGeneratorSetScalar(generator, param, scalar);
 }
 
 int STKGetGeneratorType(STKGenerator* node){
-    return (int)node->getType();
+    return (int)STKGeneratorGetType(node);
 }
