@@ -9,9 +9,10 @@
 #include "effects.h"
 #include "filters.h"
 #include "buffers.h"
-#include "readers.h"
 
 struct STKNode;
+Struct STKReader;
+
 typedef struct STKStream {
 	RtAudio* m_dac;
     std::vector<STKNode*> m_roots;

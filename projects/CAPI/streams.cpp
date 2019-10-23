@@ -1,5 +1,6 @@
 #include "streams.h"
 #include "nodes.h"
+#include "readers.h"
 
 // ----------------------------------------------------------------------
 //	STK ADD GENERATOR NODE
