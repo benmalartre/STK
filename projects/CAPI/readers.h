@@ -20,20 +20,20 @@ typedef enum STKReaderParam {
     READER_ADD_PHASE_OFFSET
 }STKREADERParam;
 
-union STKReaderMOD{
+typedef union STKReaderMOD{
     FileLoop* m_loop;
     FileWvIn* m_file;
-};
+}STKReaderMOD;
 
 struct STKNode;
-struct STKReader : public STKNode{
+typedef struct STKReader : public STKNode{
 
 	std::function<StkFloat()> m_tickCallback;
 	float m_frequency;
 	Mode m_mode;
-    STKReaderMOD m_reader;
+    STKReaderMOD m_r;
 	std::string m_filename;
-};
+}STKReader;
 
 // constructor
 STKReader* STKReaderCreate();

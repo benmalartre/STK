@@ -16,6 +16,7 @@
 #include "Granulate.h"
 #include "nodes.h"
 
+using namespace stk;
 // generator types
 typedef enum STKGeneratorType{
     GENERATOR_ASYMP,
@@ -43,7 +44,7 @@ typedef enum STKGeneratorParam{
 
 
 // generators union
-union STKGeneratorGEN
+typedef union STKGeneratorGEN
 {
     stk::Asymp* m_asymp;
     stk::Noise* m_noise;
@@ -54,32 +55,34 @@ union STKGeneratorGEN
     stk::SingWave* m_singwave;
     stk::Modulate* m_modulate;
     stk::Granulate* m_granulate;
-};
+}STKGeneratorGEN;
+
 // structure
-struct STKGenerator : public STKNode{
-    STKGeneratorGEN m_generator;
+typedef struct STKGenerator : public STKNode{
+    STKGeneratorGEN m_g;
 	std::function<StkFloat()> m_tickCallback;
 	STKGeneratorType m_gentype;
 	float m_frequency;
-};
+}STKGenerator;
+
 // constructor
 STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency=440.0f);
 
 // destructor
-void STKGeneratorDelete(STKGenerator* generator);
+void STKGeneratorDelete(STKGenerator* g);
 
-// inline function
-inline StkFloat STKGeneratorTickAsymp();
-inline StkFloat STKGeneratorTickNoise();
-inline StkFloat STKGeneratorTickBlit();
-inline StkFloat STKGeneratorTickBlitSaw();
-inline StkFloat STKGeneratorTickBlitSquare();
-inline StkFloat STKGeneratorTickSineWave();
-inline StkFloat STKSingWaveTickCallback();
-inline StkFloat STKEnvelopeTickModulate();
-inline StkFloat STKEnvelopeTickGranulate();
-inline StkFloat STKGeneratorTickHasNoEffect();
-StkFloat STKGeneratorTick(unsigned int channel = 0);
+// tick function
+inline StkFloat STKGeneratorTickAsymp(STKGenerator* g);
+inline StkFloat STKGeneratorTickNoise(STKGenerator* g);
+inline StkFloat STKGeneratorTickBlit(STKGenerator* g);
+inline StkFloat STKGeneratorTickBlitSaw(STKGenerator* g);
+inline StkFloat STKGeneratorTickBlitSquare(STKGenerator* g);
+inline StkFloat STKGeneratorTickSineWave(STKGenerator* g);
+inline StkFloat STKSingWaveTickCallback(STKGenerator* g);
+inline StkFloat STKEnvelopeTickModulate(STKGenerator* g);
+inline StkFloat STKEnvelopeTickGranulate(STKGenerator* g);
+inline StkFloat STKGeneratorTickHasNoEffect(STKGenerator* g);
+StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel = 0);
 
 
 // functions

@@ -3,76 +3,77 @@
 //--------------------------------------------------------------------
 // STKEnvelope Node Constructor
 //--------------------------------------------------------------------
-STKEnvelope::STKEnvelope(Type type, STKNode* source)
+STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source)
 {
-	m_noutput = 0;
-	m_volume = 1.0f;
-	m_outidx = 0;
-	m_type = type;
-	m_source = source;
-	init();
+    STKEnvelope* e = new STKEnvelope();
+	e->m_noutput = 0;
+	e->m_volume = 1.0f;
+	e->m_outidx = 0;
+	e->m_type = type;
+	e->m_source = source;
+	STKEnvelopeInit(e);
+    return e;
 }
 
 //--------------------------------------------------------------------
+// STKEnvelope Node Destructor
+//--------------------------------------------------------------------
+void STKEnvelopeDelete(STKEnvelope* e)
+{
+    STKEnvelopeTerm(e);
+    delete e;
+}
+//--------------------------------------------------------------------
 // STKEnvelope Node Terminate
 //--------------------------------------------------------------------
-void STKEnvelope::term()
+void STKEnvelopeTerm(STKEnvelope* e)
 {
-	if (m_adsr)delete m_adsr;
-	if (m_envelope)delete m_envelope;
+	if (e->m_e.m_adsr)delete e->m_e.m_adsr;
+	if (e->m_e.m_envelope)delete e->m_e.m_envelope;
 }
 
 //--------------------------------------------------------------------
 // STKEnvelope Node Init
 //--------------------------------------------------------------------
-void STKEnvelope::init()
+void STKEnvelopeInit(STKEnvelope* e)
 {
-	switch (m_type)
+	switch (e->m_type)
 	{
 		case ENVELOPE_ADSR:
 		{
-			m_adsr = new ADSR();
-			m_adsr->setValue(m_frequency);
-			m_type = ENVELOPE_ADSR;
-			m_tickCallback = [this](){ return this->EnvelopeTickADSR(); };
+			e->m_e.m_adsr = new ADSR();
+			e->m_e.m_adsr->setValue(e->m_frequency);
+			e->m_e.m_type = ENVELOPE_ADSR;
+			e->m_tickCallback = [e](){ return STKEnvelopeTickADSR(e); };
 			break;
 		}
 
 		case ENVELOPE_ENVELOPE:
 		{
-			m_envelope = new Envelope();
-			m_type = ENVELOPE_ENVELOPE;
-			m_tickCallback = [this](){ return this->EnvelopeTickEnvelope(); };
+			e->m_e.m_envelope = new Envelope();
+			e->m_type = ENVELOPE_ENVELOPE;
+			m_tickCallback = [e](){ return STKEnvelopeTickEnvelope(e); };
 			break;
 		}
 
 	}
 }
 
-
-//--------------------------------------------------------------------
-// STKEnvelope Node Destructor
-//--------------------------------------------------------------------
-STKEnvelope::~STKEnvelope()
-{
-	term();
-}
-
 //--------------------------------------------------------------------
 // STKEnvelope Node Reset
 //--------------------------------------------------------------------
-void STKEnvelope::reset()
+void STKEnvelopeReset(STKEnvelope* e)
 {
-	switch (m_type)
+	switch (e->m_type)
 	{
 	case ENVELOPE_ENVELOPE:
 		{
-			m_envelope->setValue(0);
+			e->m_e.m_envelope->setValue(0);
 			break;
 		}
 	case ENVELOPE_ADSR:
 		{
-			m_adsr->setValue(0);
+			e->m_e.m_adsr->setValue(0);
 			break;
 		}
 	}
@@ -81,31 +82,31 @@ void STKEnvelope::reset()
 //--------------------------------------------------------------------
 // STKEnvelope Set Type
 //--------------------------------------------------------------------
-void STKEnvelope::setType(Type type)
+void STKEnvelopeSetType(STKEnvelope* e, STKEnvelopeType type)
 {
-	if (type != m_type)
+	if (type != e->m_type)
 	{
-		term();
-		m_type = type;
-		init();
+		STKEnvelopeTerm(e);
+		e->m_type = type;
+		STKEnvelopeInit(e);
 	}
 }
 
 //--------------------------------------------------------------------
 // STKEnvelope KeyOn
 //--------------------------------------------------------------------
-void STKEnvelope::keyOn()
+void STKEnvelopeKeyOn(STKEnvelope* e)
 {
-	switch(m_type)
+	switch(e->m_type)
 	{
-	case ENVELOPE_ENVELOPE:
+	    case ENVELOPE_ENVELOPE:
 		{
-			m_envelope->keyOn();
+			e->m_e.m_envelope->keyOn();
 			break;
 		}
-	case ENVELOPE_ADSR:
+	    case ENVELOPE_ADSR:
 		{
-			m_adsr->keyOn();
+			e->m_e.m_adsr->keyOn();
 			break;
 		}
 	}
@@ -115,18 +116,18 @@ void STKEnvelope::keyOn()
 //--------------------------------------------------------------------
 // STKEnvelope KeyOff
 //--------------------------------------------------------------------
-void STKEnvelope::keyOff()
+void STKEnvelopeKeyOff(STKEnvelope* e)
 {
-	switch (m_type)
+	switch (e->m_type)
 	{
 	case ENVELOPE_ENVELOPE:
 		{
-			m_envelope->keyOff();
+			e->m_e.m_envelope->keyOff();
 			break;
 		}
 	case ENVELOPE_ADSR:
 		{
-			m_adsr->keyOff();
+			e->m_e.m_adsr->keyOff();
 			break;
 		}
 	}
@@ -135,28 +136,28 @@ void STKEnvelope::keyOff()
 //--------------------------------------------------------------------
 // STKEnvelope Set Scalar
 //--------------------------------------------------------------------
-void STKEnvelope::setScalar(Param param, StkFloat scalar)
+void STKEnvelopeSetScalar(STKEnvelope* e, STKEnvelopeParam param, StkFloat scalar)
 {
-	switch (m_type){
+	switch (e->m_type){
 		case ENVELOPE_ADSR:
 		{
-			if (param == ENV_ATTACK_RATE)m_adsr->setAttackRate(scalar);
-			else if (param == ENV_ATTACK_TARGET)m_adsr->setAttackTarget(scalar);
-			else if (param == ENV_ATTACK_TIME)m_adsr->setAttackTime(scalar);
-			else if (param == ENV_DECAY_RATE)m_adsr->setDecayRate(scalar);
-			else if (param == ENV_DECAY_TIME)m_adsr->setDecayTime(scalar);
-			else if (param == ENV_SUSTAIN_LEVEL)m_adsr->setSustainLevel(scalar);
-			else if (param == ENV_RELEASE_RATE)m_adsr->setReleaseRate(scalar);
-			else if (param == ENV_RELEASE_TIME)m_adsr->setReleaseTime(scalar);
-			else if (param == ENV_TARGET)m_adsr->setTarget(scalar);
-			else if (param == ENV_VALUE)m_adsr->setValue(scalar);
+			if (param == ENVELOPE_ATTACK_RATE)e->m_e.m_adsr->setAttackRate(scalar);
+			else if (param == ENVELOPE_ATTACK_TARGET)e->m_e.m_adsr->setAttackTarget(scalar);
+			else if (param == ENVELOPE_ATTACK_TIME)e->m_e.m_adsr->setAttackTime(scalar);
+			else if (param == ENVELOPE_DECAY_RATE)e->m_e.m_adsr->setDecayRate(scalar);
+			else if (param == ENVELOPE_DECAY_TIME)e->m_e.m_adsr->setDecayTime(scalar);
+			else if (param == ENVELOPE_SUSTAIN_LEVEL)e->m_e.m_adsr->setSustainLevel(scalar);
+			else if (param == ENVELOPE_RELEASE_RATE)e->m_e.m_adsr->setReleaseRate(scalar);
+			else if (param == ENVELOPE_RELEASE_TIME)e->m_e.m_adsr->setReleaseTime(scalar);
+			else if (param == ENVELOPE_TARGET)e->m_e.m_adsr->setTarget(scalar);
+			else if (param == ENVELOPE_VALUE)e->m_e.m_adsr->setValue(scalar);
 		}
 		case ENVELOPE_ENVELOPE:
 		{
-			if (param == ENV_RATE)m_envelope->setRate(scalar);
-			else if (param == ENV_TIME)m_envelope->setTime(scalar);
-			else if (param == ENV_TARGET)m_envelope->setTarget(scalar);
-			else if (param == ENV_VALUE)m_envelope->setValue(scalar);
+			if (param == ENVELOPE_RATE)e->m_e.m_envelope->setRate(scalar);
+			else if (param == ENVELOPE_TIME)e->m_e.m_envelope->setTime(scalar);
+			else if (param == ENVELOPE_TARGET)e->m_e.m_envelope->setTarget(scalar);
+			else if (param == ENVELOPE_VALUE)e->m_e.m_envelope->setValue(scalar);
 		}
 	}
 }
@@ -164,18 +165,18 @@ void STKEnvelope::setScalar(Param param, StkFloat scalar)
 //--------------------------------------------------------------------
 // STKEnvelope Set Has No Effect
 //--------------------------------------------------------------------
-void STKEnvelope::setHasNoEffect(bool hasnoeffect)
+void STKEnvelopeSetHasNoEffect(STKEnvelope* e, bool hasnoeffect)
 {
-	if (hasnoeffect != m_hasnoeffect)
+	if (hasnoeffect != e->m_hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			m_tickCallback = [this](){return this->EnvelopeTickHasNoEffect(); };
+			e->m_tickCallback = [e](){return STKEnvelopeTickHasNoEffect(e); };
 		}
 		else
 		{
-			term();
-			init();
+			STKEnvelopeTerm(e);
+			STKEnvelopeInit(e);
 		}
 	}
 }
@@ -183,45 +184,29 @@ void STKEnvelope::setHasNoEffect(bool hasnoeffect)
 //--------------------------------------------------------------------
 // STKEnvelope Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKEnvelope::EnvelopeTickEnvelope()
+StkFloat STKEnvelopeTickEnvelope(STKEnvelope* e)
 {
-	if (m_outidx == 0)return update(m_source->tick() * m_envelope->tick())*m_volume;
-	else return update(m_source->tick() + m_envelope->lastOut())*m_volume;
-}
-StkFloat STKEnvelope::EnvelopeTickADSR()
-{
-	if (m_outidx == 0)return update(m_source->tick() * m_adsr->tick())*m_volume;
-	else return update(m_source->tick() + m_adsr->lastOut())*m_volume;
+	if (e->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)e, STKNodeTick(e->m_source) * e->m_e.m_envelope->tick())*e->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)e, STKNodeTick(e->m_source) + e->m_e.m_envelope->lastOut());
 }
 
-StkFloat STKEnvelope::EnvelopeTickHasNoEffect()
+StkFloat STKEnvelopeTickADSR(STKEnvelope* e)
+{
+	if (e->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)e, STKNodeTick(e->m_source) * e->m_e.m_adsr->tick())*e->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)e, STKNodeTick(e->m_source) + e->m_e.m_adsr->lastOut());
+}
+
+StkFloat STKEnvelopeTickHasNoEffect(STKEnvelope* envelope)
 {
 	return 0;
 }
-StkFloat STKEnvelope::tick(unsigned int channel)
+
+StkFloat STKEnvelopeTick(STKEnvelope* e, unsigned int channel)
 {
-	return m_tickCallback();
+	return e->m_tickCallback();
 }
 
-// ----------------------------------------------------------------------
-//	SETTERS
-// ----------------------------------------------------------------------
-void STKSetEnvelopeType(STKEnvelope* envelope, STKEnvelope::Type type)
-{
-	envelope->setType(type);
-}
-
-void STKSetEnvelopeScalar(STKEnvelope* envelope, STKEnvelope::Param param, StkFloat scalar)
-{
-	envelope->setScalar(param, scalar);
-}
-
-void STKEnvelopeKeyOn(STKEnvelope* envelope)
-{
-	envelope->keyOn();
-}
-
-void STKEnvelopeKeyOff(STKEnvelope* envelope)
-{
-	envelope->keyOff();
-}

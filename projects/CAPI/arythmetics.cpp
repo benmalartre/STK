@@ -3,100 +3,79 @@
 //--------------------------------------------------------------------
 // STKArythmetic Node Constructor
 //--------------------------------------------------------------------
-STKArythmetic::STKArythmetic(STKNode* a, STKNode* b, Mode mode)
+STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, Mode mode)
 {
-	m_volume = 1.0;
-	m_lhs = a;
-	m_rhs = b;
-	m_mode = mode;
-	init();
+	STKArythmetic* a = new STKArythmetic();
+	a->m_volume = 1.0;
+	a->m_lhs = lhs;
+	a->m_rhs = rhs;
+	a->m_mode = mode;
+	STKArythmeticInit(a);
+	return a
 }
 
 //--------------------------------------------------------------------
-// STKArythmetic Set Mode
+// STKArythmetic Node Destructor
 //--------------------------------------------------------------------
-void STKArythmetic::setMode(Mode mode)
+void STKArythmeticDelete(STKArythmetic* a)
 {
-	if (mode != m_mode)
-	{
-		term();
-		m_mode = mode;
-		init();
-	}
-}
-
-//--------------------------------------------------------------------
-// STKArythmetic Set Has No Effect
-//--------------------------------------------------------------------
-void STKArythmetic::setHasNoEffect(bool hasnoeffect)
-{
-	if (hasnoeffect != m_hasnoeffect)
-	{
-		if (hasnoeffect)
-		{
-			m_tickCallback = [this](){return this->ArythmeticTickHasNoEffect(); };
-		}
-		else
-		{
-			term();
-			init();
-		}
-	}
+	STKArythmeticTerm(a);
+	delete a
 }
 
 
 //--------------------------------------------------------------------
 // STKArythmetic Node Init
 //--------------------------------------------------------------------
-void STKArythmetic::init()
+void STKArythmeticInit(	STKArythmetic* a)
 {
-	if (!this->m_lhs || !this->m_rhs) return;
+	if (!a->m_lhs || !a->m_rhs) return;
 
-	switch (m_mode)
+	switch (a->m_mode)
 	{
-		case Mode::ADD:
+		case ARYTHMETIC_ADD:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickAdd(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickAdd(a); };
 			break;
 		}
-		case Mode::SUB:
+		case ARYTHMETIC_SUB:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickSub(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickSub(a); };
 			break;
 		}
-		case Mode::MULTIPLY:
+		case ARYTHMETIC_MULTIPLY:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickMultiply(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickMultiply(a); };
 			break;
 		}
-		case Mode::SCALE:
+		case ARYTHMETIC_SCALE:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickScale(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickScale(a); };
 			break;
 		}
-		case Mode::SCALEADD:
+		case ARYTHMETIC_SCALEADD:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickScaleAdd(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickScaleAdd(a); };
 			break;
 		}
-		case Mode::SCALESUB:
+		case ARYTHMETIC_SCALESUB:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickScaleSub(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickScaleSub(a); };
 			break;
 		}
-		case Mode::MIX:
+		case ARYTHMETIC_MIX:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickMix(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickMix(a); };
 			break;
 		}
-		case Mode::BLEND:
+		case ARYTHMETIC_BLEND:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickBlend(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickBlend(a); };
 			break;
 		}
-		case Mode::SHIFT:
+		case ARYTHMETIC_SHIFT:
 		{
-			m_tickCallback = [this](){ return this->ArythmeticTickShift(); };
+			a->m_tickCallback = [a](){ return STKArythmeticTickShift(a); };
 			break;
 		}
 	}
@@ -106,7 +85,7 @@ void STKArythmetic::init()
 //--------------------------------------------------------------------
 // STKArythmetic Node Term
 //--------------------------------------------------------------------
-void STKArythmetic::term()
+void STKArythmeticTerm(	STKArythmetic* a)
 {
 }
 
@@ -114,93 +93,107 @@ void STKArythmetic::term()
 //--------------------------------------------------------------------
 // STKArythmetic Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKArythmetic::ArythmeticTickAdd()
+StkFloat STKArythmeticTickAdd(	STKArythmetic* a)
 {
-	return (m_lhs->tick() + m_rhs->tick()) * m_volume;
+	return (STKNodeTick(a->m_lhs) + STKNodeTick(a->m_rhs)) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickSub()
+StkFloat STKArythmeticTickSub(STKArythmetic* a)
 {
-	return (m_lhs->tick() - m_rhs->tick()) * m_volume ;
+	return (STKNodeTick(a->m_lhs) - STKNodeTick(a->m_rhs)) * a->m_volume ;
 }
 
-StkFloat STKArythmetic::ArythmeticTickMultiply()
+StkFloat STKArythmeticTickMultiply(STKArythmetic* a)
 {
-	return (m_lhs->tick() * m_rhs->tick()) * m_volume;
+	return (STKNodeTick(a->m_lhs) * STKNodeTick(a->m_rhs)) * a->m_volume ;
 }
 
-StkFloat STKArythmetic::ArythmeticTickScale()
+StkFloat STKArythmeticTickScale(STKArythmetic* a)
 {
-	return (m_lhs->tick() * m_scalar) * m_volume;
+	return (STKNodeTick(a->m_lhs) * a->m_scalar) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickScaleAdd()
+StkFloat STKArythmeticTickScaleAdd(STKArythmetic* a)
 {
-	return (m_lhs->tick() + m_scalar * m_rhs->tick()) * m_volume;
+	return (STKNodeTick(a->m_lhs) + a->m_scalar * STKNodeTick(a->m_rhs)) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickScaleSub()
+StkFloat STKArythmeticTickScaleSub(STKArythmetic* a)
 {
-	return (m_lhs->tick() - m_scalar * m_rhs->tick()) * m_volume;
+	return (STKNodeTick(a->m_lhs) - a->m_scalar * (STKNodeTick(a->m_rhs)) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickMix()
+StkFloat STKArythmeticTickMix(STKArythmetic* a)
 {
-	return ((1.0 - m_scalar) * m_lhs->tick() + m_scalar * m_rhs->tick()) * m_volume;
+	return ((1.0 - a->m_scalar) * STKNodeTick(a->m_lhs) + a->m_scalar * STKNodeTick(a->m_rhs)) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickBlend()
+StkFloat STKArythmeticTickBlend(STKArythmetic* a)
 {
-	return ((m_lhs->tick() + m_rhs->tick()) * 0.5f) * m_volume;
+	return ((STKNodeTick(a->m_lhs) + STKNodeTick(a->m_rhs)) * 0.5f) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickShift()
+StkFloat STKArythmeticTickShift(STKArythmetic* a)
 {
-	return (m_lhs->tick() + m_scalar) * m_volume;
+	return (STKNodeTick(a->m_lhs) + a->m_scalar) * a->m_volume;
 }
 
-StkFloat STKArythmetic::ArythmeticTickHasNoEffect()
+StkFloat STKArythmeticTickHasNoEffect(STKArythmetic* a)
 {
-	return m_lhs->tick();
+	return STKNodeTick(a->m_lhs);
 }
 
-StkFloat STKArythmetic::tick(unsigned int channel)
+StkFloat STKArythmeticTick(STKArythmetic* a, unsigned int channel)
 {
-	if (!m_lhs || !m_rhs) return 0;
-	return m_tickCallback();
+	if (!a->m_lhs || !a->m_rhs) return 0;
+	return a->m_tickCallback();
 }
 
-void STKArythmetic::setLHS(STKNode* node){
-	if (m_lhs != NULL)term();
-	m_lhs = node;
-	init();
+void STKArythmeticSetLHS(STKArythmetic* a, STKNode* node){
+	if (a->m_lhs != NULL)STKArythmeticTerm(a);
+	a->m_lhs = node;
+	STKArythmeticInit(a);
 }
 
-void STKArythmetic::setRHS(STKNode* node){
-	if (m_rhs != NULL)term();
-	m_rhs = node;
-	init();
+void STKArythmeticSetRHS(STKArythmetic* a, STKNode* node){
+	if (a->m_rhs != NULL)STKArythmeticTerm(a);
+	a->m_rhs = node;
+	STKArythmeticInit(a);
 }
 
-// ----------------------------------------------------------------------
-//	STK GENERATOR ARYTHMETIC SETTER
-// ----------------------------------------------------------------------
-void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmetic::Mode mode)
+//--------------------------------------------------------------------
+// STKArythmetic Set Mode
+//--------------------------------------------------------------------
+void STKArythmeticSetMode(STKArythmetic* a, Mode mode)
 {
-	arythmetic->setMode(mode);
+	if (mode != a->m_mode)
+	{
+		STKArythmeticTerm(a);
+		a->m_mode = mode;
+		STKArythmeticInit(a);
+	}
 }
 
-void STKSetArythmeticScalar(STKArythmetic* generator, StkFloat scalar)
+//--------------------------------------------------------------------
+// STKArythmetic Set Has No Effect
+//--------------------------------------------------------------------
+void STKArythmeticSetHasNoEffect(STKArythmetic* a, bool hasnoeffect)
 {
-	generator->setScalar(scalar);
+	if (hasnoeffect != a->m_hasnoeffect)
+	{
+		if (hasnoeffect)
+		{
+			a->m_tickCallback = [a](){return STKArythmeticTickHasNoEffect(a); };
+		}
+		else
+		{
+			STKArythmeticTerm(a);
+			STKArythmeticInit();
+		}
+	}
 }
 
-void STKSetArythmeticLHS(STKArythmetic* arythmetic, STKNode* node)
+void STKArythmeticSetScalar(STKArythmetic* a, StkFloat scalar)
 {
-	arythmetic->setLHS(node);
-}
 
-void STKSetArythmeticRHS(STKArythmetic* arythmetic, STKNode* node)
-{
-	arythmetic->setRHS(node);
 }

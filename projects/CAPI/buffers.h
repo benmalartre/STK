@@ -11,49 +11,53 @@ struct STKCircularBuffer{
 	int m_rate;
 	int m_chunck;
 
-	STKCircularBuffer(){
-		m_datas = NULL;
-		m_rate = std::ceil(Stk::sampleRate());
-		m_idx = 0;
-		m_phase = 0;
+	STKCircularBuffer* STKCircularBufferCreate(){
+		STKCircularBuffer* b = new STKCircularBuffer();
+		b->m_datas = NULL;
+		b->m_rate = std::ceil(Stk::sampleRate());
+		b->m_idx = 0;
+		b->m_phase = 0;
+		return b;
 	}
 
-	~STKCircularBuffer(){
-		if (m_datas)delete[] m_datas;
+	STKCircularBufferDelete(STKCircularBuffer* b){
+		if (b->m_datas)delete[] b->m_datas;
+		delete b;
 	}
 
-	void init(int rate){
-		if (m_datas != NULL) delete[] m_datas;
-		m_datas = new StkFloat[rate * CIRCULAR_BUFFER_PHASES];
-		m_idx = 0;
-		m_phase = 0;
+	void STKBufferInit(STKCircularBuffer*b, int rate){
+		if (b->m_datas != NULL) delete[] b->m_datas;
+		b->m_datas = new StkFloat[rate * CIRCULAR_BUFFER_PHASES];
+		b->m_rate = rate;
+		b->m_idx = 0;
+		b->m_phase = 0;
 	}
 
-	void set(StkFloat value){
-		m_idx++;
-		if (m_idx >= m_rate){
-			m_idx = 0;
-			m_phase++;
-			if (m_phase == CIRCULAR_BUFFER_PHASES)
+	void STKBufferSet(STKCircularBuffer* b, StkFloat value){
+		b->m_idx++;
+		if (b->m_idx >= b->m_rate){
+			b->m_idx = 0;
+			b->m_phase++;
+			if (b->m_phase == CIRCULAR_BUFFER_PHASES)
 			{
-				m_phase = 0;
+				b->m_phase = 0;
 			}
 		}
-		m_datas[m_phase * m_rate + m_idx] = value;
+		b->m_datas[b->m_phase * b->m_rate + b->m_idx] = value;
 	}
 
-	void get(int phase, int offset, void* datas){
-		memcpy(datas, &m_datas[0], 256 * sizeof(float));
+	void STKBufferGet(STKCircularBuffer* b, int phase, int offset, void* datas){
+		memcpy(datas, &b->m_datas[0], 256 * sizeof(float));
 	}
 };
 
-class STKBuffer : public STKNode{
+struct STKBuffer : public STKNode{
 public:
-	
+
 	StkFloat tick(unsigned int channel = 0);
 	// constructor
 	STKBuffer(STKNode* previous);
-	// destructor 
+	// destructor
 	~STKBuffer();
 	// overrides
 	void reset(){ m_outidx = 0; };

@@ -1,50 +1,21 @@
 #ifndef STK_ARYTHMETIC_H
 #define STK_ARYTHMETIC_H
 
-#include "common.h"
+#include "nodes.h"
 
-class STKArythmetic : public STKNode{
-public:
-	enum Mode{
-		ADD,
-		SUB,
-		MULTIPLY,
-		SCALE,
-		SCALEADD,
-		SCALESUB,
-		MIX,
-		BLEND,
-		SHIFT
-	};
-	StkFloat tick(unsigned int channel = 0);
-	// constructor
-	STKArythmetic(STKNode* a, STKNode* b, Mode mode);
-	// destructor 
-	~STKArythmetic();
-	// overrides
-	void reset(){ m_outidx = 0; };
-	void init();
-	void term();
-	// functions
-	void setMode(Mode mode);
-	void setScalar(StkFloat scalar){ m_scalar = scalar; };
-	void setHasNoEffect(bool hasnoeffect);
-	void setLHS(STKNode* node);
-	void setRHS(STKNode* node);
-	STKNode* getLHS(){ return m_lhs; };
-	STKNode* getRHS(){ return m_rhs; };
+enum STKArythmeticMode{
+	ARYTHMETIC_ADD,
+	ARYTHMETIC_SUB,
+	ARYTHMETIC_MULTIPLY,
+	ARYTHMETIC_SCALE,
+	ARYTHMETIC_SCALEADD,
+	ARYTHMETIC_SCALESUB,
+	ARYTHMETIC_MIX,
+	ARYTHMETIC_BLEND,
+	ARYTHMETIC_SHIFT
+};
 
-private:
-	inline StkFloat ArythmeticTickAdd();
-	inline StkFloat ArythmeticTickSub();
-	inline StkFloat ArythmeticTickMultiply();
-	inline StkFloat ArythmeticTickScale();
-	inline StkFloat ArythmeticTickScaleAdd();
-	inline StkFloat ArythmeticTickScaleSub();
-	inline StkFloat ArythmeticTickMix();
-	inline StkFloat ArythmeticTickBlend();
-	inline StkFloat ArythmeticTickShift();
-	inline StkFloat ArythmeticTickHasNoEffect();
+struct STKArythmetic : public STKNode{
 	std::function<StkFloat()> m_tickCallback;
 	STKNode* m_lhs;
 	STKNode* m_rhs;
@@ -52,6 +23,37 @@ private:
 	StkFloat m_scalar;
 };
 
+// constructor
+STKArythmeticCreate(STKNode* a, STKNode* b, Mode mode);
+
+// destructor
+STKArythmeticDelete(STKArythmetic* a);
+
+// functions
+void STKArythmeticReset(STKArythmetic* a){ a->m_outidx = 0; };
+void STKArythmeticInit(STKArythmetic* a);
+void STKArythmeticTerm(STKArythmetic* a);
+void STKArythmeticSetHasNoEffect(STKArythmetic* a, bool hasnoeffect);
+void STKArythmeticSetLHS(STKArythmetic* a, STKNode* node);
+void STKArythmeticSetRHS(STKArythmetic* a, STKNode* node);
+STKNode* STKArythmeticGetLHS(STKArythmetic* a){ return a->m_lhs; };
+STKNode* STKArythmeticGetRHS(STKArythmetic* a){ return a->m_rhs; };
+
+// tick functions
+inline StkFloat STKArythmeticTickAdd(STKArythmetic* a);
+inline StkFloat STKArythmeticTickSub(STKArythmetic* a);
+inline StkFloat STKArythmeticTickMultiply(STKArythmetic* a);
+inline StkFloat STKArythmeticTickScale(STKArythmetic* a);
+inline StkFloat STKArythmeticTickScaleAdd(STKArythmetic* a);
+inline StkFloat STKArythmeticTickScaleSub(STKArythmetic* a);
+inline StkFloat STKArythmeticTickMix(STKArythmetic* a);
+inline StkFloat STKArythmeticTickBlend(STKArythmetic* a);
+inline StkFloat STKArythmeticTickShift(STKArythmetic* a);
+inline StkFloat STKArythmeticTickHasNoEffect(STKArythmetic* a);
+
+StkFloat STKArythmeticTick(STKArythmetic* a, unsigned int channel = 0);
+
+// export functions
 EXPORT void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmetic::Mode mode);
 EXPORT void STKSetArythmeticScalar(STKArythmetic* arythmetic, StkFloat scalar);
 EXPORT void STKSetArythmeticLHS(STKArythmetic* arythmetic, STKNode* node);

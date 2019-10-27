@@ -26,10 +26,10 @@ using namespace stk;
 
 #if defined(_WIN32) || defined( __WINDOWS_ASIO__ ) || defined( __WINDOWS_DS__ ) || defined( __WINDOWS_WASAPI__ )
 #include <windows.h>
-#define SLEEP( milliseconds ) Sleep( (DWORD) milliseconds ) 
+#define SLEEP( milliseconds ) Sleep( (DWORD) milliseconds )
 
 #if defined(STATIC_LIB)
-#define EXPORT extern "C" 
+#define EXPORT extern "C"
 #else
 #define EXPORT extern "C" __declspec(dllexport)
 #endif
@@ -38,7 +38,7 @@ using namespace stk;
 #include <string.h>
 #include <stdio.h>
 #define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
-#define EXPORT extern "C" 
+#define EXPORT extern "C"
 #endif
 
 // Global Constants

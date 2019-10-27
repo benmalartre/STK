@@ -2,83 +2,86 @@
 //--------------------------------------------------------------------
 // STKFilter Node Constructor
 //--------------------------------------------------------------------
-STKFilter::STKFilter(STKNode* source, Type type)
+STKFilter* STKFilterCreate(STKNode* source, STKFilterType type)
 {
-	m_source = source;
-	m_volume = 1.0f;
-	m_type = type;
-	m_noutput = 0;
-	m_outidx = 0;
-	init();
+    STKFilter* filter = new STKFilter();
+	filter->m_source = source;
+	filter->m_volume = 1.0f;
+	filter->m_type = type;
+	filter->m_noutput = 0;
+	filter->m_outidx = 0;
+	STKFilterInit(filter);
+    return filter;
 }
 
 //--------------------------------------------------------------------
 // STKFilter Node Constructor
 //--------------------------------------------------------------------
-STKFilter::~STKFilter()
+void STKFilterDelete(STKFilter* filter)
 {
-	term();
+	STKFilterTerm(filter);
+    delete filter;
 }
 
 //--------------------------------------------------------------------
 // STKFilter Node Init
 //--------------------------------------------------------------------
-void STKFilter::init()
+void STKFilterInit(STKFilter* filter)
 {
-	switch (m_type)
+	switch (filter->m_type)
 	{
-		case Type::ONEZERO:
+        case FILTER_ONEZERO:
 		{
-			m_onezero = new OneZero();
-			m_tickCallback = [this](){ return this->FilterTickOneZero(); };
+			filter->m_filter.m_onezero = new OneZero();
+			filter->m_tickCallback = [filter](){ return STKFilterTickOneZero(filter); };
 			break;
 		}
-		case Type::POLEZERO:
+		case FILTER_POLEZERO:
 		{
-			m_polezero = new PoleZero();
-			m_tickCallback = [this](){ return this->FilterTickPoleZero(); };
+			filter->m_filter.m_polezero = new PoleZero();
+			filter->m_tickCallback = [filter](){ return STKFilterTickPoleZero(filter); };
 			break;
 		}
-		case Type::TWOZERO:
+		case FILTER_TWOZERO:
 		{
-			m_twozero = new TwoZero();
-			m_tickCallback = [this](){ return this->FilterTickTwoZero(); };
+			filter->m_filter.m_twozero = new TwoZero();
+			filter->m_tickCallback = [filter](){ return STKFilterTickTwoZero(filter); };
 			break;
 		}
-		case Type::TWOPOLE:
+		case FILTER_TWOPOLE:
 		{
-			m_twopole = new TwoPole();
-			m_tickCallback = [this](){ return this->FilterTickTwoPole(); };
+			filter->m_filter.m_twopole = new TwoPole();
+			filter->m_tickCallback = [filter](){ return STKFilterTickTwoPole(filter); };
 			break;
 		}
-		case Type::BIQUAD:
+		case FILTER_BIQUAD:
 		{
-			m_biquad = new BiQuad();
-			m_tickCallback = [this](){ return this->FilterTickBiQuad(); };
+			filter->m_filter.m_biquad = new BiQuad();
+			filter->m_tickCallback = [filter](){ return STKFilterTickBiQuad(filter); };
 			break;
 		}
-		case Type::FORMSWEP:
+		case FILTER_FORMSWEP:
 		{
-			m_formswep = new FormSwep();
-			m_tickCallback = [this](){ return this->FilterTickFormSwep(); };
+			filter->m_filter.m_formswep = new FormSwep();
+			filter->m_tickCallback = [filter](){ return STKFilterTickFormSwep(filter); };
 			break;
 		}
-		case Type::DELAY:
+		case FILTER_DELAY:
 		{
-			m_delay = new Delay();
-			m_tickCallback = [this](){ return this->FilterTickDelay(); };
+			filter->m_filter.m_delay = new Delay();
+			filter->m_tickCallback = [filter](){ return STKFilterTickDelay(); };
 			break;
 		}
-		case Type::DELAYA:
+		case FILTER_DELAYA:
 		{
-			m_delaya = new DelayA();
-			m_tickCallback = [this](){ return this->FilterTickDelayA(); };
+			filter->m_filter.m_delaya = new DelayA();
+			filter->m_tickCallback = [filter](){ return STKFilterTickDelayA(); };
 			break;
 		}
-		case Type::DELAYL:
+		case FILTER_DELAYL:
 		{
-			m_delayl = new DelayL();
-			m_tickCallback = [this](){ return this->FilterTickDelayL(); };
+			filter->m_filter.m_delayl = new DelayL();
+			filter->m_tickCallback = [filter](){ return STKFilterTickDelayL(); };
 			break;
 		}
 		default:
@@ -92,7 +95,7 @@ void STKFilter::init()
 //--------------------------------------------------------------------
 // STKFilter Node Term
 //--------------------------------------------------------------------
-void STKFilter::term()
+void STKFilterTerm(STKFilter* filter)
 {
 }
 
@@ -100,92 +103,108 @@ void STKFilter::term()
 //--------------------------------------------------------------------
 // STKFilter Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKFilter::FilterTickOneZero()
+StkFloat STKFilterTickOneZero(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_onezero->tick(m_source->tick()))*m_volume;
-	else return update(m_onezero->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_onezero->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_onezero->lastOut());
 }
 
-StkFloat STKFilter::FilterTickOnePole()
+StkFloat STKFilterTickOnePole(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_onepole->tick(m_source->tick()))*m_volume;
-	else return update(m_onepole->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_onepole->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_onepole->lastOut());
 }
 
-StkFloat STKFilter::FilterTickPoleZero()
+StkFloat STKFilterTickPoleZero(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_polezero->tick(m_source->tick()))*m_volume;
-	else return update(m_polezero->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_polezero->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_polezero->lastOut());
 }
 
-StkFloat STKFilter::FilterTickTwoZero()
+StkFloat STKFilterTickTwoZero(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_twozero->tick(m_source->tick()))*m_volume;
-	else return update(m_twozero->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_twozero->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_twozero->lastOut());
 }
 
-StkFloat STKFilter::FilterTickTwoPole()
+StkFloat STKFilterTickTwoPole(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_twopole->tick(m_source->tick()))*m_volume;
-	else return update(m_twopole->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_twopole->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_twopole->lastOut());
 }
 
-StkFloat STKFilter::FilterTickBiQuad()
+StkFloat STKFilterTickBiQuad(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_biquad->tick(m_source->tick()))*m_volume;
-	else return update(m_biquad->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_biquad->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_biquad->lastOut());
 }
 
-StkFloat STKFilter::FilterTickFormSwep()
+StkFloat STKFilterTickFormSwep(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_formswep->tick(m_source->tick()))*m_volume;
-	else return update(m_formswep->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_formswep->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_formswep->lastOut());
 }
 
-StkFloat STKFilter::FilterTickDelay()
+StkFloat STKFilterTickDelay(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_delay->tick(m_source->tick()))*m_volume;
-	else return update(m_delay->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_delay->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_delay->lastOut());
 }
 
-StkFloat STKFilter::FilterTickDelayA()
+StkFloat STKFilterTickDelayA(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_delaya->tick(m_source->tick()))*m_volume;
-	else return update(m_delaya->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_delaya->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_delaya->lastOut());
 }
 
-StkFloat STKFilter::FilterTickDelayL()
+StkFloat STKFilterTickDelayL(STKFilter* f)
 {
-	if (m_outidx == 0) return update(m_delayl->tick(m_source->tick()))*m_volume;
-	else return update(m_delayl->lastOut())*m_volume;
+	if (f->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_delayl->tick(STKNodeTick(f->m_source)))*f->m_volume;
+	else
+        return STKNodeUpdate((STKNode*)f, f->m_filter.m_delayl->lastOut());
 }
 
-StkFloat STKFilter::FilterTickHasNoEffect()
+StkFloat STKFilterTickHasNoEffect(STKFilter* f)
 {
-	return m_source->tick();
+	return STKNodeTick(f->m_source);
 }
 
-StkFloat STKFilter::tick(unsigned int channel)
+StkFloat STKFilterTick(STKFilter* f, unsigned int channel)
 {
-	return m_tickCallback();
+	return f->m_tickCallback();
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Change Type
 //--------------------------------------------------------------------
-void STKFilter::setType(Type type)
+void STKFilterSetType(STKFilter* filter, STKFilterType type)
 {
-	if (type != m_type){
-		term();
-		m_type = type;
-		init();
-	}
+    
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Change Scalar
 //--------------------------------------------------------------------
-void STKFilter::setScalar(StkFloat scalar, Param param)
+void STKFilterSetScalar(STKFilter* filter, StkFloat scalar, STKFilterParam param)
 {
 	/*
 	switch (m_type){
@@ -253,31 +272,19 @@ void STKFilter::setScalar(StkFloat scalar, Param param)
 //--------------------------------------------------------------------
 // STKFilter Set Has No Effect
 //--------------------------------------------------------------------
-void STKFilter::setHasNoEffect(bool hasnoeffect)
+void STKFilterSetHasNoEffect(STKFilter* filter, bool hasnoeffect)
 {
-	if (hasnoeffect != m_hasnoeffect)
+	if (hasnoeffect != filter->m_hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			m_tickCallback = [this](){return this->FilterTickHasNoEffect(); };
+			filter->m_tickCallback = [filter](){return STKFilterTickHasNoEffect(filter); };
 		}
 		else
 		{
-			term();
-			init();
+			STKFilterTerm(filter);
+			STKFilterInit(filter);
 		}
 	}
 }
 
-// ----------------------------------------------------------------------
-//	STK FILTER NODE SETTER
-// ----------------------------------------------------------------------
-void STKSetFilterType(STKFilter* filter, STKFilter::Type type)
-{
-	filter->setType(type);
-}
-
-void STKSetFilterScalar(STKFilter* filter, STKFilter::Param param, StkFloat scalar)
-{
-	filter->setScalar(scalar, param);
-}

@@ -2,40 +2,42 @@
 #ifndef STK_WRITER_H
 #define STK_WRITER_H
 
-#include "common.h"
+#include "nodes.h"
 #include "FileWvOut.h"
 #include <cstdlib>
 
-class STKWriter : public STKNode{
-public:
-	enum Mode {
 
-	};
+typedef enum STKWriterMode {
+    
+}STKWriterMode;
 
-	enum Param {
+typedf enum STKWriterParam {
+    
+}STKWriterParam;
 
-	};
-
-	StkFloat tick(unsigned int channel = 0);
-	// constructor
-	STKWriter();
-	// destructor 
-	~STKWriter();
-	// overrides
-	void reset();
-	void init();
-	void term();
-	// functions
-	void setFile(std::string filename);
-	void setScalar(Param param, StkFloat scalar);
-	void setHasNoEffect(bool hasnoeffect);
-
-private:
+struct STKWriter : public STKNode{
 	std::function<StkFloat()> m_tickCallback;
 	FileWvOut m_file;
 	std::string m_filename;
 };
 
+// functions
+
+StkFloat STKWriterTick(unsigned int channel = 0);
+// constructor
+STKWriter* STKWriterCreate();
+
+// destructor
+void STKWriterDelete(STKWriter* writer);
+
+// functions
+void STKWriterReset(STKWriter* writer);
+void STKWriterInit(STKWriter* writer);
+void STKWriterTerm(STKWriter* writer);
+void STKWriterSetFile(STKWriter* writer, std::string filename);
+void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);
+
+// exported functions
 EXPORT void STKSetWriterMode(STKWriter* writer, STKWriter::Mode mode);
 EXPORT void STKSetWriterScalar(STKWriter* writer, STKWriter::Param param, StkFloat scalar);
 

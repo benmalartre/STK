@@ -1,7 +1,7 @@
 #ifndef STK_FILTERS_H
 #define STK_FILTERS_H
 
-#include "common.h"
+#include "nodes.h"
 #include "Filter.h"
 #include "OneZero.h"
 #include "OnePole.h"
@@ -14,102 +14,103 @@
 #include "DelayL.h"
 #include "DelayA.h"
 
+typedef enum STKFilterType{
+    FILTER_ONEZERO,
+    FILTER_ONEPOLE,
+    FILTER_POLEZERO,
+    FILTER_TWOZERO,
+    FILTER_TWOPOLE,
+    FILTER_BIQUAD,
+    FILTER_FORMSWEP,
+    FILTER_DELAY,
+    FILTER_DELAYL,
+    FILTER_DELAYA
+}STKFilterType;
 
-class STKFilter : public STKNode{
-public:
-	enum Type{
-		ONEZERO,
-		ONEPOLE,
-		POLEZERO,
-		TWOZERO,
-		TWOPOLE,
-		BIQUAD,
-		FORMSWEP,
-		DELAY,
-		DELAYL,
-		DELAYA
-	};
+typedef enum STKFilterParam{
+    FILTER_GAIN,            // gain
+    FILTER_ONE_ZERO_ZERO,            // one zero zero
+    FILTER_ONE_ZERO_B0,
+    FILTER_ONE_ZERO_B1,
+    FILTER_ONE_POLE_POLE,
+    FILTER_ONE_POLE_B0,
+    FILTER_ONE_POLE_A1,
+    FILTER_TWO_ZERO_B0,
+    FILTER_TWO_ZERO_B1,
+    FILTER_TWO_ZERO_B2
+    /*
+     FILTER_B2,
+     
+     FILTER_TIME,            // envelope time
+     FILTER_TARGET,            // envelope target
+     FILTER_VALUE,            // envelope value
+     FILTER_T60,            // prcrev, jcrev, nrev T60
+     FILTER_MIX,            // freeverb effect mix
+     FILTER_ROOMSIZE,        // freeverb room size
+     FILTER_DAMPING,        // freeverb damping
+     FILTER_WIDTH,            // freeverb width
+     FILTER_MODE,            // freeverb mode
+     FILTER_DELAY,            // echo delay
+     FILTER_MAXIMUMDELAY,    // echo maximum delay
+     FILTER_SHIFT,            // pitshift and lentpitshift
+     FILTER_MODDEPTH,        // chorus mod depth
+     FILTER_MODFREQUENCY    // chorus mod frequency
+     */
+};
 
-	enum Param{
-		GAIN,			// gain
-		ONE_ZERO_ZERO,			// one zero zero
-		ONE_ZERO_B0,
-		ONE_ZERO_B1,
-		ONE_POLE_POLE,
-		ONE_POLE_B0,
-		ONE_POLE_A1,
-		TWO_ZERO_B0,
-		TWO_ZERO_B1,
-		TWO_ZERO_B2
-		/*
-		B2,
+union STKFilterFILTER
+{
+    OneZero* m_onezero;
+    OnePole* m_onepole;
+    PoleZero* m_polezero;
+    TwoZero* m_twozero;
+    TwoPole* m_twopole;
+    BiQuad* m_biquad;
+    FormSwep* m_formswep;
+    Delay* m_delay;
+    DelayL* m_delayl;
+    DelayA* m_delaya;
+    LentPitShift* m_lentpitshift;
+    Chorus* m_chorus;
+};
 
-		TIME,			// envelope time
-		TARGET,			// envelope target
-		VALUE,			// envelope value
-		T60,			// prcrev, jcrev, nrev T60
-		MIX,			// freeverb effect mix
-		ROOMSIZE,		// freeverb room size
-		DAMPING,		// freeverb damping
-		WIDTH,			// freeverb width
-		MODE,			// freeverb mode
-		DELAY,			// echo delay
-		MAXIMUMDELAY,	// echo maximum delay
-		SHIFT,			// pitshift and lentpitshift 
-		MODDEPTH,		// chorus mod depth	
-		MODFREQUENCY	// chorus mod frequency
-		*/
-	};
-
-	StkFloat tick(unsigned int channel = 0);
-	// constructor
-	STKFilter(STKNode* source, Type type);
-	// destructor 
-	~STKFilter();
-	// overrides
-	void reset(){ m_outidx = 0; };
-	void init();
-	void term();
-	// functions
-	Type getType(){ return m_type; };
-	void setType(Type type);
-	void setScalar(StkFloat scalar, Param param);
-	void setHasNoEffect(bool hasnoeffect);
-private:
-	inline StkFloat FilterTickOneZero();
-	inline StkFloat FilterTickOnePole();
-	inline StkFloat FilterTickPoleZero();
-	inline StkFloat FilterTickTwoZero();
-	inline StkFloat FilterTickTwoPole();
-	inline StkFloat FilterTickBiQuad();
-	inline StkFloat FilterTickFormSwep();
-	inline StkFloat FilterTickDelay();
-	inline StkFloat FilterTickDelayL();
-	inline StkFloat FilterTickDelayA();
-	inline StkFloat FilterTickHasNoEffect();
+struct STKFilter : public STKNode{
 	std::function<StkFloat()> m_tickCallback;
-	union
-	{
-		OneZero* m_onezero;
-		OnePole* m_onepole;
-		PoleZero* m_polezero;
-		TwoZero* m_twozero;
-		TwoPole* m_twopole;
-		BiQuad* m_biquad;
-		FormSwep* m_formswep;
-		Delay* m_delay;
-		DelayL* m_delayl;
-		DelayA* m_delaya;
-		LentPitShift* m_lentpitshift;
-		Chorus* m_chorus;
-	};
+    STKFilterFILTER m_filter;
 	STKNode* m_source;
 	Type m_type;
 };
 
+
+// constructor
+STKFilter* STKFilterCreate(STKNode* source, Type type);
+
+// destructor
+void STKFilterDelete(STKFilter* filter);
+
+// functions
+void STKFilterReset(STKFilter* filter){ m_outidx = 0; };
+void STKFilterInit(STKFilter* filter);
+void STKFilterTerm(STKFilter* filter);
+
+// tick functions
+inline StkFloat STKFilterTickOneZero(STKFilter* filter);
+inline StkFloat STKFilterTickOnePole(STKFilter* filter);
+inline StkFloat STKFilterTickPoleZero(STKFilter* filter);
+inline StkFloat STKFilterTickTwoZero(STKFilter* filter);
+inline StkFloat STKFilterTickTwoPole(STKFilter* filter);
+inline StkFloat STKFilterTickBiQuad(STKFilter* filter);
+inline StkFloat STKFilterTickFormSwep(STKFilter* filter);
+inline StkFloat STKFilterTickDelay(STKFilter* filter);
+inline StkFloat STKFilterTickDelayL(STKFilter* filter);
+inline StkFloat STKFilterTickDelayA(STKFilter* filter);
+inline StkFloat STKFilterTickHasNoEffect(STKFilter* filter);
+StkFloat STKFilterTick(STKFilter* filter, unsigned int channel = 0);
+
 // ----------------------------------------------------------------------
 //	STK FILTER NODE SETTER
 // ----------------------------------------------------------------------
+EXPORT STKFilterType STKFilterGetType(STKFilter* filter){ return m_type; };
 EXPORT void STKSetFilterType(STKFilter* filter, STKFilter::Type type);
 EXPORT void STKSetFilterScalar(STKFilter* filter, STKFilter::Param param, StkFloat scalar);
 

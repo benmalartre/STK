@@ -1,65 +1,40 @@
 #ifndef STK_ENVELOPES_H
 #define STK_ENVELOPES_H
 
-#include "common.h"
+#include "nodes.h"
 #include "Envelope.h"
 #include "ADSR.h"
 #include "Asymp.h"
 
-/*
+enum STKEnvelopeType {
+    ENVELOPE_ENVELOPE,
+    ENVELOPE_ADSR,
+    ENVELOPE_ASYMP
+};
 
-*/
-class STKEnvelope : public STKNode{
-public:
-	enum Type {
-		ENVELOPE_ENVELOPE,
-		ENVELOPE_ADSR,
-		ENVELOPE_ASYMP
-	};
+enum STKEnvelopeParam {
+    ENVELOPE_ATTACK_RATE,
+    ENVELOPE_ATTACK_TARGET,
+    ENVELOPE_ATTACK_TIME,
+    ENVELOPE_DECAY_RATE,
+    ENVELOPE_DECAY_TIME,
+    ENVELOPE_SUSTAIN_LEVEL,
+    ENVELOPE_RELEASE_RATE,
+    ENVELOPE_RELEASE_TIME,
+    ENVELOPE_TARGET,
+    ENVELOPE_VALUE,
+    ENVELOPE_RATE,
+    ENVELOPE_TIME
+};
 
-	enum Param {
-		ENV_ATTACK_RATE,
-		ENV_ATTACK_TARGET,
-		ENV_ATTACK_TIME,
-		ENV_DECAY_RATE,
-		ENV_DECAY_TIME,
-		ENV_SUSTAIN_LEVEL,
-		ENV_RELEASE_RATE,
-		ENV_RELEASE_TIME,
-		ENV_TARGET,
-		ENV_VALUE,
-		ENV_RATE,
-		ENV_TIME
-	};
+union STKEnvelopeENV
+{
+    Envelope* m_envelope;
+    ADSR* m_adsr;
+};
 
-	StkFloat tick(unsigned int channel = 0);
-	// constructor
-	STKEnvelope(Type type, STKNode* source);
-	// destructor 
-	~STKEnvelope();
-	// overrides
-	void reset();
-	void init();
-	void term();
-	// functions
-	Type getType(){ return m_type; };
-	void setType(Type type);
-	void setScalar(Param param, StkFloat scalar);
-	void setHasNoEffect(bool hasnoeffect);
-	void keyOn();
-	void keyOff();
-
-
-private:
-	union
-	{
-		Envelope* m_envelope;
-		ADSR* m_adsr;
-	};
-	inline StkFloat EnvelopeTickEnvelope();
-	inline StkFloat EnvelopeTickADSR();
-	inline StkFloat EnvelopeTickAsymp();
-	inline StkFloat EnvelopeTickHasNoEffect();
+struct STKEnvelope : public STKNode{
+    STKEnvelopeENV m_e;
 	std::function<StkFloat()> m_tickCallback;
 	Type m_type;
 	float m_frequency;
@@ -67,8 +42,29 @@ private:
 
 };
 
-EXPORT void STKSetEnvelopeType(STKEnvelope* envelope, STKEnvelope::Type type);
-EXPORT void STKSetEnvelopeScalar(STKEnvelope* envelope, STKEnvelope::Param param, StkFloat scalar);
+// constructor
+STKEnvelope* STKEnvelopeCreate(STKEnvelope*, STKEnvelopeType type, STKNode* source);
+
+// destructor
+void STKEnvelopeDelete(STKEnvelope*);
+
+// functions
+void STKEnvelopeReset(STKEnvelope*);
+void STKEnvelopeInit(STKEnvelope*);
+void STKEnvelopeTerm(STKEnvelope*);
+
+// tick functions
+inline StkFloat STKEnvelopeTickEnvelope(STKEnvelope*);
+inline StkFloat STKEnvelopeTickADSR(STKEnvelope*);
+inline StkFloat STKEnvelopeTickAsymp(STKEnvelope*);
+inline StkFloat STKEnvelopeTickHasNoEffect(STKEnvelope*);
+StkFloat STKEnvelopeTick(STKEnvelope*, unsigned int channel = 0);
+
+// exported functions
+EXPORT void STKEnvelopeSetHasNoEffect(STKEnvelope* e, bool hasnoeffect);
+EXPORT STKEnvelopeType STKEnvelopeGetType(STKEnvelope*){ return m_type; };
+EXPORT void STKEnvelopeSetType(STKEnvelope* envelope, STKEnvelope::Type type);
+EXPORT void STKEnvelopeSetScalar(STKEnvelope* envelope, STKEnvelope::Param param, StkFloat scalar);
 EXPORT void STKEnvelopeKeyOn(STKEnvelope* envelope);
 EXPORT void STKEnvelopeKeyOff(STKEnvelope* envelope);
 
