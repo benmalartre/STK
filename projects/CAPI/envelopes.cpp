@@ -107,6 +107,10 @@ void STKEnvelopeKeyOn(STKEnvelope* e)
 {
 	switch(e->m_envtype)
 	{
+        case ENVELOPE_ASYMP:
+        {
+            
+        }
 	    case ENVELOPE_ENVELOPE:
 		{
 			e->m_e.m_envelope->keyOn();

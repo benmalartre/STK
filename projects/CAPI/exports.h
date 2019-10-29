@@ -15,11 +15,11 @@ EXPORT void STKTerm(RtAudio* DAC);
 EXPORT void STKSetSampleRate(float rate);
 EXPORT int STKGetDevices(RtAudio* DAC);
 
-EXPORT StkFloat STKNodeTick(STKNode*);
+//EXPORT StkFloat STKNodeTick(STKNode*);
 EXPORT void STKNodeSetHasNoEffect(STKNode* node, bool hasnoeffect);
 EXPORT void STKNodeReset(STKNode*);
 EXPORT void STKNodeInit(STKNode*);
-EXPORT void STKNodeTerm(STKNode*)
+EXPORT void STKNodeTerm(STKNode*);
 
 
 

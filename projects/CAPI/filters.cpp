@@ -7,7 +7,7 @@ STKFilter* STKFilterCreate(STKNode* source, STKFilterType type)
     STKFilter* filter = new STKFilter();
 	filter->m_source = source;
 	filter->m_volume = 1.0f;
-	filter->m_type = type;
+	filter->m_ftype = type;
 	filter->m_noutput = 0;
 	filter->m_outidx = 0;
 	STKFilterInit(filter);
@@ -69,19 +69,19 @@ void STKFilterInit(STKFilter* filter)
 		case FILTER_DELAY:
 		{
 			filter->m_filter.m_delay = new Delay();
-			filter->m_tickCallback = [filter](){ return STKFilterTickDelay(); };
+			filter->m_tickCallback = [filter](){ return STKFilterTickDelay(filter); };
 			break;
 		}
 		case FILTER_DELAYA:
 		{
 			filter->m_filter.m_delaya = new DelayA();
-			filter->m_tickCallback = [filter](){ return STKFilterTickDelayA(); };
+			filter->m_tickCallback = [filter](){ return STKFilterTickDelayA(filter); };
 			break;
 		}
 		case FILTER_DELAYL:
 		{
 			filter->m_filter.m_delayl = new DelayL();
-			filter->m_tickCallback = [filter](){ return STKFilterTickDelayL(); };
+			filter->m_tickCallback = [filter](){ return STKFilterTickDelayL(filter); };
 			break;
 		}
 		default:

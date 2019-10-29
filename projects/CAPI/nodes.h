@@ -17,7 +17,7 @@ struct STKNode{
     
 };
 
-StkFloat STKNodeTick(STKNode* node);
+EXPORT StkFloat STKNodeTick(STKNode* node);
 
 EXPORT void STKNodeSetVolume(STKNode* node, StkFloat volume);
 EXPORT void STKNodeIncrementNumOutput(STKNode*);

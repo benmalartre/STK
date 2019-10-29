@@ -28,7 +28,7 @@ void STKEffectDelete(STKEffect* fx)
 //--------------------------------------------------------------------
 void STKEffectInit(STKEffect* fx)
 {
-	switch (m_fxtype)
+	switch (fx->m_fxtype)
 	{
 		case EFFECT_ENVELOPE:
 		{
@@ -36,58 +36,58 @@ void STKEffectInit(STKEffect* fx)
 			fx->m_tickCallback = [fx](){ return STKEffectTickEnvelope(fx); };
 			break;
 		}
-		case Type::PRCREV:
+		case EFFECT_PRCREV:
 		{
-			m_prcrev = new PRCRev();
-			m_tickCallback = [this](){ return this->EffectTickPRCRev(); };
+			fx->m_fx.m_prcrev = new PRCRev();
+			fx->m_tickCallback = [fx](){ return STKEffectTickPRCRev(fx); };
 			break;
 		}
-		case Type::JCREV:
+		case EFFECT_JCREV:
 		{
-			m_jcrev = new JCRev();
-			m_tickCallback = [this](){ return this->EffectTickJCRev(); };
+			fx->m_fx.m_jcrev = new JCRev();
+			fx->m_tickCallback = [fx](){ return STKEffectTickJCRev(fx); };
 			break;
 		}
-		case Type::NREV:
+		case EFFECT_NREV:
 		{
-			m_nrev = new NRev();
-			m_tickCallback = [this](){ return this->EffectTickNRev(); };
+			fx->m_fx.m_nrev = new NRev();
+			fx->m_tickCallback = [fx](){ return STKEffectTickNRev(fx); };
 			break;
 		}
-		case Type::FREEVERB:
+		case EFFECT_FREEVERB:
 		{
-			m_freeverb = new FreeVerb();
-			m_tickCallback = [this](){ return this->EffectTickFreeVerb(); };
+			fx->m_fx.m_freeverb = new FreeVerb();
+			fx->m_tickCallback = [fx](){ return STKEffectTickFreeVerb(fx); };
 			break;
 		}
-		case Type::ECHO:
+		case EFFECT_ECHO:
 		{
-			m_echo = new Echo();
-			m_tickCallback = [this](){ return this->EffectTickEcho(); };
+			fx->m_fx.m_echo = new Echo();
+			fx->m_tickCallback = [fx](){ return STKEffectTickEcho(fx); };
 			break;
 		}
-		case Type::PITSHIFT:
+		case EFFECT_PITSHIFT:
 		{
-			m_pitshift = new PitShift();
-			m_tickCallback = [this](){ return this->EffectTickPitShift(); };
+			fx->m_fx.m_pitshift = new PitShift();
+			fx->m_tickCallback = [fx](){ return STKEffectTickPitShift(fx); };
 			break;
 		}
-		case Type::LENTPITSHIFT:
+		case EFFECT_LENTPITSHIFT:
 		{
-			m_lentpitshift = new LentPitShift();
-			m_tickCallback = [this](){ return this->EffectTickLentPitShift(); };
+			fx->m_fx.m_lentpitshift = new LentPitShift();
+			fx->m_tickCallback = [fx](){ return STKEffectTickLentPitShift(fx); };
 			break;
 		}
-		case Type::CHORUS:
+		case EFFECT_CHORUS:
 		{
-			m_chorus = new Chorus();
-			m_tickCallback = [this](){ return this->EffectTickChorus(); };
+			fx->m_fx.m_chorus = new Chorus();
+			fx->m_tickCallback = [fx](){ return STKEffectTickChorus(fx); };
 			break;
 		}
-		case Type::MOOG:
+		case EFFECT_MOOG:
 		{
-			m_moog = new Moog();
-			m_tickCallback = [this](){ return this->EffectTickMoog(); };
+			fx->m_fx.m_moog = new Moog();
+			fx->m_tickCallback = [fx](){ return STKEffectTickMoog(fx); };
 			break;
 		}
 	}
@@ -97,170 +97,204 @@ void STKEffectInit(STKEffect* fx)
 //--------------------------------------------------------------------
 // STKEffect Node Term
 //--------------------------------------------------------------------
-void STKEffect::term()
+void STKEffectTerm()
 {
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKEffect::EffectTickEnvelope()
+StkFloat STKEffectTickEnvelope(STKEffect* fx)
 {
-	if (m_outidx == 0) return update(m_envelope->tick() * m_source->tick()) * m_volume;
-	else return update(m_envelope->lastOut() * m_source->tick()) * m_volume;
+	if (fx->m_outidx == 0)
+        return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_envelope->tick()) *
+            STKNodeTick(fx->m_source) *
+            fx->m_volume;
+    
+	else
+        return STKNodeUpdate((STKNode*) fx, fx->m_fx.m_envelope->lastOut()) *
+            STKNodeTick(fx->m_source) *
+            fx->m_volume;
 }
 
-StkFloat STKEffect::EffectTickPRCRev()
+StkFloat STKEffectTickPRCRev(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
 	else return update(m_prcrev->lastOut())* m_volume;
+     */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickJCRev()
+StkFloat STKEffectTickJCRev(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_jcrev->tick(m_source->tick()))* m_volume;
 	else return update(m_jcrev->lastOut())* m_volume;
+     */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickNRev()
+StkFloat STKEffectEffectTickNRev(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_nrev->tick(m_source->tick()))* m_volume;
 	else return update(m_nrev->lastOut())* m_volume;
+     */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickFreeVerb()
+StkFloat STKEffectEffectTickFreeVerb(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_freeverb->tick(m_source->tick()))* m_volume;
 	else return update(m_freeverb->lastOut())* m_volume;
+     */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickEcho()
+StkFloat STKEffectEffectTickEcho(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
 	else return update(m_prcrev->lastOut())* m_volume;
 	return m_echo->tick(m_source->tick())* m_volume;
+    */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickPitShift()
+StkFloat STKEffectEffectTickPitShift(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_pitshift->tick(m_source->tick()))* m_volume;
 	else return update(m_pitshift->lastOut())* m_volume;
+     */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickLentPitShift()
+StkFloat STKEffectEffectTickLentPitShift(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
 	else return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
+     */
+    return 0;
 }
 
-StkFloat STKEffect::EffectTickChorus()
+StkFloat STKEffectEffectTickChorus(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_chorus->tick(m_source->tick()))* m_volume;
 	else return update(m_chorus->lastOut())* m_volume;
+     */
+    return 0;
 
 }
 
-StkFloat STKEffect::EffectTickMoog()
+StkFloat STKEffectEffectTickMoog(STKEffect* fx)
 {
+    /*
 	if (m_outidx == 0) return update(m_moog->tick(m_source->tick()))* m_volume;
 	else return update(m_moog->lastOut())* m_volume;
+     */
+    return 0;
 
 }
 
-StkFloat STKEffect::EffectTickHasNoEffect()
+StkFloat STKEffectEffectTickHasNoEffect(STKEffect* fx)
 {
-	return m_source->tick();
+	return STKNodeTick(fx->m_source);
 }
 
-StkFloat STKEffect::tick(unsigned int channel)
+StkFloat STKEffectTick(STKEffect* fx, unsigned int channel)
 {
-	return m_tickCallback();
+	return fx->m_tickCallback();
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Change Type
 //--------------------------------------------------------------------
-void STKEffect::setType(TSTKEffectype type)
+void STKEffectSetType(STKEffect* fx, STKEffectType type)
 {
-	if (type != m_type){
-		term();
-		m_fxtype = type;
-		init();
+	if (type != fx->m_fxtype){
+		STKEffectTerm(fx);
+		fx->m_fxtype = type;
+		STKEffectInit(fx);
 	}
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Change Scalar
 //--------------------------------------------------------------------
-void STKEffect::setScalar( StkFloat scalar, Param param)
+void STKEffectSetScalar( STKEffect* fx, StkFloat scalar, STKEffectParam param)
 {
-	switch (m_type){
-		case ENVELOPE:
+	switch (fx->m_fxtype){
+		case EFFECT_ENVELOPE:
 		{
-			if (param == RATE)
+			if (param == EFFECT_RATE)
 			{
 				if (scalar < 0)scalar = 0;
-				m_envelope->setRate(scalar);
+				fx->m_fx.m_envelope->setRate(scalar);
 			}
-			else if (param == TIME)m_envelope->setTime(scalar);
-			else if (param == TARGET)m_envelope->setTarget(scalar);
-			else if (param == VALUE)m_envelope->setValue(scalar);
+			else if (param == EFFECT_TIME)fx->m_fx.m_envelope->setTime(scalar);
+			else if (param == EFFECT_TARGET)fx->m_fx.m_envelope->setTarget(scalar);
+			else if (param == EFFECT_VALUE)fx->m_fx.m_envelope->setValue(scalar);
 			break;
 		}
-		case PRCREV:
+		case EFFECT_PRCREV:
 		{
-			if (param == T60)m_prcrev->setT60(scalar);
-			else if (param == MIX)m_prcrev->setEffectMix(scalar);
+			if (param == EFFECT_T60)fx->m_fx.m_prcrev->setT60(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_prcrev->setEffectMix(scalar);
             break;
 		}
-		case JCREV:
+		case EFFECT_JCREV:
 		{
-			if (param == T60)m_jcrev->setT60(scalar);
-			else if (param == MIX)m_jcrev->setEffectMix(scalar);
+			if (param == EFFECT_T60)fx->m_fx.m_jcrev->setT60(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_jcrev->setEffectMix(scalar);
             break;
 		}
-		case NREV:
+		case EFFECT_NREV:
 		{
-			if (param == T60)m_nrev->setT60(scalar);
-			else if (param == MIX)m_nrev->setEffectMix(scalar);
+			if (param == EFFECT_T60)fx->m_fx.m_nrev->setT60(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_nrev->setEffectMix(scalar);
             break;
 		}
-		case FREEVERB:
+		case EFFECT_FREEVERB:
 		{
-			if (param == MIX)m_freeverb->setEffectMix(scalar);
-			else if (param == ROOMSIZE)m_freeverb->setRoomSize(scalar);
-			else if (param == DAMPING)m_freeverb->setDamping(scalar);
-			else if (param == WIDTH)m_freeverb->setWidth(scalar);
-			else if (param == MODE)m_freeverb->setMode((bool)scalar);
+			if (param == EFFECT_MIX)fx->m_fx.m_freeverb->setEffectMix(scalar);
+			else if (param == EFFECT_ROOMSIZE)fx->m_fx.m_freeverb->setRoomSize(scalar);
+			else if (param == EFFECT_DAMPING)fx->m_fx.m_freeverb->setDamping(scalar);
+			else if (param == EFFECT_WIDTH)fx->m_fx.m_freeverb->setWidth(scalar);
+			else if (param == EFFECT_MODE)fx->m_fx.m_freeverb->setMode((bool)scalar);
             break;
 		}
-		case ECHO:
+		case EFFECT_ECHO:
 		{
-			if (param == DELAY)m_echo->setDelay(scalar);
-			else if (param == MAXIMUMDELAY)m_echo->setMaximumDelay(scalar);
-			else if (param == MIX)m_echo->setEffectMix(scalar);
+			if (param == EFFECT_DELAY)fx->m_fx.m_echo->setDelay(scalar);
+			else if (param == EFFECT_MAXIMUMDELAY)fx->m_fx.m_echo->setMaximumDelay(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_echo->setEffectMix(scalar);
             break;
 		}
-		case PITSHIFT:
+		case EFFECT_PITSHIFT:
 		{
-			if (param == SHIFT)m_pitshift->setShift(scalar);
-			else if (param == MIX)m_pitshift->setEffectMix(scalar);
+			if (param == EFFECT_SHIFT)fx->m_fx.m_pitshift->setShift(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_pitshift->setEffectMix(scalar);
             break;
 		}
-		case LENTPITSHIFT:
+		case EFFECT_LENTPITSHIFT:
 		{
-			if (param == SHIFT)m_lentpitshift->setShift(scalar);
-			else if (param == MIX)m_lentpitshift->setEffectMix(scalar);
+			if (param == EFFECT_SHIFT)fx->m_fx.m_lentpitshift->setShift(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_lentpitshift->setEffectMix(scalar);
             break;
 		}
-		case CHORUS:
+		case EFFECT_CHORUS:
 		{
-			if (param == MODDEPTH)m_chorus->setModDepth(scalar);
-			else if (param == MODFREQUENCY)m_chorus->setModFrequency(scalar);
-			else if (param == MIX)m_chorus->setEffectMix(scalar);
+			if (param == EFFECT_MODDEPTH)fx->m_fx.m_chorus->setModDepth(scalar);
+			else if (param == EFFECT_MODFREQUENCY)fx->m_fx.m_chorus->setModFrequency(scalar);
+			else if (param == EFFECT_MIX)fx->m_fx.m_chorus->setEffectMix(scalar);
             break;
 		}
-        case MOOG:
+        case EFFECT_MOOG:
         {
             break;
         }
@@ -270,31 +304,19 @@ void STKEffect::setScalar( StkFloat scalar, Param param)
 //--------------------------------------------------------------------
 // STKEffect Set Has No Effect
 //--------------------------------------------------------------------
-void STKEffect::setHasNoEffect(bool hasnoeffect)
+void STKEffectSetHasNoEffect(STKEffect* fx, bool hasnoeffect)
 {
-	if (hasnoeffect != m_hasnoeffect)
+	if (hasnoeffect != fx->m_hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			m_tickCallback = [this](){return this->EffectTickHasNoEffect(); };
+			fx->m_tickCallback = [fx](){return STKEffectTickHasNoEffect(fx); };
 		}
 		else
 		{
-			term();
-			init();
+			STKEffectTerm(fx);
+			STKEffectInit(fx);
 		}
 	}
 }
 
-// ----------------------------------------------------------------------
-//	STK EFFECT NODE SETTER
-// ----------------------------------------------------------------------
-void STKSetEffectType(STKEffect* effect, STKEffect::Type type)
-{
-	effect->setType(type);
-}
-
-void STKSetEffectScalar(STKEffect* effect, STKEffect::Param param, StkFloat scalar)
-{
-	effect->setScalar(scalar, param);
-}

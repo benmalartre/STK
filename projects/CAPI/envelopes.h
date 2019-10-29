@@ -44,7 +44,7 @@ struct STKEnvelope : public STKNode{
 };
 
 // constructor
-STKEnvelope* STKEnvelopeCreate(STKEnvelope*, STKEnvelopeType type, STKNode* source);
+STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source);
 
 // destructor
 void STKEnvelopeDelete(STKEnvelope*);
