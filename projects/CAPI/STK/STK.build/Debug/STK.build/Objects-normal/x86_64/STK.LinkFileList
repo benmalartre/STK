@@ -2,7 +2,6 @@
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/TubeBell.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/RtAudio.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/FormSwep.o
-/Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/common.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/UdpSocket.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/Fir.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/filters.o
@@ -98,5 +97,6 @@
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/PoleZero.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/VoicForm.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/BlitSquare.o
+/Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/exports.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/ModalBar.o
 /Users/benmalartre/Documents/RnD/STK/projects/CAPI/STK/STK.build/Debug/STK.build/Objects-normal/x86_64/LentPitShift.o

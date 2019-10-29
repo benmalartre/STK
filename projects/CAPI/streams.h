@@ -1,7 +1,7 @@
 #ifndef STK_STREAM_H
 #define STK_STREAM_H
 
-#include "Stk.h"
+#include "common.h"
 #include <math.h>
 #include "generators.h"
 #include "envelopes.h"
@@ -11,15 +11,15 @@
 #include "buffers.h"
 
 struct STKNode;
-Struct STKReader;
+struct STKReader;
 
 typedef struct STKStream {
 	RtAudio* m_dac;
     std::vector<STKNode*> m_roots;
 }STKStream;
 
-EXPORT STKStreamRemoveRootNode(STKStream* stream, STKNode* node);
-EXPORT STKStreamAddRootNode(STKStream* stream, STKNode* node);
+EXPORT void STKStreamRemoveRootNode(STKStream* stream, STKNode* node);
+EXPORT void STKStreamAddRootNode(STKStream* stream, STKNode* node);
 
 // GeneratorStream tick() function
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
@@ -32,11 +32,11 @@ EXPORT bool STKStreamStop(STKStream* stream);
 EXPORT void STKStreamSetFrequency(STKStream* stream, float frequency);
 EXPORT int STKStreamNumRoots(STKStream* stream);
 
-EXPORT STKNode* STKStreamAddGenerator(STKStream* stream, STKGenerator::Type type, float frequency, bool isRoot = true);
-EXPORT STKNode* STKStreamAddEnvelope(STKStream* stream, STKEnvelope::Type type, STKNode* source, bool isRoot = true);
-EXPORT STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmetic::Mode mode, STKNode* lhs, STKNode* rhs, bool isRoot = true);
-EXPORT STKNode* STKStreamAddEffect(STKStream* stream, STKEffect::Type type, STKNode* source, bool isRoot = true);
-EXPORT STKNode* STKStreamAddFilter(STKStream* stream, STKFilter::Type type, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, float frequency, bool isRoot = true);
+EXPORT STKNode* STKStreamAddEnvelope(STKStream* stream, STKEnvelopeType type, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmeticMode mode, STKNode* lhs, STKNode* rhs, bool isRoot = true);
+EXPORT STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNode* source, bool isRoot = true);
+EXPORT STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot = true);
 

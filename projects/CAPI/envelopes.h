@@ -1,6 +1,7 @@
 #ifndef STK_ENVELOPES_H
 #define STK_ENVELOPES_H
 
+#include "common.h"
 #include "nodes.h"
 #include "Envelope.h"
 #include "ADSR.h"
@@ -36,7 +37,7 @@ union STKEnvelopeENV
 struct STKEnvelope : public STKNode{
     STKEnvelopeENV m_e;
 	std::function<StkFloat()> m_tickCallback;
-	Type m_type;
+	STKEnvelopeType m_envtype;
 	float m_frequency;
 	STKNode* m_source;
 
@@ -62,9 +63,9 @@ StkFloat STKEnvelopeTick(STKEnvelope*, unsigned int channel = 0);
 
 // exported functions
 EXPORT void STKEnvelopeSetHasNoEffect(STKEnvelope* e, bool hasnoeffect);
-EXPORT STKEnvelopeType STKEnvelopeGetType(STKEnvelope*){ return m_type; };
-EXPORT void STKEnvelopeSetType(STKEnvelope* envelope, STKEnvelope::Type type);
-EXPORT void STKEnvelopeSetScalar(STKEnvelope* envelope, STKEnvelope::Param param, StkFloat scalar);
+EXPORT STKEnvelopeType STKEnvelopeGetType(STKEnvelope* e){ return e->m_envtype; };
+EXPORT void STKEnvelopeSetType(STKEnvelope* envelope, STKEnvelopeType type);
+EXPORT void STKEnvelopeSetScalar(STKEnvelope* envelope, STKEnvelopeParam param, StkFloat scalar);
 EXPORT void STKEnvelopeKeyOn(STKEnvelope* envelope);
 EXPORT void STKEnvelopeKeyOff(STKEnvelope* envelope);
 

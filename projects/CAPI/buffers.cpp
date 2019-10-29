@@ -3,28 +3,46 @@
 //--------------------------------------------------------------------
 // STKBuffer Node Constructor
 //--------------------------------------------------------------------
-STKBuffer::STKBuffer(STKNode* source)
+STKBuffer* STKBufferCreate(STKNode* source)
 {
-	m_volume = 1.0;
-	m_source = source;
-	init();
+    STKBuffer* b = new STKBuffer();
+	b->m_volume = 1.0;
+	b->m_source = source;
+    
+    b->m_datas = NULL;
+    b->m_rate = std::ceil(Stk::sampleRate());
+    b->m_idx = 0;
+    b->m_phase = 0;
+    
+    STKBufferInit(b, Stk::sampleRate());
+    return b;
+}
+
+//--------------------------------------------------------------------
+// STKBuffer Node Destructor
+//--------------------------------------------------------------------
+void STKBufferDelete(STKBuffer* b)
+{
+    if (b->m_datas)delete[] b->m_datas;
+    STKBufferTerm(b);
+    delete b;
 }
 
 //--------------------------------------------------------------------
 // STKBuffer Set Has No Effect
 //--------------------------------------------------------------------
-void STKBuffer::setHasNoEffect(bool hasnoeffect)
+void STKBufferSetHasNoEffect(STKBuffer* b,bool hasnoeffect)
 {
-	if (hasnoeffect != m_hasnoeffect)
+	if (hasnoeffect != b->m_hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			m_tickCallback = [this](){return this->BufferTickHasNoEffect(); };
+			b->m_tickCallback = [b](){return STKBufferTickHasNoEffect(b); };
 		}
 		else
 		{
-			term();
-			init();
+			STKBufferTerm(b);
+            STKBufferInit(b, Stk::sampleRate());
 		}
 	}
 }
@@ -33,17 +51,23 @@ void STKBuffer::setHasNoEffect(bool hasnoeffect)
 //--------------------------------------------------------------------
 // STKBuffer Node Init
 //--------------------------------------------------------------------
-void STKBuffer::init()
+void STKBufferInit(STKBuffer* b, int rate)
 {
-	m_buffer.init(Stk::sampleRate());
-	m_tickCallback = [this](){ return this->BufferTick(); };
+    if (b->m_datas != NULL) delete[] b->m_datas;
+    
+    b->m_rate = rate;
+    b->m_idx = 0;
+    b->m_phase = 0;
+    
+    b->m_datas = new StkFloat[b->m_rate * BUFFER_PHASES];
+	b->m_tickCallback = [b](){ return STKBufferTick(b); };
 }
 
 
 //--------------------------------------------------------------------
 // STKBuffer Node Term
 //--------------------------------------------------------------------
-void STKBuffer::term()
+void STKBufferTerm(STKBuffer* b)
 {
 }
 
@@ -51,43 +75,42 @@ void STKBuffer::term()
 //--------------------------------------------------------------------
 // STKBuffer Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKBuffer::BufferTick()
+StkFloat STKBufferTick(STKBuffer* b)
 {
-	StkFloat value = m_source->tick() * m_volume;
-
+	StkFloat value = STKNodeTick(b->m_source) * b->m_volume;
 	return value;
 }
 
-StkFloat STKBuffer::BufferTickHasNoEffect()
+StkFloat STKBufferTickHasNoEffect(STKBuffer* b)
 {
-	return m_source->tick();
+	return STKNodeTick(b->m_source);
 }
 
-StkFloat STKBuffer::tick(unsigned int channel)
+StkFloat STKBufferTick(STKBuffer* b, unsigned int channel)
 {
-	if (!m_source) return 0;
-	return m_tickCallback();
+	if (!b->m_source) return 0;
+	return b->m_tickCallback();
 }
 
-void STKBuffer::setPrevious(STKNode* node){
-	if (m_source != NULL)term();
-	m_source = node;
-	init();
+void STKBufferSetPrevious(STKBuffer* b, STKNode* node){
+	if (b->m_source != NULL)STKBufferTerm(b);
+	b->m_source = node;
+    STKBufferInit(b, Stk::sampleRate());
 }
 
 // ----------------------------------------------------------------------
 //	STK GENERATOR ARYTHMETIC SETTER
 // ----------------------------------------------------------------------
-void STKSetBufferScalar(STKBuffer* buffer, StkFloat scalar)
+void STKSetBufferScalar(STKBuffer* b, StkFloat scalar)
 {
-	buffer->setScalar(scalar);
+    b->m_scalar = scalar;
 }
 
-void STKSetBufferPrevious(STKBuffer* buffer, STKNode* node)
+void STKSetBufferSource(STKBuffer* b, STKNode* source)
 {
-	buffer->setPrevious(node);
+	b->m_source = source;
 }
 
-void STKGetBufferSample(STKBuffer* buffer, StkFloat* datas){
-	buffer->getBuffer()->get(0, 0, datas);
+void STKGetBufferSample(STKBuffer* b, StkFloat* datas){
+	//STKBufferGet()->get(0, 0, datas);
 }

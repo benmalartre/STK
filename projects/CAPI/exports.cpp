@@ -1,5 +1,4 @@
-#include "common.h"
-#include "streams.h"
+#include "exports.h"
 
 // ----------------------------------------------------------------------
 //	STK GENERAL FUNCTIONS

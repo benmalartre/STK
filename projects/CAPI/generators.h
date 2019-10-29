@@ -2,7 +2,8 @@
 #ifndef STK_GENERATORS_H
 #define STK_GENERATORS_H
 
-#include "Stk.h"
+#include "common.h"
+#include "nodes.h"
 #include "Envelope.h"
 #include "ADSR.h"
 #include "Asymp.h"
@@ -14,7 +15,8 @@
 #include "BlitSquare.h"
 #include "Modulate.h"
 #include "Granulate.h"
-#include "nodes.h"
+
+
 
 using namespace stk;
 // generator types
@@ -88,13 +90,13 @@ StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel = 0);
 // functions
 void STKGeneratorInit(STKGenerator* generator);
 void STKGeneratorTerm(STKGenerator* generator);
-STKGeneratorType STKGeneratorGetType(STKGenerator* generator){ return generator->m_type; };
+STKGeneratorType STKGeneratorGetType(STKGenerator* generator){ return generator->m_gentype; };
 void STKGeneratorSetType(STKGenerator* generator, STKGeneratorType type);
 void STKGeneratorSetScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar);
 void STKGenartorSetHasNoEffect(STKGenerator* generator, bool hasnoeffect);
 
 // exported functions
-EXPORT void STKSetGeneratorType(STKGenerator* generator, STKGenerator::Type type);
-EXPORT void STKSetGeneratorScalar(STKGenerator* generator, STKGenerator::Param param, StkFloat scalar);
+EXPORT void STKSetGeneratorType(STKGenerator* generator, STKGeneratorType type);
+EXPORT void STKSetGeneratorScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar);
 EXPORT int STKGetGeneratorType(STKGenerator* generator);
 #endif

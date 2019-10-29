@@ -5,15 +5,16 @@
 //--------------------------------------------------------------------
 STKReader* STKReaderCreate()
 {
-    STKReader* reader = new STKReader();
-    reader->m_r.m_file = NULL;
-    reader->m_r.m_loop = NULL;
-	reader->m_noutput = 0;
-	reader->m_volume = 1.0;
-	reader->m_outidx = 0;
-	reader->m_mode = READER_FILEWVIN;
-	reader->m_filename = "";
-    STKReaderInit(reader);
+    STKReader* r = new STKReader();
+    r->m_r.m_file = NULL;
+    r->m_r.m_loop = NULL;
+	r->m_noutput = 0;
+	r->m_volume = 1.0;
+	r->m_outidx = 0;
+	r->m_mode = READER_FILEWVIN;
+	r->m_filename = "";
+    STKReaderInit(r);
+    return r;
 }
 
 //--------------------------------------------------------------------
@@ -50,23 +51,23 @@ void STKReaderReset(STKReader* reader){
 //--------------------------------------------------------------------
 // STKReader Node Init
 //--------------------------------------------------------------------
-void STKReaderInit(STKReader* reader)
+void STKReaderInit(STKReader* r)
 {
-	switch (reader->m_mode)
+	switch (r->m_mode)
 	{
 		case READER_FILEWVIN:
 		{
-			reader->m_r.m_file = new FileWvIn();
-			reader->m_mode = READER_FILEWVIN;
-			reader->m_tickCallback = [reader](){ return STKReaderTickFileWvIn(); };
+			r->m_r.m_file = new FileWvIn();
+			r->m_mode = READER_FILEWVIN;
+			r->m_tickCallback = [r](){ return STKReaderTickFileWvIn(r); };
 			break;
 		}
 
 		case READER_FILELOOP:
 		{
-			reader->m_r.m_loop = new FileLoop();
-			reader->m_mode = READER_FILELOOP;
-			reader->m_tickCallback = [reader](){ return STKReaderTickFileLoop(); };
+			r->m_r.m_loop = new FileLoop();
+			r->m_mode = READER_FILELOOP;
+			r->m_tickCallback = [r](){ return STKReaderTickFileLoop(r); };
 			break;
 		}
 	}
@@ -75,62 +76,62 @@ void STKReaderInit(STKReader* reader)
 //--------------------------------------------------------------------
 // STKReader Node Term
 //--------------------------------------------------------------------
-void STKReaderTerm(STKReader* reader)
+void STKReaderTerm(STKReader* r)
 {
-    reader->m_tickCallback = [reader](){return STKReaderTickHasNoEffect(reader);};
-    if(reader->m_mode == READER_FILEWVIN && reader->m_r.m_file){
-        reader->m_r.m_file->closeFile();
-        delete reader->m_r.m_file;
+    r->m_tickCallback = [r](){return STKReaderTickHasNoEffect(r);};
+    if(r->m_mode == READER_FILEWVIN && r->m_r.m_file){
+        r->m_r.m_file->closeFile();
+        delete r->m_r.m_file;
     }
-    if(reader->m_mode == READER_FILELOOP && reader->m_r.m_loop){
-        reader->m_r.m_loop->closeFile();
-        delete reader->m_r.m_loop;
+    if(r->m_mode == READER_FILELOOP && r->m_r.m_loop){
+        r->m_r.m_loop->closeFile();
+        delete r->m_r.m_loop;
     }
 }
 
 //--------------------------------------------------------------------
 // STKReader Functions
 //--------------------------------------------------------------------
-StkFloat STKReaderTick(STKReader* reader, unsigned int channel )
+StkFloat STKReaderTick(STKReader* r, unsigned int channel )
 {
-	return reader->m_tickCallback();
+	return r->m_tickCallback();
 }
 
-void STKReaderSetFile(STKReader* reader, const char* filename)
+void STKReaderSetFile(STKReader* r, const char* filename)
 {
-    reader->m_filename = std::string(filename);
-	switch (reader->m_mode)
+    r->m_filename = std::string(filename);
+	switch (r->m_mode)
 	{
 		case READER_FILEWVIN:
 		{
-            if(reader->m_r.m_loop){
-			    if (reader->m_r.m_loop->isOpen())
-                    reader->m_r.m_loop->closeFile();
+            if(r->m_r.m_loop){
+			    if (((FileWvIn*)r->m_r.m_loop)->isOpen())
+                    r->m_r.m_loop->closeFile();
             }
-            else if(reader->m_r.m_file){
-                if (reader->m_r.m_file->isOpen())
-                    reader->m_r.m_file->closeFile();
+            else if(r->m_r.m_file){
+                if (r->m_r.m_file->isOpen())
+                    r->m_r.m_file->closeFile();
             }
-			reader->m_r.m_file->openFile(reader->m_r.m_filename, false);
-            StkFloat fileSampleRate = reader->m_r.m_file->getFileRate();
-            if ( Stk::sampleRate() != fileSampleRate )reader->m_r.m_file->setRate( fileSampleRate/ Stk::sampleRate() );
+			r->m_r.m_file->openFile(r->m_filename, false);
+            StkFloat fileSampleRate = r->m_r.m_file->getFileRate();
+            if ( Stk::sampleRate() != fileSampleRate )r->m_r.m_file->setRate( fileSampleRate/ Stk::sampleRate() );
             
 			break;
 		}
 
-		case FILELOOP:
+		case READER_FILELOOP:
 		{
-            if(reader->m_r.m_file){
-                if (reader->m_r.m_file->isOpen())
-                    reader->m_r.m_file->closeFile();
+            if(r->m_r.m_file){
+                if (r->m_r.m_file->isOpen())
+                    r->m_r.m_file->closeFile();
             }
-            else if(reader->m_r.m_loop){
-                if (reader->m_r.m_loop->isOpen())
-                    reader->m_r.m_loop->closeFile();
+            else if(r->m_r.m_loop){
+                if (((FileWvIn*)r->m_r.m_loop)->isOpen())
+                    r->m_r.m_loop->closeFile();
             }
-			reader->m_r.m_loop->openFile(m_filename, false);
-            StkFloat fileSampleRate = reader->m_r.m_loop->getFileRate();
-            if ( Stk::sampleRate() != fileSampleRate)reader->m_r.m_loop->setRate( fileSampleRate / Stk::sampleRate() );
+			r->m_r.m_loop->openFile(r->m_filename, false);
+            StkFloat fileSampleRate = r->m_r.m_loop->getFileRate();
+            if ( Stk::sampleRate() != fileSampleRate)r->m_r.m_loop->setRate( fileSampleRate / Stk::sampleRate() );
             
             break;
 		}
@@ -154,12 +155,12 @@ StkFloat STKReaderGetFileSampleRate(STKReader* reader){
             if(reader->m_r.m_loop)
             {
                 FileWvIn* file = (FileWvIn*)reader->m_r.m_loop;
-                if(file->isOpen())return m_loop->getFileRate();
+                if(file->isOpen())return reader->m_r.m_loop->getFileRate();
                 else return -1.0f;
             }
         }
     }
-    
+    return 0;
 }
 
 void STKReaderSetScalar(STKReader* reader, STKReaderParam param, StkFloat scalar)
@@ -296,4 +297,5 @@ void STKResetReader(STKReader* reader){
 
 StkFloat STKGetReaderFileSampleRate(STKReader* reader){
     STKReaderGetFileSampleRate(reader);
+    return 0;
 }

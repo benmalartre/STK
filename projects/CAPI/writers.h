@@ -2,6 +2,7 @@
 #ifndef STK_WRITER_H
 #define STK_WRITER_H
 
+#include "common.h"
 #include "nodes.h"
 #include "FileWvOut.h"
 #include <cstdlib>
@@ -11,7 +12,7 @@ typedef enum STKWriterMode {
     
 }STKWriterMode;
 
-typedf enum STKWriterParam {
+typedef enum STKWriterParam {
     
 }STKWriterParam;
 
@@ -38,7 +39,7 @@ void STKWriterSetFile(STKWriter* writer, std::string filename);
 void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);
 
 // exported functions
-EXPORT void STKSetWriterMode(STKWriter* writer, STKWriter::Mode mode);
-EXPORT void STKSetWriterScalar(STKWriter* writer, STKWriter::Param param, StkFloat scalar);
+EXPORT void STKSetWriterMode(STKWriter* writer, STKWriterMode mode);
+EXPORT void STKSetWriterScalar(STKWriter* writer, STKWriterParam param, StkFloat scalar);
 
 #endif

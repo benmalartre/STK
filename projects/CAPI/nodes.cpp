@@ -37,6 +37,6 @@ void STKNodeSetStream(STKNode* node, STKStream* stream) { node->m_stream = strea
 
 STKStream* STKNodeGetStream(STKNode* node){ return node->m_stream; };
 
-
-
-
+StkFloat STKNodeTick(STKNode* n){
+    return 0.f;
+}

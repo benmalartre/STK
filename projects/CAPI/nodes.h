@@ -2,7 +2,9 @@
 #define STK_NODE_H
 
 #include "Stk.h"
-#include "streams.h"
+#include "common.h"
+
+struct STKStream;
 
 struct STKNode{
     bool m_hasnoeffect;
@@ -11,9 +13,11 @@ struct STKNode{
     int m_outidx;
     StkFloat m_volume;
     STKStream* m_stream;
-    STKGenartorType m_type;
+    STKNodeType m_type;
     
 };
+
+StkFloat STKNodeTick(STKNode* node);
 
 EXPORT void STKNodeSetVolume(STKNode* node, StkFloat volume);
 EXPORT void STKNodeIncrementNumOutput(STKNode*);

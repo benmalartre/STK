@@ -3,7 +3,7 @@
 //--------------------------------------------------------------------
 // STKArythmetic Node Constructor
 //--------------------------------------------------------------------
-STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, Mode mode)
+STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, STKArythmeticMode mode)
 {
 	STKArythmetic* a = new STKArythmetic();
 	a->m_volume = 1.0;
@@ -11,7 +11,7 @@ STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, Mode mode)
 	a->m_rhs = rhs;
 	a->m_mode = mode;
 	STKArythmeticInit(a);
-	return a
+    return a;
 }
 
 //--------------------------------------------------------------------
@@ -20,7 +20,7 @@ STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, Mode mode)
 void STKArythmeticDelete(STKArythmetic* a)
 {
 	STKArythmeticTerm(a);
-	delete a
+    delete a;
 }
 
 
@@ -120,7 +120,7 @@ StkFloat STKArythmeticTickScaleAdd(STKArythmetic* a)
 
 StkFloat STKArythmeticTickScaleSub(STKArythmetic* a)
 {
-	return (STKNodeTick(a->m_lhs) - a->m_scalar * (STKNodeTick(a->m_rhs)) * a->m_volume;
+	return (STKNodeTick(a->m_lhs) - a->m_scalar * STKNodeTick(a->m_rhs)) * a->m_volume;
 }
 
 StkFloat STKArythmeticTickMix(STKArythmetic* a)
@@ -164,7 +164,7 @@ void STKArythmeticSetRHS(STKArythmetic* a, STKNode* node){
 //--------------------------------------------------------------------
 // STKArythmetic Set Mode
 //--------------------------------------------------------------------
-void STKArythmeticSetMode(STKArythmetic* a, Mode mode)
+void STKArythmeticSetMode(STKArythmetic* a, STKArythmeticMode mode)
 {
 	if (mode != a->m_mode)
 	{
@@ -188,7 +188,7 @@ void STKArythmeticSetHasNoEffect(STKArythmetic* a, bool hasnoeffect)
 		else
 		{
 			STKArythmeticTerm(a);
-			STKArythmeticInit();
+			STKArythmeticInit(a);
 		}
 	}
 }

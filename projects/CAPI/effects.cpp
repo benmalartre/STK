@@ -2,35 +2,38 @@
 //--------------------------------------------------------------------
 // STKEffect Node Constructor
 //--------------------------------------------------------------------
-STKEffect::STKEffect(STKNode* source, Type type)
+STKEffect* STKEffectCreate(STKNode* source, STKEffectType type)
 {
-	m_source = source;
-	m_volume = 1.0f;
-	m_type = type;
-	m_noutput = 0;
-	m_outidx = 0;
-	init();
+    STKEffect* fx = new STKEffect();
+	fx->m_source = source;
+	fx->m_volume = 1.0f;
+	fx->m_fxtype = type;
+	fx->m_noutput = 0;
+	fx->m_outidx = 0;
+	STKEffectInit(fx);
+    return fx;
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Constructor
 //--------------------------------------------------------------------
-STKEffect::~STKEffect()
+void STKEffectDelete(STKEffect* fx)
 {
-	term();
+	STKEffectTerm(fx);
+    delete fx;
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Init
 //--------------------------------------------------------------------
-void STKEffect::init()
+void STKEffectInit(STKEffect* fx)
 {
-	switch (m_type)
+	switch (m_fxtype)
 	{
-		case Type::ENVELOPE:
+		case EFFECT_ENVELOPE:
 		{
-			m_envelope = new Envelope();
-			m_tickCallback = [this](){ return this->EffectTickEnvelope(); };
+			fx->m_fx.m_envelope = new Envelope();
+			fx->m_tickCallback = [fx](){ return STKEffectTickEnvelope(fx); };
 			break;
 		}
 		case Type::PRCREV:
@@ -177,11 +180,11 @@ StkFloat STKEffect::tick(unsigned int channel)
 //--------------------------------------------------------------------
 // STKEffect Node Change Type
 //--------------------------------------------------------------------
-void STKEffect::setType(Type type)
+void STKEffect::setType(TSTKEffectype type)
 {
 	if (type != m_type){
 		term();
-		m_type = type;
+		m_fxtype = type;
 		init();
 	}
 }

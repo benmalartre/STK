@@ -1,6 +1,7 @@
 #ifndef STK_ARYTHMETIC_H
 #define STK_ARYTHMETIC_H
 
+#include "common.h"
 #include "nodes.h"
 
 enum STKArythmeticMode{
@@ -19,15 +20,15 @@ struct STKArythmetic : public STKNode{
 	std::function<StkFloat()> m_tickCallback;
 	STKNode* m_lhs;
 	STKNode* m_rhs;
-	Mode m_mode;
+	STKArythmeticMode m_mode;
 	StkFloat m_scalar;
 };
 
 // constructor
-STKArythmeticCreate(STKNode* a, STKNode* b, Mode mode);
+STKArythmetic* STKArythmeticCreate(STKNode* a, STKNode* b, STKArythmeticMode mode);
 
 // destructor
-STKArythmeticDelete(STKArythmetic* a);
+void STKArythmeticDelete(STKArythmetic* a);
 
 // functions
 void STKArythmeticReset(STKArythmetic* a){ a->m_outidx = 0; };
@@ -54,7 +55,7 @@ inline StkFloat STKArythmeticTickHasNoEffect(STKArythmetic* a);
 StkFloat STKArythmeticTick(STKArythmetic* a, unsigned int channel = 0);
 
 // export functions
-EXPORT void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmetic::Mode mode);
+EXPORT void STKSetArythmeticMode(STKArythmetic* arythmetic, STKArythmeticMode mode);
 EXPORT void STKSetArythmeticScalar(STKArythmetic* arythmetic, StkFloat scalar);
 EXPORT void STKSetArythmeticLHS(STKArythmetic* arythmetic, STKNode* node);
 EXPORT void STKSetArythmeticRHS(STKArythmetic* arythmetic, STKNode* node);

@@ -49,7 +49,7 @@ INCLUDES = -I$(STK_INCLUDES) -I$(SRCDIR)
 #
 STK_PATH = ../../src
 
-LIBS += -lm 
+LIBS += -lm
 LIBS += -framework CoreFoundation
 LIBS += -framework AudioToolbox
 LIBS += -framework AudioUnit
@@ -161,16 +161,17 @@ SOURCES += $(STK_PATH)/VoicForm.cpp
 SOURCES += $(STK_PATH)/Whistle.cpp
 SOURCES += $(STK_PATH)/Wurley.cpp
 
-SOURCES += $(SRCDIR)/common.cpp
-SOURCES += $(SRCDIR)/arythmetics.cpp 
+SOURCES += $(SRCDIR)/nodes.cpp
+SOURCES += $(SRCDIR)/arythmetics.cpp
 SOURCES += $(SRCDIR)/buffers.cpp
 SOURCES += $(SRCDIR)/generators.cpp
-SOURCES += $(SRCDIR)/readers.cpp 
+SOURCES += $(SRCDIR)/readers.cpp
 SOURCES += $(SRCDIR)/streams.cpp
-SOURCES += $(SRCDIR)/effects.cpp 
-SOURCES += $(SRCDIR)/envelopes.cpp 
-SOURCES += $(SRCDIR)/filters.cpp 
-SOURCES += $(SRCDIR)/writers.cpp 
+SOURCES += $(SRCDIR)/effects.cpp
+SOURCES += $(SRCDIR)/envelopes.cpp
+SOURCES += $(SRCDIR)/filters.cpp
+SOURCES += $(SRCDIR)/writers.cpp
+SOURCES += $(SRCDIR)/exports.cpp
 
 OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
 
@@ -181,7 +182,7 @@ MAKEFILE := $(SRCDIR)/MakefileMacOS
 #
 $(OBJECTS): CFLAGS   := $(CFLAGS)
 $(OBJECTS): C++FLAGS := $(C++FLAGS)
-$(OBJECTS): INCLUDES := $(INCLUDES) -I/usr/X11R6/include 
+$(OBJECTS): INCLUDES := $(INCLUDES) -I/usr/X11R6/include
 
 DEPENDS:     INCLUDES := $(INCLUDES)
 
@@ -207,7 +208,7 @@ test:
 	@echo "		Here : $(DEST)"
 	#
 	@cp STK.so $(DEST)
-	
+
 deploy:
 	+@make -f $(SRCDIR)/MakefileMacOS clean
 	+@make -f $(SRCDIR)/MakefileMacOS

@@ -3,6 +3,7 @@
 #define STK_READER_H
 
 #include "common.h"
+#include "nodes.h"
 #include "FileRead.h"
 #include "FileWvIn.h"
 #include "FileLoop.h"
@@ -30,7 +31,7 @@ typedef struct STKReader : public STKNode{
 
 	std::function<StkFloat()> m_tickCallback;
 	float m_frequency;
-	Mode m_mode;
+	STKReaderMode m_mode;
     STKReaderMOD m_r;
 	std::string m_filename;
 }STKReader;
@@ -52,15 +53,15 @@ inline StkFloat STKReaderTickHasNoEffect(STKReader* reader);
 StkFloat STKReaderTick(STKReader* reader, unsigned int channel = 0);
 
 void STKReaderSetFile(STKReader* reader, const char* filename);
-void STKReaderSetScalar(STKReader* reader, Param param, StkFloat scalar);
+void STKReaderSetScalar(STKReader* reader, STKReaderParam param, StkFloat scalar);
 void STKReaderSetHasNoEffect(STKReader* reader, bool hasnoeffect);
-void STKReaderSetMode(STKReader* reader, STKReaderMode mode){m_mode = mode;};
-STKReaderMode STKReaderGetMode(STKReader* reader){return m_mode;};
-const char* STKReaderGetFileName(STKReader* reader){return m_filename.c_str();};
+void STKReaderSetMode(STKReader* reader, STKReaderMode mode){reader->m_mode = mode;};
+STKReaderMode STKReaderGetMode(STKReader* reader){return reader->m_mode;};
+const char* STKReaderGetFileName(STKReader* reader){return reader->m_filename.c_str();};
 StkFloat STKReaderGetFileSampleRate(STKReader* reader);
 
-EXPORT void STKSetReaderMode(STKReader* reader, STKReader::Mode mode);
-EXPORT void STKSetReaderScalar(STKReader* reader, STKReader::Param param, StkFloat scalar);
+EXPORT void STKSetReaderMode(STKReader* reader, STKReaderMode mode);
+EXPORT void STKSetReaderScalar(STKReader* reader, STKReaderParam param, StkFloat scalar);
 EXPORT void STKSetReaderFilename(STKReader* reader, const char* filename);
 EXPORT void STKResetReader(STKReader* reader);
 EXPORT StkFloat STKGetReaderFileSampleRate(STKReader* reader);

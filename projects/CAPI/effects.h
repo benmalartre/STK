@@ -1,5 +1,6 @@
 #ifndef STK_EFFECTS_H
 #define STK_EFFECTS_H
+#include "common.h"
 #include "nodes.h"
 #include "Envelope.h"
 #include "PRCRev.h"
@@ -57,22 +58,22 @@ union STKEffectFX
     Moog* m_moog;
 };
 
-struct STKEffect : public STKNode{
+typedef struct STKEffect : public STKNode{
     std::function<StkFloat()> m_tickCallback;
     STKEffectFX m_fx;
 	STKNode* m_source;
-	Type m_type;
-};
+	STKEffectType m_fxtype;
+}STKEffect;
 
 
 // constructor
-STKEffect(STKEffect* fx, STKNode* source, Type type);
+STKEffect* STKEffectCreate(STKNode* source, STKEffectType type);
 
 // destructor
-STKEffectDelete(STKEffect* fx);
+void STKEffectDelete(STKEffect* fx);
 
 // functions
-void STKEffectReset(STKEffect* fx){ m_outidx = 0; };
+void STKEffectReset(STKEffect* fx){ fx->m_outidx = 0; };
 void STKEffectInit(STKEffect* fx);
 void STKEffectTerm(STKEffect* fx);
 
@@ -91,18 +92,16 @@ inline StkFloat STKEffectTickHasNoEffect(STKEffect* fx);
 StkFloat STKEffectTick(STKEffect* fx, unsigned int channel = 0);
 
 // functions
-Type getType(){ return m_type; };
-void setType(Type type);
-void setScalar(StkFloat scalar, Param param);
-void setHasNoEffect(bool hasnoeffect);
-private:
-
+STKEffectType STKEffectGetType(STKEffect* fx){ return fx->m_fxtype; };
+void STKEffectSetType(STKEffect* fx, STKEffectType type);
+void STKEffectSetScalar(STKEffect* fx, StkFloat scalar, STKEffectParam param);
+void STKEffectSetHasNoEffect(STKEffect* fx, bool hasnoeffect);
 
 
 // ----------------------------------------------------------------------
 //	STK EFFECT NODE SETTER
 // ----------------------------------------------------------------------
-EXPORT void STKSetEffectType(STKEffect* effect, STKEffect::Type type);
-EXPORT void STKSetEffectScalar(STKEffect* effect, STKEffect::Param param, StkFloat scalar);
+EXPORT void STKSetEffectType(STKEffect* effect, STKEffectType type);
+EXPORT void STKSetEffectScalar(STKEffect* effect, STKEffectParam param, StkFloat scalar);
 
 #endif

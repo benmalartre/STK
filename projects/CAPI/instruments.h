@@ -1,6 +1,8 @@
 #ifndef STK_FILTERS_H
 #define STK_FILTERS_H
 
+#include "common.h"
+#include "nodes.h"
 #include "Clarinet.h"// Pretty good physical model of the clarinet
 #include "BlowHole.h"// A clarinet physical model with one tonehole and one register vent
 #include "Saxofony.h"// A psuedo-conical bore reed instrument that sometimes sounds like a saxophone
