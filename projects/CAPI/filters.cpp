@@ -207,63 +207,63 @@ void STKFilterSetType(STKFilter* filter, STKFilterType type)
 void STKFilterSetScalar(STKFilter* filter, StkFloat scalar, STKFilterParam param)
 {
 	/*
-	switch (m_type){
-		case ENVELOPE:
+	switch (filter->m_type){
+		case FILTER_ENVELOPE:
 		{
-			if (param == RATE)
+			if (param == FILTER_RATE)
 			{
 				if (scalar < 0)scalar = 0;
-				m_envelope->setRate(scalar);
+				filter->m_envelope->setRate(scalar);
 			}
-			else if (param == TIME)m_envelope->setTime(scalar);
-			else if (param == TARGET)m_envelope->setTarget(scalar);
-			else if (param == VALUE)m_envelope->setValue(scalar);
+			else if (param == FILTER_TIME)filter->m_envelope->setTime(scalar);
+			else if (param == FILTER_TARGET)filter->m_envelope->setTarget(scalar);
+			else if (param == FILTER_VALUE)filter->m_envelope->setValue(scalar);
 			break;
 		}
-		case PRCREV:
+		case FILTER_PRCREV:
 		{
-			if (param == T60)m_prcrev->setT60(scalar);
-			else if (param == MIX)m_prcrev->setEffectMix(scalar);
+			if (param == FILTER_T60)filter->_prcrev->setT60(scalar);
+			else if (param == FILTER_MIX)filter->m_prcrev->setEffectMix(scalar);
 		}
-		case JCREV:
+		case FILTER_JCREV:
 		{
-			if (param == T60)m_jcrev->setT60(scalar);
-			else if (param == MIX)m_jcrev->setEffectMix(scalar);
+			if (param == FILTER_T60)filter->m_jcrev->setT60(scalar);
+			else if (param == FILTER_MIX)filter->m_jcrev->setEffectMix(scalar);
 		}
-		case NREV:
+		case FILTER_NREV:
 		{
-			if (param == T60)m_nrev->setT60(scalar);
-			else if (param == MIX)m_nrev->setEffectMix(scalar);
+			if (param == FILTER_T60)filter->m_nrev->setT60(scalar);
+			else if (param == FILTER_MIX)filter->m_nrev->setEffectMix(scalar);
 		}
-		case FREEVERB:
+		case FILTER_FREEVERB:
 		{
-			if (param == MIX)m_freeverb->setEffectMix(scalar);
-			else if (param == ROOMSIZE)m_freeverb->setRoomSize(scalar);
-			else if (param == DAMPING)m_freeverb->setDamping(scalar);
-			else if (param == WIDTH)m_freeverb->setWidth(scalar);
-			else if (param == MODE)m_freeverb->setMode((bool)scalar);
+			if (param == FILTER_MIX)filter->m_freeverb->setEffectMix(scalar);
+			else if (param == FILTER_ROOMSIZE)filter->m_freeverb->setRoomSize(scalar);
+			else if (param == FILTER_DAMPING)filter->m_freeverb->setDamping(scalar);
+			else if (param == FILTER_WIDTH)filter->m_freeverb->setWidth(scalar);
+			else if (param == FILTER_MODE)filter->m_freeverb->setMode((bool)scalar);
 		}
-		case ECHO:
+		case FILTER_ECHO:
 		{
-			if (param == DELAY)m_echo->setDelay(scalar);
-			else if (param == MAXIMUMDELAY)m_echo->setMaximumDelay(scalar);
-			else if (param == MIX)m_echo->setEffectMix(scalar);
+			if (param == FILTER_DELAY)filter->m_echo->setDelay(scalar);
+			else if (param == FILTER_MAXIMUMDELAY)filter->m_echo->setMaximumDelay(scalar);
+			else if (param == FILTER_MIX)filter->m_echo->setEffectMix(scalar);
 		}
-		case PITSHIFT:
+		case FILTER_PITSHIFT:
 		{
-			if (param == SHIFT)m_pitshift->setShift(scalar);
-			else if (param == MIX)m_pitshift->setEffectMix(scalar);
+			if (param == FILTER_SHIFT)filter->m_pitshift->setShift(scalar);
+			else if (param == FILTER_MIX)filter->m_pitshift->setEffectMix(scalar);
 		}
-		case LENTPITSHIFT:
+		case FILTER_LENTPITSHIFT:
 		{
-			if (param == SHIFT)m_lentpitshift->setShift(scalar);
-			else if (param == MIX)m_lentpitshift->setEffectMix(scalar);
+			if (param == FILTER_SHIFT)filter->m_lentpitshift->setShift(scalar);
+			else if (param == FILTER_MIX)filter->m_lentpitshift->setEffectMix(scalar);
 		}
-		case CHORUS:
+		case FILTER_CHORUS:
 		{
-			if (param == MODDEPTH)m_chorus->setModDepth(scalar);
-			else if (param == MODFREQUENCY)m_chorus->setModFrequency(scalar);
-			else if (param == MIX)m_chorus->setEffectMix(scalar);
+			if (param == FILTER_MODDEPTH)filter->m_chorus->setModDepth(scalar);
+			else if (param == FILTER_MODFREQUENCY)filter->m_chorus->setModFrequency(scalar);
+			else if (param == FILTER_MIX)filter->m_chorus->setEffectMix(scalar);
 		}
 	}
 	*/

@@ -10,6 +10,7 @@ STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, STKArythmeticMode
 	a->m_lhs = lhs;
 	a->m_rhs = rhs;
 	a->m_mode = mode;
+	a->m_type = STK_ARYTHMETIC;
 	STKArythmeticInit(a);
     return a;
 }

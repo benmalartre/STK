@@ -37,25 +37,26 @@ typedef enum STKFilterParam{
     FILTER_ONE_POLE_A1,
     FILTER_TWO_ZERO_B0,
     FILTER_TWO_ZERO_B1,
-    FILTER_TWO_ZERO_B2
+    FILTER_TWO_ZERO_B2,
     /*
-     FILTER_B2,
-     
-     FILTER_TIME,            // envelope time
-     FILTER_TARGET,            // envelope target
-     FILTER_VALUE,            // envelope value
-     FILTER_T60,            // prcrev, jcrev, nrev T60
-     FILTER_MIX,            // freeverb effect mix
-     FILTER_ROOMSIZE,        // freeverb room size
-     FILTER_DAMPING,        // freeverb damping
-     FILTER_WIDTH,            // freeverb width
-     FILTER_MODE,            // freeverb mode
-     FILTER_DELAY,            // echo delay
-     FILTER_MAXIMUMDELAY,    // echo maximum delay
-     FILTER_SHIFT,            // pitshift and lentpitshift
-     FILTER_MODDEPTH,        // chorus mod depth
-     FILTER_MODFREQUENCY    // chorus mod frequency
-     */
+    FILTER_B2,
+
+    FILTER_TIME,            // envelope time
+    FILTER_TARGET,            // envelope target
+    FILTER_VALUE,            // envelope value
+    FILTER_T60,            // prcrev, jcrev, nrev T60
+    FILTER_MIX,            // freeverb effect mix
+    FILTER_ROOMSIZE,        // freeverb room size
+    FILTER_DAMPING,        // freeverb damping
+    FILTER_WIDTH,            // freeverb width
+    FILTER_MODE,            // freeverb mode
+    FILTER_DELAY,            // echo delay
+    FILTER_MAXIMUMDELAY,    // echo maximum delay
+    FILTER_SHIFT,            // pitshift and lentpitshift
+    FILTER_MODDEPTH,        // chorus mod depth
+    FILTER_MODFREQUENCY    // chorus mod frequency
+    */
+
 }STKFilterParam;
 
 union STKFilterFILTER
