@@ -222,3 +222,8 @@ StkFloat STKEnvelopeTick(STKEnvelope* e, unsigned int channel)
 	return e->m_tickCallback();
 }
 
+STKEnvelopeType STKEnvelopeGetType(STKEnvelope* e)
+{ 
+	return e->m_envtype; 
+};
+

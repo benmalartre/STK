@@ -288,3 +288,5 @@ void STKFilterSetHasNoEffect(STKFilter* filter, bool hasnoeffect)
 	}
 }
 
+EXPORT STKFilterType STKFilterGetType(STKFilter* f){ return f->m_ftype; };
+

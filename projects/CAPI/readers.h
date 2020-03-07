@@ -1,6 +1,4 @@
-
-#ifndef STK_READER_H
-#define STK_READER_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -37,32 +35,31 @@ typedef struct STKReader : public STKNode{
 }STKReader;
 
 // constructor
-STKReader* STKReaderCreate();
+static STKReader* STKReaderCreate();
 // destructor
-void STKReaderDelete(STKReader* reader);
+static void STKReaderDelete(STKReader* reader);
 
 // overrides
-void STKReaderReset(STKReader* reader);
-void STKReaderInit(STKReader* reader);
-void STKReaderTerm(STKReader* reader);
-
+static void STKReaderReset(STKReader* reader);
+static void STKReaderInit(STKReader* reader);
+static void STKReaderTerm(STKReader* reader);
+ 
 // functions
-inline StkFloat STKReaderTickFileWvIn(STKReader* reader);
-inline StkFloat STKReaderTickFileLoop(STKReader* reader);
-inline StkFloat STKReaderTickHasNoEffect(STKReader* reader);
-StkFloat STKReaderTick(STKReader* reader, unsigned int channel = 0);
-
-void STKReaderSetFile(STKReader* reader, const char* filename);
-void STKReaderSetScalar(STKReader* reader, STKReaderParam param, StkFloat scalar);
-void STKReaderSetHasNoEffect(STKReader* reader, bool hasnoeffect);
-void STKReaderSetMode(STKReader* reader, STKReaderMode mode){reader->m_mode = mode;};
-STKReaderMode STKReaderGetMode(STKReader* reader){return reader->m_mode;};
-const char* STKReaderGetFileName(STKReader* reader){return reader->m_filename.c_str();};
-StkFloat STKReaderGetFileSampleRate(STKReader* reader);
+static inline StkFloat STKReaderTickFileWvIn(STKReader* reader);
+static inline StkFloat STKReaderTickFileLoop(STKReader* reader);
+static inline StkFloat STKReaderTickHasNoEffect(STKReader* reader);
+static StkFloat STKReaderTick(STKReader* reader, unsigned int channel = 0);
+ 
+static void STKReaderSetFile(STKReader* reader, const char* filename);
+static void STKReaderSetScalar(STKReader* reader, STKReaderParam param, StkFloat scalar);
+static void STKReaderSetHasNoEffect(STKReader* reader, bool hasnoeffect);
+static void STKReaderSetMode(STKReader* reader, STKReaderMode mode){reader->m_mode = mode;};
+static STKReaderMode STKReaderGetMode(STKReader* reader){return reader->m_mode;};
+static const char* STKReaderGetFileName(STKReader* reader){return reader->m_filename.c_str();};
+static StkFloat STKReaderGetFileSampleRate(STKReader* reader);
 
 EXPORT void STKSetReaderMode(STKReader* reader, STKReaderMode mode);
 EXPORT void STKSetReaderScalar(STKReader* reader, STKReaderParam param, StkFloat scalar);
 EXPORT void STKSetReaderFilename(STKReader* reader, const char* filename);
 EXPORT void STKResetReader(STKReader* reader);
 EXPORT StkFloat STKGetReaderFileSampleRate(STKReader* reader);
-#endif

@@ -214,6 +214,11 @@ StkFloat STKEffectTick(STKEffect* fx, unsigned int channel)
 //--------------------------------------------------------------------
 // STKEffect Node Change Type
 //--------------------------------------------------------------------
+STKEffectType STKEffectGetType(STKEffect* fx)
+{ 
+	return fx->m_fxtype; 
+};
+
 void STKEffectSetType(STKEffect* fx, STKEffectType type)
 {
 	if (type != fx->m_fxtype){

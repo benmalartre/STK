@@ -252,7 +252,7 @@ void STKGeneratorSetHasNoEffect(STKGenerator* g, bool hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			g->m_tickCallback = [g](){return STKGeneratorTickHasNoEffect(g); };
+			g->m_tickCallback = [g](){return 0.f; };
 		}
 		else
 		{
@@ -316,6 +316,7 @@ StkFloat STKGeneratorTickHasNoEffect()
 {
 	return 0;
 }
+
 StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel)
 {
 	return g->m_tickCallback();

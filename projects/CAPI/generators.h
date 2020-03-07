@@ -1,6 +1,5 @@
 
-#ifndef STK_GENERATORS_H
-#define STK_GENERATORS_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -68,35 +67,34 @@ typedef struct STKGenerator : public STKNode{
 }STKGenerator;
 
 // constructor
-STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency=440.0f);
+static STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency=440.0f);
 
 // destructor
-void STKGeneratorDelete(STKGenerator* g);
+static void STKGeneratorDelete(STKGenerator* g);
 
 // tick function
-inline StkFloat STKGeneratorTickAsymp(STKGenerator* g);
-inline StkFloat STKGeneratorTickNoise(STKGenerator* g);
-inline StkFloat STKGeneratorTickBlit(STKGenerator* g);
-inline StkFloat STKGeneratorTickBlitSaw(STKGenerator* g);
-inline StkFloat STKGeneratorTickBlitSquare(STKGenerator* g);
-inline StkFloat STKGeneratorTickSineWave(STKGenerator* g);
-inline StkFloat STKSingWaveTickCallback(STKGenerator* g);
-inline StkFloat STKEnvelopeTickModulate(STKGenerator* g);
-inline StkFloat STKEnvelopeTickGranulate(STKGenerator* g);
-inline StkFloat STKGeneratorTickHasNoEffect(STKGenerator* g);
-StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel = 0);
+static inline StkFloat STKGeneratorTickAsymp(STKGenerator* g);
+static inline StkFloat STKGeneratorTickNoise(STKGenerator* g);
+static inline StkFloat STKGeneratorTickBlit(STKGenerator* g);
+static inline StkFloat STKGeneratorTickBlitSaw(STKGenerator* g);
+static inline StkFloat STKGeneratorTickBlitSquare(STKGenerator* g);
+static inline StkFloat STKGeneratorTickSineWave(STKGenerator* g);
+static inline StkFloat STKSingWaveTickCallback(STKGenerator* g);
+static inline StkFloat STKEnvelopeTickModulate(STKGenerator* g);
+static inline StkFloat STKEnvelopeTickGranulate(STKGenerator* g);
+static inline StkFloat STKGeneratorTickHasNoEffect(STKGenerator* g);
+static StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel = 0);
 
 
 // functions
-void STKGeneratorInit(STKGenerator* generator);
-void STKGeneratorTerm(STKGenerator* generator);
-STKGeneratorType STKGeneratorGetType(STKGenerator* generator){ return generator->m_gentype; };
-void STKGeneratorSetType(STKGenerator* generator, STKGeneratorType type);
-void STKGeneratorSetScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar);
-void STKGenartorSetHasNoEffect(STKGenerator* generator, bool hasnoeffect);
+static void STKGeneratorInit(STKGenerator* generator);
+static void STKGeneratorTerm(STKGenerator* generator);
+static STKGeneratorType STKGeneratorGetType(STKGenerator* generator){ return generator->m_gentype; };
+static void STKGeneratorSetType(STKGenerator* generator, STKGeneratorType type);
+static void STKGeneratorSetScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar);
+static void STKGenartorSetHasNoEffect(STKGenerator* generator, bool hasnoeffect);
 
 // exported functions
 EXPORT void STKSetGeneratorType(STKGenerator* generator, STKGeneratorType type);
 EXPORT void STKSetGeneratorScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar);
 EXPORT int STKGetGeneratorType(STKGenerator* generator);
-#endif

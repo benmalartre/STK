@@ -1,5 +1,4 @@
-#ifndef STK_FILTERS_H
-#define STK_FILTERS_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -138,4 +137,3 @@ private:
 EXPORT void STKSetFilterType(STKFilter* filter, STKFilter::Type type);
 EXPORT void STKSetFilterScalar(STKFilter* filter, STKFilter::Param param, StkFloat scalar);
 
-#endif

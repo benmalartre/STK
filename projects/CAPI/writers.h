@@ -1,6 +1,5 @@
 
-#ifndef STK_WRITER_H
-#define STK_WRITER_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -41,5 +40,3 @@ void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);
 // exported functions
 EXPORT void STKSetWriterMode(STKWriter* writer, STKWriterMode mode);
 EXPORT void STKSetWriterScalar(STKWriter* writer, STKWriterParam param, StkFloat scalar);
-
-#endif

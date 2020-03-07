@@ -1,6 +1,8 @@
 #ifndef STK_ARYTHMETIC_H
 #define STK_ARYTHMETIC_H
 
+#pragma once
+
 #include "common.h"
 #include "nodes.h"
 
@@ -25,32 +27,32 @@ struct STKArythmetic : public STKNode{
 };
 
 // constructor
-STKArythmetic* STKArythmeticCreate(STKNode* a, STKNode* b, STKArythmeticMode mode);
+static STKArythmetic* STKArythmeticCreate(STKNode* a, STKNode* b, STKArythmeticMode mode);
 
 // destructor
-void STKArythmeticDelete(STKArythmetic* a);
+static void STKArythmeticDelete(STKArythmetic* a);
 
 // functions
-void STKArythmeticReset(STKArythmetic* a){ a->m_outidx = 0; };
-void STKArythmeticInit(STKArythmetic* a);
-void STKArythmeticTerm(STKArythmetic* a);
-void STKArythmeticSetHasNoEffect(STKArythmetic* a, bool hasnoeffect);
-void STKArythmeticSetLHS(STKArythmetic* a, STKNode* node);
-void STKArythmeticSetRHS(STKArythmetic* a, STKNode* node);
-STKNode* STKArythmeticGetLHS(STKArythmetic* a){ return a->m_lhs; };
-STKNode* STKArythmeticGetRHS(STKArythmetic* a){ return a->m_rhs; };
+static void STKArythmeticReset(STKArythmetic* a){ a->m_outidx = 0; };
+static void STKArythmeticInit(STKArythmetic* a);
+static void STKArythmeticTerm(STKArythmetic* a);
+static void STKArythmeticSetHasNoEffect(STKArythmetic* a, bool hasnoeffect);
+static void STKArythmeticSetLHS(STKArythmetic* a, STKNode* node);
+static void STKArythmeticSetRHS(STKArythmetic* a, STKNode* node);
+static STKNode* STKArythmeticGetLHS(STKArythmetic* a){ return a->m_lhs; };
+static STKNode* STKArythmeticGetRHS(STKArythmetic* a){ return a->m_rhs; };
 
 // tick functions
-inline StkFloat STKArythmeticTickAdd(STKArythmetic* a);
-inline StkFloat STKArythmeticTickSub(STKArythmetic* a);
-inline StkFloat STKArythmeticTickMultiply(STKArythmetic* a);
-inline StkFloat STKArythmeticTickScale(STKArythmetic* a);
-inline StkFloat STKArythmeticTickScaleAdd(STKArythmetic* a);
-inline StkFloat STKArythmeticTickScaleSub(STKArythmetic* a);
-inline StkFloat STKArythmeticTickMix(STKArythmetic* a);
-inline StkFloat STKArythmeticTickBlend(STKArythmetic* a);
-inline StkFloat STKArythmeticTickShift(STKArythmetic* a);
-inline StkFloat STKArythmeticTickHasNoEffect(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickAdd(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickSub(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickMultiply(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickScale(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickScaleAdd(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickScaleSub(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickMix(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickBlend(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickShift(STKArythmetic* a);
+static inline StkFloat STKArythmeticTickHasNoEffect(STKArythmetic* a);
 
 StkFloat STKArythmeticTick(STKArythmetic* a, unsigned int channel = 0);
 

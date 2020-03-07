@@ -1,5 +1,4 @@
-#ifndef STK_NODE_H
-#define STK_NODE_H
+#pragma once
 
 #include "Stk.h"
 #include "common.h"
@@ -28,4 +27,3 @@ EXPORT void STKNodeSetStream(STKNode*, STKStream* stream);
 EXPORT STKStream* STKNodeGetStream(STKNode*);
 EXPORT StkFloat STKNodeUpdate(STKNode*, StkFloat value);
 
-#endif
