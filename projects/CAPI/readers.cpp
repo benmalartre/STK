@@ -11,6 +11,7 @@ STKReader* STKReaderCreate()
 	r->m_noutput = 0;
 	r->m_volume = 1.0;
 	r->m_outidx = 0;
+    r->m_type = NODE_READER;
 	r->m_mode = READER_FILEWVIN;
 	r->m_filename = "";
     STKReaderInit(r);

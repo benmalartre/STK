@@ -65,3 +65,41 @@ void STKNodeSetHasNoEffect(STKNode* node, bool hasnoeffect)
     }
      */
 }
+
+StkFloat STKNodeTick(STKNode* node){
+    switch(node->m_type){
+        case NODE_GENERATOR:
+        {
+            STKGeneratorTick((STKGenerator*)node);
+            break;
+        }
+        case NODE_READER:
+        {
+            STKReaderTick((STKReader*)node);
+            break;
+        }
+        case NODE_EFFECT:
+        {
+            STKEffectTick((STKEffect*)node);
+            break;
+        }
+        case NODE_FILTER:
+        {
+            STKFilterTick((STKFilter*)node);
+            break;
+        }
+            /*
+        case NODE_INSTRUMENT:
+        {
+            STKInstrumentTick((STKInstrument*)node);
+            break;
+        }
+             */
+        case NODE_WRITER:
+        {
+            STKWriterTick((STKWriter*)node);
+        }
+    }
+    return 0.f;
+}
+

@@ -20,7 +20,7 @@ STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency)
 	g->m_noutput = 0;
 	g->m_volume = 1.0;
 	g->m_outidx = 0;
-    g->m_type = GENERATOR;
+    g->m_type = NODE_GENERATOR;
     
 	g->m_gentype = type;
 	g->m_frequency = frequency;

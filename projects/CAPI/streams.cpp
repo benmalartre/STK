@@ -4,6 +4,21 @@
 #include "exports.h"
 
 // ----------------------------------------------------------------------
+//    ROOT NODES
+// ----------------------------------------------------------------------
+void STKStreamRemoveRootNode(STKStream* stream, STKNode* node){
+    stream->m_roots.push_back(node);
+}
+
+void STKStreamAddRootNode(STKStream* stream, STKNode* node){
+    for(int i=0;i<stream->m_roots.size();i++){
+        if(stream->m_roots[i] == node){
+            stream->m_roots.erase(stream->m_roots.begin()+i);
+        }
+    }
+}
+
+// ----------------------------------------------------------------------
 //	STK ADD GENERATOR NODE
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, StkFloat frequency, bool isRoot)

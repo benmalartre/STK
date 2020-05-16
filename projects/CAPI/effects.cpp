@@ -5,6 +5,7 @@
 STKEffect* STKEffectCreate(STKNode* source, STKEffectType type)
 {
     STKEffect* fx = new STKEffect();
+    fx->m_type = NODE_EFFECT;
 	fx->m_source = source;
 	fx->m_volume = 1.0f;
 	fx->m_fxtype = type;
@@ -97,7 +98,7 @@ void STKEffectInit(STKEffect* fx)
 //--------------------------------------------------------------------
 // STKEffect Node Term
 //--------------------------------------------------------------------
-void STKEffectTerm()
+void STKEffectTerm(STKEffect* fx)
 {
 }
 
@@ -135,7 +136,7 @@ StkFloat STKEffectTickJCRev(STKEffect* fx)
     return 0;
 }
 
-StkFloat STKEffectEffectTickNRev(STKEffect* fx)
+StkFloat STKEffectTickNRev(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_nrev->tick(m_source->tick()))* m_volume;
@@ -144,7 +145,7 @@ StkFloat STKEffectEffectTickNRev(STKEffect* fx)
     return 0;
 }
 
-StkFloat STKEffectEffectTickFreeVerb(STKEffect* fx)
+StkFloat STKEffectTickFreeVerb(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_freeverb->tick(m_source->tick()))* m_volume;
@@ -153,7 +154,7 @@ StkFloat STKEffectEffectTickFreeVerb(STKEffect* fx)
     return 0;
 }
 
-StkFloat STKEffectEffectTickEcho(STKEffect* fx)
+StkFloat STKEffectTickEcho(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
@@ -163,7 +164,7 @@ StkFloat STKEffectEffectTickEcho(STKEffect* fx)
     return 0;
 }
 
-StkFloat STKEffectEffectTickPitShift(STKEffect* fx)
+StkFloat STKEffectTickPitShift(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_pitshift->tick(m_source->tick()))* m_volume;
@@ -172,7 +173,7 @@ StkFloat STKEffectEffectTickPitShift(STKEffect* fx)
     return 0;
 }
 
-StkFloat STKEffectEffectTickLentPitShift(STKEffect* fx)
+StkFloat STKEffectTickLentPitShift(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
@@ -181,7 +182,7 @@ StkFloat STKEffectEffectTickLentPitShift(STKEffect* fx)
     return 0;
 }
 
-StkFloat STKEffectEffectTickChorus(STKEffect* fx)
+StkFloat STKEffectTickChorus(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_chorus->tick(m_source->tick()))* m_volume;
@@ -191,7 +192,7 @@ StkFloat STKEffectEffectTickChorus(STKEffect* fx)
 
 }
 
-StkFloat STKEffectEffectTickMoog(STKEffect* fx)
+StkFloat STKEffectTickMoog(STKEffect* fx)
 {
     /*
 	if (m_outidx == 0) return update(m_moog->tick(m_source->tick()))* m_volume;
@@ -201,7 +202,7 @@ StkFloat STKEffectEffectTickMoog(STKEffect* fx)
 
 }
 
-StkFloat STKEffectEffectTickHasNoEffect(STKEffect* fx)
+StkFloat STKEffectTickHasNoEffect(STKEffect* fx)
 {
 	return STKNodeTick(fx->m_source);
 }

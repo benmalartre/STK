@@ -2,7 +2,7 @@
 //--------------------------------------------------------------------
 // STKFilter Node Constructor
 //--------------------------------------------------------------------
-STKFilter::STKFilter(STKNode* source, Type type)
+STKFilterCreate(STKNode* source, Type type)
 {
 	m_source = source;
 	m_volume = 1.0f;

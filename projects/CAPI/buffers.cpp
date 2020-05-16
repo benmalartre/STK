@@ -6,6 +6,7 @@
 STKBuffer* STKBufferCreate(STKNode* source)
 {
     STKBuffer* b = new STKBuffer();
+    b->m_type = NODE_BUFFER;
 	b->m_volume = 1.0;
 	b->m_source = source;
     

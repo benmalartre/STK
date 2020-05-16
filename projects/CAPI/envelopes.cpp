@@ -6,6 +6,7 @@
 STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source)
 {
     STKEnvelope* e = new STKEnvelope();
+    e->m_type = NODE_ENVELOPE;
 	e->m_noutput = 0;
 	e->m_volume = 1.0f;
 	e->m_outidx = 0;

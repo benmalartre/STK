@@ -37,12 +37,5 @@ using namespace stk;
 
 #define FORMAT RTAUDIO_FLOAT32
 
-typedef enum STKNodeType{
-    GENERATOR,
-    READER,
-    FILTER,
-    EFFECT,
-    INSTRUMENT,
-    WRITER
-}STKNodeType;
+
 #endif

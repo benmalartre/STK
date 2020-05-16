@@ -4,6 +4,18 @@
 #include "Stk.h"
 #include "common.h"
 
+typedef enum STKNodeType{
+    NODE_GENERATOR,
+    NODE_READER,
+    NODE_ARYTHMETIC,
+    NODE_FILTER,
+    NODE_EFFECT,
+    NODE_ENVELOPE,
+    NODE_BUFFER,
+    NODE_INSTRUMENT,
+    NODE_WRITER
+}STKNodeType;
+
 struct STKStream;
 
 struct STKNode{

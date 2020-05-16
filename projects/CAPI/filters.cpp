@@ -5,6 +5,7 @@
 STKFilter* STKFilterCreate(STKNode* source, STKFilterType type)
 {
     STKFilter* filter = new STKFilter();
+    filter->m_type = NODE_FILTER;
 	filter->m_source = source;
 	filter->m_volume = 1.0f;
 	filter->m_ftype = type;

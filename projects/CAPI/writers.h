@@ -22,9 +22,7 @@ struct STKWriter : public STKNode{
 	std::string m_filename;
 };
 
-// functions
 
-StkFloat STKWriterTick(unsigned int channel = 0);
 // constructor
 STKWriter* STKWriterCreate();
 
@@ -35,11 +33,13 @@ void STKWriterDelete(STKWriter* writer);
 void STKWriterReset(STKWriter* writer);
 void STKWriterInit(STKWriter* writer);
 void STKWriterTerm(STKWriter* writer);
-void STKWriterSetFile(STKWriter* writer, std::string filename);
-void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);
+
+
+// tick functions
+StkFloat STKWriterTick(STKWriter* w, unsigned int channel = 0);
 
 // exported functions
-EXPORT void STKSetWriterMode(STKWriter* writer, STKWriterMode mode);
-EXPORT void STKSetWriterScalar(STKWriter* writer, STKWriterParam param, StkFloat scalar);
+EXPORT void STKWriterSetFile(STKWriter* writer, std::string filename);
+EXPORT void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);;
 
 #endif

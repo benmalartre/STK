@@ -8,6 +8,8 @@
 #include "nodes.h"
 #include "generators.h"
 #include "readers.h"
+//#include "instruments.h"
+#include "writers.h"
 
 // exported functions
 EXPORT RtAudio* STKInit();

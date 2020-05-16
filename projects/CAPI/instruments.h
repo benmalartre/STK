@@ -31,111 +31,117 @@
 #include "Mesh2D.h"// Two-dimensional, rectilinear digital waveguide mesh
 #include "Whistle.h"// Hybrid physical/spectral model of a police whistle
 
+enum STKInstrumentType{
+    INSTRUMENT_CLARINET,
+    INSTRUMENT_BLOWHOLE,
+    INSTRUMENT_SAXOFONY,
+    INSTRUMENT_FLUTE,
+    INSTRUMENT_BRASS,
+    INSTRUMENT_BLOWBOTL,
+    INSTRUMENT_BOWED,
+    INSTRUMENT_PLUCKED,
+    INSTRUMENT_STIFKARP,
+    INSTRUMENT_SITAR,
+    INSTRUMENT_MANDOLIN,
+    INSTRUMENT_RHODEY,
+    INSTRUMENT_WURLEY,
+    INSTRUMENT_TUBEBELL,
+    INSTRUMENT_HEAVYMETL,
+    INSTRUMENT_PERCFLUT,
+    INSTRUMENT_BEETHREE,
+    INSTRUMENT_MOOG,
+    INSTRUMENT_FMVOICES,
+    INSTRUMENT_VOICFORM,
+    INSTRUMENT_RESONATE,
+    INSTRUMENT_DRUMMER,
+    INSTRUMENT_BANDEDWG,
+    INSTRUMENT_SHAKERS,
+    INSTRUMENT_MODALBAR,
+    INSTRUMENT_MESH2D,
+    INSTRUMENT_WHISTLE
+};
 
-class Instruments : public STKNode{
-public:
-	enum Type{
-		CLARINET,
-		BLOWHOLE,
-		SAXOFONY,
-		FLUTE,
-		BRASS,
-		BLOWBOTL,
-		BOWED,
-		PLUCKED,
-		STIFKARP,
-		SITAR,
-        MANDOLIN,
-        RHODEY,
-        WURLEY,
-        TUBEBELL,
-        HEAVYMETL,
-        PERCFLUT,
-        BEETHREE,
-        MOOG,
-        FMVOICES,
-        VOICFORM,
-        RESONATE,
-        DRUMMER,
-        BANDEDWG,
-        SHAKERS,
-        MODALBAR,
-        MESH2D,
-        WHISTLE
-	};
-
-	enum Param{
+enum STKInstrumentParam{
     
-	};
+};
 
-	StkFloat tick(unsigned int channel = 0);
-	// constructor
-	STKInstrument(STKNode* source, Type type);
-	// destructor 
-	~SSTKInstrument();
-	// overrides
-	void reset(){ m_outidx = 0; };
-	void init();
-	void term();
-	// functions
-	Type getType(){ return m_type; };
-	void setType(Type type);
-	void setScalar(StkFloat scalar, Param param);
-	void setHasNoEffect(bool hasnoeffect);
-private:
-	inline StkFloat InstrumentTickClarinet();
-	inline StkFloat InstrumentTickBlowHole();
-	inline StkFloat InstrumentTickSaxophony();
-	inline StkFloat InstrumentTickFlute();
-	inline StkFloat InstrumentTickBrass();
-	inline StkFloat InstrumentTickBlowBotl();
-	inline StkFloat InstrumentTickBowed();
-	inline StkFloat InstrumentTickPlucked();
-	inline StkFloat InstrumentTickStiffKarp();
-	inline StkFloat InstrumentTickSitar();
-    inline StkFloat InstrumentTickMandolin();
-    inline StkFloat InstrumentTickRhodey();
-    inline StkFloat InstrumentTickWurley();
-    inline StkFloat InstrumentTickTubeBell();
-    inline StkFloat InstrumentTickHeavyMetl();
-    inline StkFloat InstrumentTickPercFlut();
-    inline StkFloat InstrumentTickBeeThree();
-    inline StkFloat InstrumentTickMoog();
-    inline StkFloat InstrumentTickFMVoices();
-    inline StkFloat InstrumentTickVoicForm();
-    inline StkFloat InstrumentTickResonate();
-    inline StkFloat InstrumentTickDrummer();
-    inline StkFloat InstrumentTickBandedWG();
-    inline StkFloat InstrumentTickMoog();
-    inline StkFloat InstrumentTickShakers();
-    inline StkFloat InstrumentTickModalBar();
-    inline StkFloat InstrumentTickMesh2D();
-    inline StkFloat InstrumentTickWhistle();
-	inline StkFloat InstrumentTickHasNoEffect();
-	std::function<StkFloat()> m_tickCallback;
-	union
-	{
-		Clarinet* m_onezero;
-		OnePole* m_onepole;
-		PoleZero* m_polezero;
-		TwoZero* m_twozero;
-		TwoPole* m_twopole;
-		BiQuad* m_biquad;
-		FormSwep* m_formswep;
-		Delay* m_delay;
-		DelayL* m_delayl;
-		DelayA* m_delaya;
-		LentPitShift* m_lentpitshift;
-		Chorus* m_chorus;
-	};
+union STKInstrumentINSTR
+{
+    Clarinet* m_onezero;
+    OnePole* m_onepole;
+    PoleZero* m_polezero;
+    TwoZero* m_twozero;
+    TwoPole* m_twopole;
+    BiQuad* m_biquad;
+    FormSwep* m_formswep;
+    Delay* m_delay;
+    DelayL* m_delayl;
+    DelayA* m_delaya;
+    LentPitShift* m_lentpitshift;
+    Chorus* m_chorus;
+};
+
+
+struct Instruments : public STKNode{
+    STKInstrumentINSTR m_i;
 	STKNode* m_source;
 	Type m_type;
+    std::function<StkFloat()> m_tickCallback;
 };
+
+
+
+// constructor
+STKInstrument* STKInstrumentCreate(STKNode* source, Type type);
+
+// destructor
+STKInstrumentDelete(STKInstrument* i);
+
+// functions
+
+void STKInstrumentReset(STKInstrument* i){ i->m_outidx = 0; };
+void STKInstrumentInit(STKInstrument* i);
+void STKInstrumentTerm(STKInstrument* i);
+
+
+// tick functions
+inline StkFloat STKInstrumentTickClarinet(STKInstrument* i);
+inline StkFloat STKInstrumentTickBlowHole(STKInstrument* i);
+inline StkFloat STKInstrumentTickSaxophony(STKInstrument* i);
+inline StkFloat STKInstrumentTickFlute(STKInstrument* i);
+inline StkFloat STKInstrumentTickBrass()STKInstrument* i;
+inline StkFloat STKInstrumentTickBlowBotl(STKInstrument* i);
+inline StkFloat STKInstrumentTickBowed(STKInstrument* i);
+inline StkFloat STKInstrumentTickPlucked(STKInstrument* i);
+inline StkFloat STKInstrumentTickStiffKarp(STKInstrument* i);
+inline StkFloat STKInstrumentTickSitar(STKInstrument* i);
+inline StkFloat STKInstrumentTickMandolin(STKInstrument* i);
+inline StkFloat STKInstrumentTickRhodey(STKInstrument* i);
+inline StkFloat STKInstrumentTickWurley(STKInstrument* i);
+inline StkFloat STKInstrumentTickTubeBell(STKInstrument* i);
+inline StkFloat STKInstrumentTickHeavyMetl(STKInstrument* i);
+inline StkFloat STKInstrumentTickPercFlut(STKInstrument* i);
+inline StkFloat STKInstrumentTickBeeThree(STKInstrument* i);
+inline StkFloat STKInstrumentTickMoog(STKInstrument* i);
+inline StkFloat STKInstrumentTickFMVoices(STKInstrument* i);
+inline StkFloat STKInstrumentTickVoicForm(STKInstrument* i);
+inline StkFloat STKInstrumentTickResonate(STKInstrument* i);
+inline StkFloat STKInstrumentTickDrummer(STKInstrument* i);
+inline StkFloat STKInstrumentTickBandedWG(STKInstrument* i);
+inline StkFloat STKInstrumentTickMoog(STKInstrument* i);
+inline StkFloat STKInstrumentTickShakers(STKInstrument* i);
+inline StkFloat STKInstrumentTickModalBar(STKInstrument* i);
+inline StkFloat STKInstrumentTickMesh2D(STKInstrument* i);
+inline StkFloat STKInstrumentTickWhistle(STKInstrument* i);
+inline StkFloat STKInstrumentTickHasNoEffect(STKInstrument* i);
+StkFloat STKInstrumentTick(STKInstrument* i, unsigned int channel = 0);
 
 // ----------------------------------------------------------------------
 //	STK FILTER NODE SETTER
 // ----------------------------------------------------------------------
-EXPORT void STKSetFilterType(STKFilter* filter, STKFilter::Type type);
-EXPORT void STKSetFilterScalar(STKFilter* filter, STKFilter::Param param, StkFloat scalar);
+EXPORT STKInstrumentType STKInstrumentGetType(){ return m_type; };
+EXPORT void STKInstrumentSetType(STKInstrumentType type);
+EXPORT void STKInstrumentSetScalar(StkFloat scalar, STKInstrumentParam param);
+EXPORT void STKInstrumentSetHasNoEffect(bool hasnoeffect);
 
 #endif
