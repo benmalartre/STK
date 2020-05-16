@@ -1,5 +1,4 @@
-#ifndef STK_FILTERS_H
-#define STK_FILTERS_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -144,4 +143,3 @@ EXPORT void STKInstrumentSetType(STKInstrumentType type);
 EXPORT void STKInstrumentSetScalar(StkFloat scalar, STKInstrumentParam param);
 EXPORT void STKInstrumentSetHasNoEffect(bool hasnoeffect);
 
-#endif

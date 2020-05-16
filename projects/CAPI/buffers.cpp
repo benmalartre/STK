@@ -9,7 +9,7 @@ STKBuffer* STKBufferCreate(STKNode* source)
     b->m_type = NODE_BUFFER;
 	b->m_volume = 1.0;
 	b->m_source = source;
-    
+    b->m_type = STK_BUFFER;
     b->m_datas = NULL;
     b->m_rate = std::ceil(Stk::sampleRate());
     b->m_idx = 0;

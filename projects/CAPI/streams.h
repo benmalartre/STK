@@ -1,5 +1,4 @@
-#ifndef STK_STREAM_H
-#define STK_STREAM_H
+#pragma once
 
 #include "common.h"
 #include <math.h>
@@ -22,7 +21,7 @@ EXPORT void STKStreamRemoveRootNode(STKStream* stream, STKNode* node);
 EXPORT void STKStreamAddRootNode(STKStream* stream, STKNode* node);
 
 // GeneratorStream tick() function
-int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+static int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *dataPointer);
 
 EXPORT STKStream* STKStreamSetup(RtAudio* dac, int numChannels);
@@ -39,6 +38,3 @@ EXPORT STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNod
 EXPORT STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot = true);
-
-
-#endif

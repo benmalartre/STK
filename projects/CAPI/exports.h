@@ -1,6 +1,5 @@
 
-#ifndef STK_EXPORT_H
-#define STK_EXPORT_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -54,5 +53,3 @@ protected:
 
 };
 */
-
-#endif

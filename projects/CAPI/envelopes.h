@@ -1,5 +1,4 @@
-#ifndef STK_ENVELOPES_H
-#define STK_ENVELOPES_H
+#pragma once
 
 #include "common.h"
 #include "nodes.h"
@@ -44,29 +43,27 @@ struct STKEnvelope : public STKNode{
 };
 
 // constructor
-STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source);
+static STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source);
 
 // destructor
-void STKEnvelopeDelete(STKEnvelope*);
+static void STKEnvelopeDelete(STKEnvelope*);
 
 // functions
-void STKEnvelopeReset(STKEnvelope*);
-void STKEnvelopeInit(STKEnvelope*);
-void STKEnvelopeTerm(STKEnvelope*);
-
+static void STKEnvelopeReset(STKEnvelope*);
+static void STKEnvelopeInit(STKEnvelope*);
+static void STKEnvelopeTerm(STKEnvelope*);
+ 
 // tick functions
-inline StkFloat STKEnvelopeTickEnvelope(STKEnvelope*);
-inline StkFloat STKEnvelopeTickADSR(STKEnvelope*);
-inline StkFloat STKEnvelopeTickAsymp(STKEnvelope*);
-inline StkFloat STKEnvelopeTickHasNoEffect(STKEnvelope*);
-StkFloat STKEnvelopeTick(STKEnvelope*, unsigned int channel = 0);
+static StkFloat STKEnvelopeTickEnvelope(STKEnvelope*);
+static StkFloat STKEnvelopeTickADSR(STKEnvelope*);
+static StkFloat STKEnvelopeTickAsymp(STKEnvelope*);
+static StkFloat STKEnvelopeTickHasNoEffect(STKEnvelope*);
+static StkFloat STKEnvelopeTick(STKEnvelope*, unsigned int channel = 0);
 
 // exported functions
 EXPORT void STKEnvelopeSetHasNoEffect(STKEnvelope* e, bool hasnoeffect);
-EXPORT STKEnvelopeType STKEnvelopeGetType(STKEnvelope* e){ return e->m_envtype; };
+EXPORT STKEnvelopeType STKEnvelopeGetType(STKEnvelope* e);
 EXPORT void STKEnvelopeSetType(STKEnvelope* envelope, STKEnvelopeType type);
 EXPORT void STKEnvelopeSetScalar(STKEnvelope* envelope, STKEnvelopeParam param, StkFloat scalar);
 EXPORT void STKEnvelopeKeyOn(STKEnvelope* envelope);
 EXPORT void STKEnvelopeKeyOff(STKEnvelope* envelope);
-
-#endif

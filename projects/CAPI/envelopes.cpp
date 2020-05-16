@@ -10,6 +10,7 @@ STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source)
 	e->m_noutput = 0;
 	e->m_volume = 1.0f;
 	e->m_outidx = 0;
+	e->m_type = STK_ENVELOPE;
 	e->m_envtype = type;
 	e->m_source = source;
 	STKEnvelopeInit(e);
@@ -222,4 +223,9 @@ StkFloat STKEnvelopeTick(STKEnvelope* e, unsigned int channel)
 {
 	return e->m_tickCallback();
 }
+
+STKEnvelopeType STKEnvelopeGetType(STKEnvelope* e)
+{ 
+	return e->m_envtype; 
+};
 
