@@ -1,15 +1,14 @@
 #include "buffers.h"
-
+#include "exports.h"
 //--------------------------------------------------------------------
 // STKBuffer Node Constructor
 //--------------------------------------------------------------------
 STKBuffer* STKBufferCreate(STKNode* source)
 {
     STKBuffer* b = new STKBuffer();
-    b->m_type = NODE_BUFFER;
-	b->m_volume = 1.0;
-	b->m_source = source;
     b->m_type = STK_BUFFER;
+	  b->m_volume = 1.0;
+	  b->m_source = source;
     b->m_datas = NULL;
     b->m_rate = std::ceil(Stk::sampleRate());
     b->m_idx = 0;

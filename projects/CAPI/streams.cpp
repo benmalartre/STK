@@ -2,28 +2,32 @@
 #include "nodes.h"
 #include "readers.h"
 #include "exports.h"
+#include "generators.h"
 
 // ----------------------------------------------------------------------
 //    ROOT NODES
 // ----------------------------------------------------------------------
-void STKStreamRemoveRootNode(STKStream* stream, STKNode* node){
-    stream->m_roots.push_back(node);
+void STKStreamRemoveRootNode(STKStream* stream, STKNode* node)
+{
+  for (int i = 0; i<stream->m_roots.size(); i++) {
+    if (stream->m_roots[i] == node) {
+      stream->m_roots.erase(stream->m_roots.begin() + i);
+    }
+  }
 }
 
-void STKStreamAddRootNode(STKStream* stream, STKNode* node){
-    for(int i=0;i<stream->m_roots.size();i++){
-        if(stream->m_roots[i] == node){
-            stream->m_roots.erase(stream->m_roots.begin()+i);
-        }
-    }
+void STKStreamAddRootNode(STKStream* stream, STKNode* node)
+{
+  stream->m_roots.push_back(node);
 }
 
 // ----------------------------------------------------------------------
 //	STK ADD GENERATOR NODE
 // ----------------------------------------------------------------------
-STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, StkFloat frequency, bool isRoot)
+STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, float frequency, bool isRoot)
 {
 	STKNode* node = (STKNode*) STKGeneratorCreate(type, frequency);
+  
 	STKNodeSetStream(node, stream);
 	STKNodeIncrementNumOutput(node);
 	if (isRoot)
@@ -33,7 +37,7 @@ STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, StkFloa
 	}
 
 	else STKNodeSetIsRoot(node, false);
-		
+	
 	return node;
 }
 
@@ -72,8 +76,6 @@ STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmeticMode mode, STKNo
 	else STKNodeSetIsRoot(node, false);
 
 	return node;
-	
-	return NULL;
 }
 
 // ----------------------------------------------------------------------
@@ -139,20 +141,19 @@ STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot)
 {
-    STKReader* reader = new STKReader();
-    STKNode* node = static_cast<STKNode*>(reader);
-    STKNodeSetStream(node, stream);
-    STKNodeIncrementNumOutput(node);
+    STKReader* reader = STKReaderCreate();
+    STKNodeSetStream(reader, stream);
+    STKNodeIncrementNumOutput(reader);
     if (isRoot)
     {
-        STKNodeSetIsRoot(node, true);
-        stream->m_roots.push_back(node);
+        STKNodeSetIsRoot(reader, true);
+        stream->m_roots.push_back(reader);
     }
     
-    else STKNodeSetIsRoot(node, false);
+    else STKNodeSetIsRoot(reader, false);
+
     STKReaderSetFile(reader, filename);
-    return node;
-    
+    return reader;
 }
 
 // ----------------------------------------------------------------------
@@ -165,14 +166,13 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 	StkFloat *samples = (StkFloat *)outputBuffer;
 	size_t numRoots = stream->m_roots.size();
 	if (!numRoots)return 0;
-	float weight = 1.0 / numRoots;
+	float weight = 1.0 / (float)numRoots;
 	for (unsigned int i = 0; i < nBufferFrames; i++)
 	{
 		*samples = 0;
-		for (unsigned int j = 0; j < numRoots; ++j)
-			*samples += STKNodeTick(stream->m_roots[j]) * weight;
+    for (unsigned int j = 0; j < numRoots; ++j)
+      *samples += STKNodeTick(stream->m_roots[j]) * weight;
 		samples++;
-
 	}
 
 	return 0;
@@ -180,9 +180,10 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
 
 STKStream* STKStreamSetup(RtAudio* DAC, int numChannels)
 {
+  
 	STKStream* stream = new STKStream();
 	stream->m_dac = DAC;
-
+  
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
 	parameters.deviceId = DAC->getDefaultOutputDevice();

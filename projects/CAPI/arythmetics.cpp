@@ -1,17 +1,17 @@
 #include "arythmetics.h"
-
+#include "exports.h"
 //--------------------------------------------------------------------
 // STKArythmetic Node Constructor
 //--------------------------------------------------------------------
 STKArythmetic* STKArythmeticCreate(STKNode* lhs, STKNode* rhs, STKArythmeticMode mode)
 {
 	STKArythmetic* a = new STKArythmetic();
-    a->m_type = NODE_ARYTHMETIC;
+  a->m_type = STK_ARYTHMETIC;
 	a->m_volume = 1.0;
 	a->m_lhs = lhs;
 	a->m_rhs = rhs;
 	a->m_mode = mode;
-	a->m_type = STK_ARYTHMETIC;
+	
 	STKArythmeticInit(a);
     return a;
 }

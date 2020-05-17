@@ -1,19 +1,18 @@
 #include "envelopes.h"
-
+#include "exports.h"
 //--------------------------------------------------------------------
 // STKEnvelope Node Constructor
 //--------------------------------------------------------------------
 STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source)
 {
     STKEnvelope* e = new STKEnvelope();
-    e->m_type = NODE_ENVELOPE;
-	e->m_noutput = 0;
-	e->m_volume = 1.0f;
-	e->m_outidx = 0;
-	e->m_type = STK_ENVELOPE;
-	e->m_envtype = type;
-	e->m_source = source;
-	STKEnvelopeInit(e);
+    e->m_noutput = 0;
+    e->m_volume = 1.0f;
+    e->m_outidx = 0;
+    e->m_type = STK_ENVELOPE;
+    e->m_envtype = type;
+    e->m_source = source;
+    STKEnvelopeInit(e);
     return e;
 }
 

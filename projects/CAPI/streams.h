@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_STREAM_H
+#define STK_CAPI_STREAM_H
 #pragma once
 
 #include "common.h"
@@ -12,23 +14,22 @@
 struct STKNode;
 struct STKReader;
 
-typedef struct STKStream {
-	RtAudio* m_dac;
+struct STKStream {
+    RtAudio* m_dac;
     std::vector<STKNode*> m_roots;
-}STKStream;
+    stk::SineWave* m_sinewave;
+};
 
 EXPORT void STKStreamRemoveRootNode(STKStream* stream, STKNode* node);
 EXPORT void STKStreamAddRootNode(STKStream* stream, STKNode* node);
 
-// GeneratorStream tick() function
-static int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *dataPointer);
 
 EXPORT STKStream* STKStreamSetup(RtAudio* dac, int numChannels);
 EXPORT bool STKStreamClean(STKStream* stream);
 EXPORT bool STKStreamStart(STKStream* stream);
 EXPORT bool STKStreamStop(STKStream* stream);
-EXPORT void STKStreamSetFrequency(STKStream* stream, float frequency);
 EXPORT int STKStreamNumRoots(STKStream* stream);
 
 EXPORT STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, float frequency, bool isRoot = true);
@@ -38,3 +39,5 @@ EXPORT STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNod
 EXPORT STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* source, bool isRoot = true);
 EXPORT STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot = true);
+
+#endif // STK_CAPI_STREAM_H

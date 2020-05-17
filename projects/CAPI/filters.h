@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_FILTER_H
+#define STK_CAPI_FILTER_H
 #pragma once
 
 #include "common.h"
@@ -76,37 +78,36 @@ union STKFilterFILTER
 };
 
 struct STKFilter : public STKNode{
-	std::function<StkFloat()> m_tickCallback;
     STKFilterFILTER m_filter;
-	STKNode* m_source;
-	STKFilterType m_ftype;
+    STKNode* m_source;
+    STKFilterType m_ftype;
 };
 
 
 // constructor
-static STKFilter* STKFilterCreate(STKNode* source, STKFilterType type);
+STKFilter* STKFilterCreate(STKNode* source, STKFilterType type);
 
 // destructor
-static void STKFilterDelete(STKFilter* f);
+void STKFilterDelete(STKFilter* f);
 
 // functions
-static void STKFilterReset(STKFilter* f){ f->m_outidx = 0; };
-static void STKFilterInit(STKFilter* f);
-static void STKFilterTerm(STKFilter* f);
+inline void STKFilterReset(STKFilter* f){ f->m_outidx = 0; };
+void STKFilterInit(STKFilter* f);
+void STKFilterTerm(STKFilter* f);
 
 // tick functions
-static StkFloat STKFilterTickOneZero(STKFilter* f);
-static StkFloat STKFilterTickOnePole(STKFilter* f);
-static StkFloat STKFilterTickPoleZero(STKFilter* f);
-static StkFloat STKFilterTickTwoZero(STKFilter* f);
-static StkFloat STKFilterTickTwoPole(STKFilter* f);
-static StkFloat STKFilterTickBiQuad(STKFilter* f);
-static StkFloat STKFilterTickFormSwep(STKFilter* f);
-static StkFloat STKFilterTickDelay(STKFilter* f);
-static StkFloat STKFilterTickDelayL(STKFilter* f);
-static StkFloat STKFilterTickDelayA(STKFilter* f);
-static StkFloat STKFilterTickHasNoEffect(STKFilter* f);
-static StkFloat STKFilterTick(STKFilter* f, unsigned int channel = 0);
+StkFloat STKFilterTickOneZero(STKFilter* f);
+StkFloat STKFilterTickOnePole(STKFilter* f);
+StkFloat STKFilterTickPoleZero(STKFilter* f);
+StkFloat STKFilterTickTwoZero(STKFilter* f);
+StkFloat STKFilterTickTwoPole(STKFilter* f);
+StkFloat STKFilterTickBiQuad(STKFilter* f);
+StkFloat STKFilterTickFormSwep(STKFilter* f);
+StkFloat STKFilterTickDelay(STKFilter* f);
+StkFloat STKFilterTickDelayL(STKFilter* f);
+StkFloat STKFilterTickDelayA(STKFilter* f);
+StkFloat STKFilterTickHasNoEffect(STKFilter* f);
+StkFloat STKFilterTick(STKFilter* f, unsigned int channel = 0);
 
 // ----------------------------------------------------------------------
 //	STK FILTER NODE SETTER
@@ -114,3 +115,5 @@ static StkFloat STKFilterTick(STKFilter* f, unsigned int channel = 0);
 EXPORT STKFilterType STKFilterGetType(STKFilter* f);
 EXPORT void STKSetFilterType(STKFilter* f, STKFilterType type);
 EXPORT void STKSetFilterScalar(STKFilter* f, STKFilterParam param, StkFloat scalar);
+
+#endif // STK_CAPI_FILTER_H

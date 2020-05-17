@@ -4,7 +4,7 @@
 STKWriter* STKWriterCreate()
 {
     STKWriter* writer = new STKWriter();
-    writer->m_type = NODE_WRITER;
+    writer->m_type = STK_WRITER;
     return writer;
 }
 
