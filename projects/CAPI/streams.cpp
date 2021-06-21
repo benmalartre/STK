@@ -1,6 +1,8 @@
 #include "streams.h"
+#include "buffers.h"
 #include "nodes.h"
 #include "readers.h"
+#include "filters.h"
 #include "exports.h"
 
 // ----------------------------------------------------------------------

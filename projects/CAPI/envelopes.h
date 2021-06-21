@@ -34,16 +34,15 @@ union STKEnvelopeENV
 };
 
 struct STKEnvelope : public STKNode{
-    STKEnvelopeENV m_e;
-	std::function<StkFloat()> m_tickCallback;
-	STKEnvelopeType m_envtype;
-	float m_frequency;
-	STKNode* m_source;
-
+  STKEnvelopeENV m_e;
+  std::function<StkFloat()> m_tickCallback;
+  STKEnvelopeType m_envtype;
+  float m_frequency;
+  STKNode* m_source;
 };
 
 // constructor
-static STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source);
+EXPORT STKEnvelope* STKEnvelopeCreate(STKEnvelopeType type, STKNode* source);
 
 // destructor
 static void STKEnvelopeDelete(STKEnvelope*);

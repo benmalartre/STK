@@ -23,26 +23,29 @@ void STKCircularBufferGet(STKCircularBuffer* b, int phase, int offset, void* dat
 }
 */
 
-typedef struct STKBuffer : public STKNode{
-	std::function<StkFloat()> m_tickCallback;
-	STKNode* m_source;
-	StkFloat m_scalar;
-	
-    StkFloat* m_datas;
-    int m_phase;
-    int m_idx;
-    int m_rate;
-    int m_chunck;
-}STKBuffer;
+typedef struct STKBuffer : public STKNode {
+  std::function<StkFloat()> m_tickCallback;
+  STKNode* m_source;
+  StkFloat m_scalar;
+
+  StkFloat* m_datas;
+  int m_phase;
+  int m_idx;
+  int m_rate;
+  int m_chunck;
+} STKBuffer;
 
 // constructor
-static STKBuffer* STKBufferCreate(STKNode* previous);
+EXPORT STKBuffer* STKBufferCreate(STKNode* previous);
+
 // destructor
 static void STKBufferDelete(STKBuffer* b);
+
 // overrides
 static void STKBufferReset(STKBuffer* b){ b->m_outidx = 0; };
 static void STKBufferInit(STKBuffer* b, int rate);
 static void STKBufferTerm(STKBuffer* b);
+
 // functions
 static void STKBufferSetScalar(STKBuffer* b, StkFloat scalar){ b->m_scalar = scalar; };
 static void STKBufferSetHasNoEffect(STKBuffer* b, bool hasnoeffect);

@@ -27,7 +27,7 @@ struct STKArythmetic : public STKNode{
 };
 
 // constructor
-static STKArythmetic* STKArythmeticCreate(STKNode* a, STKNode* b, STKArythmeticMode mode);
+EXPORT STKArythmetic* STKArythmeticCreate(STKNode* a, STKNode* b, STKArythmeticMode mode);
 
 // destructor
 static void STKArythmeticDelete(STKArythmetic* a);

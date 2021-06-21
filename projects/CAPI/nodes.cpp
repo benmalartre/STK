@@ -1,5 +1,6 @@
 #include "nodes.h"
 #include "streams.h"
+#include "writers.h"
 //--------------------------------------------------------------------
 // STKNode Set Volume
 //--------------------------------------------------------------------
@@ -37,6 +38,40 @@ void STKNodeSetStream(STKNode* node, STKStream* stream) { node->m_stream = strea
 
 STKStream* STKNodeGetStream(STKNode* node){ return node->m_stream; };
 
-StkFloat STKNodeTick(STKNode* n){
-    return 0.f;
+StkFloat STKNodeTick(STKNode* node){
+  switch(node->m_type){
+    case STK_GENERATOR:
+    {
+      STKGeneratorTick((STKGenerator*)node);
+      break;
+    }
+    case STK_READER:
+    {
+      STKReaderTick((STKReader*)node);
+      break;
+    }
+    case STK_EFFECT:
+    {
+      STKEffectTick((STKEffect*)node);
+      break;
+    }
+    case STK_FILTER:
+    {
+      STKFilterTick((STKFilter*)node);
+      break;
+    }
+    /*
+    case NODE_INSTRUMENT:
+    {
+        STKInstrumentTick((STKInstrument*)node);
+        break;
+    }
+    */
+    case STK_WRITER:
+    {
+      STKWriterTick((STKWriter*)node);
+    }
+  }
+  return 0.f;
 }
+

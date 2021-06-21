@@ -89,7 +89,7 @@ static StkFloat STKEffectTickLentPitShift(STKEffect* fx);
 static StkFloat STKEffectTickChorus(STKEffect* fx);
 static StkFloat STKEffectTickMoog(STKEffect* fx);
 static StkFloat STKEffectTickHasNoEffect(STKEffect* fx);
-static StkFloat STKEffectTick(STKEffect* fx, unsigned int channel = 0);
+EXPORT StkFloat STKEffectTick(STKEffect* fx, unsigned int channel = 0);
 
 // functions
 static STKEffectType STKEffectGetType(STKEffect* fx);

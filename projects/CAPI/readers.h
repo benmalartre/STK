@@ -35,7 +35,7 @@ typedef struct STKReader : public STKNode{
 }STKReader;
 
 // constructor
-static STKReader* STKReaderCreate();
+EXPORT STKReader* STKReaderCreate();
 // destructor
 static void STKReaderDelete(STKReader* reader);
 
@@ -48,9 +48,9 @@ static void STKReaderTerm(STKReader* reader);
 static inline StkFloat STKReaderTickFileWvIn(STKReader* reader);
 static inline StkFloat STKReaderTickFileLoop(STKReader* reader);
 static inline StkFloat STKReaderTickHasNoEffect(STKReader* reader);
-static StkFloat STKReaderTick(STKReader* reader, unsigned int channel = 0);
+EXPORT StkFloat STKReaderTick(STKReader* reader, unsigned int channel = 0);
  
-static void STKReaderSetFile(STKReader* reader, const char* filename);
+EXPORT void STKReaderSetFile(STKReader* reader, const char* filename);
 static void STKReaderSetScalar(STKReader* reader, STKReaderParam param, StkFloat scalar);
 static void STKReaderSetHasNoEffect(STKReader* reader, bool hasnoeffect);
 static void STKReaderSetMode(STKReader* reader, STKReaderMode mode){reader->m_mode = mode;};

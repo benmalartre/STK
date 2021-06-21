@@ -35,11 +35,10 @@ void STKWriterTerm(STKWriter* writer);
 
 
 // tick functions
-StkFloat STKWriterTick(STKWriter* w, unsigned int channel = 0);
+EXPORT StkFloat STKWriterTick(STKWriter* w, unsigned int channel = 0);
 
 // exported functions
 EXPORT void STKWriterSetFile(STKWriter* writer, std::string filename);
 EXPORT void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);;
 
-#endif
 

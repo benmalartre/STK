@@ -8,17 +8,20 @@
 #include "effects.h"
 #include "filters.h"
 #include "buffers.h"
+#include "readers.h"
 
 struct STKNode;
 struct STKReader;
 
 typedef struct STKStream {
-	RtAudio* m_dac;
-    std::vector<STKNode*> m_roots;
-}STKStream;
+  RtAudio* m_dac;
+  std::vector<STKNode*> m_roots;
+} STKStream;
 
 EXPORT void STKStreamRemoveRootNode(STKStream* stream, STKNode* node);
 EXPORT void STKStreamAddRootNode(STKStream* stream, STKNode* node);
+
+EXPORT STKStream* STKStreamSetup(RtAudio* DAC, int numChannels);
 
 // GeneratorStream tick() function
 static int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,

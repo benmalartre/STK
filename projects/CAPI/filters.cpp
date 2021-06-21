@@ -4,15 +4,15 @@
 //--------------------------------------------------------------------
 STKFilter* STKFilterCreate(STKNode* source, STKFilterType type)
 {
-    STKFilter* filter = new STKFilter();
-    filter->m_type = NODE_FILTER;
-	filter->m_source = source;
-	filter->m_volume = 1.0f;
-	filter->m_ftype = type;
-	filter->m_noutput = 0;
-	filter->m_outidx = 0;
-	STKFilterInit(filter);
-    return filter;
+  STKFilter* filter = new STKFilter();
+  filter->m_type = STK_FILTER;
+  filter->m_source = source;
+  filter->m_volume = 1.0f;
+  filter->m_ftype = type;
+  filter->m_noutput = 0;
+  filter->m_outidx = 0;
+  STKFilterInit(filter);
+  return filter;
 }
 
 //--------------------------------------------------------------------

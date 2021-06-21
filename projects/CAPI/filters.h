@@ -84,7 +84,7 @@ struct STKFilter : public STKNode{
 
 
 // constructor
-static STKFilter* STKFilterCreate(STKNode* source, STKFilterType type);
+EXPORT STKFilter* STKFilterCreate(STKNode* source, STKFilterType type);
 
 // destructor
 static void STKFilterDelete(STKFilter* f);
@@ -106,7 +106,7 @@ static StkFloat STKFilterTickDelay(STKFilter* f);
 static StkFloat STKFilterTickDelayL(STKFilter* f);
 static StkFloat STKFilterTickDelayA(STKFilter* f);
 static StkFloat STKFilterTickHasNoEffect(STKFilter* f);
-static StkFloat STKFilterTick(STKFilter* f, unsigned int channel = 0);
+EXPORT StkFloat STKFilterTick(STKFilter* f, unsigned int channel = 0);
 
 // ----------------------------------------------------------------------
 //	STK FILTER NODE SETTER

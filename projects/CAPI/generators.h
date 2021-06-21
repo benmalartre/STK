@@ -67,7 +67,7 @@ typedef struct STKGenerator : public STKNode{
 }STKGenerator;
 
 // constructor
-static STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency=440.0f);
+EXPORT STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency=440.0f);
 
 // destructor
 static void STKGeneratorDelete(STKGenerator* g);
@@ -83,7 +83,7 @@ static inline StkFloat STKSingWaveTickCallback(STKGenerator* g);
 static inline StkFloat STKEnvelopeTickModulate(STKGenerator* g);
 static inline StkFloat STKEnvelopeTickGranulate(STKGenerator* g);
 static inline StkFloat STKGeneratorTickHasNoEffect(STKGenerator* g);
-static StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel = 0);
+EXPORT StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel = 0);
 
 
 // functions

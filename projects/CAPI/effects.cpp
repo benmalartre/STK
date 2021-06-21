@@ -1,19 +1,19 @@
 #include "effects.h"
+
 //--------------------------------------------------------------------
 // STKEffect Node Constructor
 //--------------------------------------------------------------------
 STKEffect* STKEffectCreate(STKNode* source, STKEffectType type)
 {
-    STKEffect* fx = new STKEffect();
-    fx->m_type = NODE_EFFECT;
-	fx->m_source = source;
-	fx->m_volume = 1.0f;
-	fx->m_fxtype = type;
-	fx->m_type = STK_EFFECT;
-	fx->m_noutput = 0;
-	fx->m_outidx = 0;
-	STKEffectInit(fx);
-    return fx;
+  STKEffect* fx = new STKEffect();
+  fx->m_source = source;
+  fx->m_volume = 1.0f;
+  fx->m_fxtype = type;
+  fx->m_type = STK_EFFECT;
+  fx->m_noutput = 0;
+  fx->m_outidx = 0;
+  STKEffectInit(fx);
+  return fx;
 }
 
 //--------------------------------------------------------------------

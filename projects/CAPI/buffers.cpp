@@ -5,18 +5,17 @@
 //--------------------------------------------------------------------
 STKBuffer* STKBufferCreate(STKNode* source)
 {
-    STKBuffer* b = new STKBuffer();
-    b->m_type = NODE_BUFFER;
+  STKBuffer* b = new STKBuffer();
 	b->m_volume = 1.0;
 	b->m_source = source;
-    b->m_type = STK_BUFFER;
-    b->m_datas = NULL;
-    b->m_rate = std::ceil(Stk::sampleRate());
-    b->m_idx = 0;
-    b->m_phase = 0;
-    
-    STKBufferInit(b, Stk::sampleRate());
-    return b;
+  b->m_type = STK_BUFFER;
+  b->m_datas = NULL;
+  b->m_rate = std::ceil(Stk::sampleRate());
+  b->m_idx = 0;
+  b->m_phase = 0;
+  
+  STKBufferInit(b, Stk::sampleRate());
+  return b;
 }
 
 //--------------------------------------------------------------------
@@ -24,9 +23,9 @@ STKBuffer* STKBufferCreate(STKNode* source)
 //--------------------------------------------------------------------
 void STKBufferDelete(STKBuffer* b)
 {
-    if (b->m_datas)delete[] b->m_datas;
-    STKBufferTerm(b);
-    delete b;
+  if (b->m_datas)delete[] b->m_datas;
+  STKBufferTerm(b);
+  delete b;
 }
 
 //--------------------------------------------------------------------

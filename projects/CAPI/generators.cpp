@@ -6,26 +6,26 @@
 //--------------------------------------------------------------------
 STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency)
 {
-    STKGenerator* g = new STKGenerator();
-    g->m_g.m_asymp = NULL;
-    g->m_g.m_noise = NULL;
-    g->m_g.m_blit = NULL;
-    g->m_g.m_blitsaw = NULL;
-    g->m_g.m_blitsquare = NULL;
-    g->m_g.m_sinewave = NULL;
-    g->m_g.m_singwave = NULL;
-    g->m_g.m_modulate = NULL;
-    g->m_g.m_granulate = NULL;
-    
-	g->m_noutput = 0;
-	g->m_volume = 1.0;
-	g->m_outidx = 0;
-    g->m_type = NODE_GENERATOR;
-    
-	g->m_gentype = type;
-	g->m_frequency = frequency;
-	STKGeneratorInit(g);
-    return g;
+  STKGenerator* g = new STKGenerator();
+  g->m_g.m_asymp = NULL;
+  g->m_g.m_noise = NULL;
+  g->m_g.m_blit = NULL;
+  g->m_g.m_blitsaw = NULL;
+  g->m_g.m_blitsquare = NULL;
+  g->m_g.m_sinewave = NULL;
+  g->m_g.m_singwave = NULL;
+  g->m_g.m_modulate = NULL;
+  g->m_g.m_granulate = NULL;
+
+  g->m_noutput = 0;
+  g->m_volume = 1.0;
+  g->m_outidx = 0;
+  g->m_type = STK_GENERATOR;
+
+  g->m_gentype = type;
+  g->m_frequency = frequency;
+  STKGeneratorInit(g);
+  return g;
 }
 
 //--------------------------------------------------------------------
