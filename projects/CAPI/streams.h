@@ -18,6 +18,7 @@ struct STKReader;
 
 typedef struct STKStream {
   RtAudio* m_dac;
+  short m_channels;
   std::vector<STKNode*> m_nodes;
   std::vector<STKNode*> m_roots;
   //std::map<STKNode*, std::vector<STKNode*> > m_dependencies;

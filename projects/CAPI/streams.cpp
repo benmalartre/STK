@@ -180,10 +180,10 @@ int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFra
   float weight = 1.0 / (float)numRoots;
   for (unsigned int i = 0; i < nBufferFrames; i++)
   {
-    *samples = 0;
+    float sample = 0;
     for (unsigned int j = 0; j < numRoots; ++j)
-      *samples += STKNodeTick(stream->m_roots[j]) * weight;
-    samples++;
+      sample += STKNodeTick(stream->m_roots[j]) * weight;
+    for ( int k=0; k<stream->m_channels; ++k ) *samples++ = sample;
   }
   
   return 0;
@@ -194,7 +194,7 @@ STKStream* STKStreamSetup(RtAudio* DAC, int numChannels)
   
 	STKStream* stream = new STKStream();
 	stream->m_dac = DAC;
-  
+  stream->m_channels = numChannels;
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
 	parameters.deviceId = DAC->getDefaultOutputDevice();
