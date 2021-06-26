@@ -1,6 +1,7 @@
 
-#ifndef STK_COMMON_H
-#define STK_COMMON_H
+#ifndef STK_CAPI_COMMON_H
+#define STK_CAPI_COMMON_H
+#pragma once
 
 #include <functional>
 #include <vector>
@@ -37,7 +38,7 @@ using namespace stk;
 
 #define FORMAT RTAUDIO_FLOAT32
 
-typedef enum STKNodeType{
+typedef enum STKNodeType {
     STK_GENERATOR,
     STK_READER,
     STK_ARYTHMETIC,
@@ -48,4 +49,5 @@ typedef enum STKNodeType{
     STK_WRITER,
     STK_BUFFER
 }STKNodeType;
-#endif
+
+#endif // STK_CAPI_COMMON_H

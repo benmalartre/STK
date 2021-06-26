@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_FILTER_H
+#define STK_CAPI_FILTER_H
 #pragma once
 
 #include "common.h"
@@ -76,10 +78,9 @@ union STKFilterFILTER
 };
 
 struct STKFilter : public STKNode{
-	std::function<StkFloat()> m_tickCallback;
     STKFilterFILTER m_filter;
-	STKNode* m_source;
-	STKFilterType m_ftype;
+    STKNode* m_source;
+    STKFilterType m_ftype;
 };
 
 
@@ -87,12 +88,12 @@ struct STKFilter : public STKNode{
 EXPORT STKFilter* STKFilterCreate(STKNode* source, STKFilterType type);
 
 // destructor
-static void STKFilterDelete(STKFilter* f);
+void STKFilterDelete(STKFilter* f);
 
 // functions
-static void STKFilterReset(STKFilter* f){ f->m_outidx = 0; };
-static void STKFilterInit(STKFilter* f);
-static void STKFilterTerm(STKFilter* f);
+inline void STKFilterReset(STKFilter* f){ f->m_outidx = 0; };
+void STKFilterInit(STKFilter* f);
+void STKFilterTerm(STKFilter* f);
 
 // tick functions
 static StkFloat STKFilterTickOneZero(STKFilter* f);
@@ -114,3 +115,5 @@ EXPORT StkFloat STKFilterTick(STKFilter* f, unsigned int channel = 0);
 EXPORT STKFilterType STKFilterGetType(STKFilter* f);
 EXPORT void STKSetFilterType(STKFilter* f, STKFilterType type);
 EXPORT void STKSetFilterScalar(STKFilter* f, STKFilterParam param, StkFloat scalar);
+
+#endif // STK_CAPI_FILTER_H

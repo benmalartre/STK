@@ -1,4 +1,5 @@
 #include "effects.h"
+#include "exports.h"
 
 //--------------------------------------------------------------------
 // STKEffect Node Constructor

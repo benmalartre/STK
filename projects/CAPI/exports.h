@@ -1,4 +1,5 @@
-
+#ifndef STK_CAPI_EXPORT_H
+#define STK_CAPI_EXPORT_H
 #pragma once
 
 #include "common.h"
@@ -15,8 +16,6 @@ EXPORT RtAudio* STKInit();
 EXPORT void STKTerm(RtAudio* DAC);
 EXPORT void STKSetSampleRate(float rate);
 EXPORT int STKGetDevices(RtAudio* DAC);
-
-//EXPORT StkFloat STKNodeTick(STKNode*);
 
 /*
 class STKStream;
@@ -47,3 +46,5 @@ protected:
 
 };
 */
+
+#endif // STK_CAPI_EXPORT_H

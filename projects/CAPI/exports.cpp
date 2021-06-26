@@ -51,27 +51,8 @@ int STKGetDevices(RtAudio* DAC)
   return 0;
 }
 
-void STKNodeSetHasNoEffect(STKNode* node, bool hasnoeffect)
+StkFloat STKNodeTick(STKNode* node) 
 {
-  /*
-  //--------------------------------------------------------------------
-  // STKBuffer Set Has No Effect
-  //--------------------------------------------------------------------
-  void STKNodeSetHasNoEffect(STKNode* node, bool hasnoeffect)
-  {
-    if (hasnoeffect != node->m_hasnoeffect)
-    {
-      if (hasnoeffect)
-      {
-        node->m_tickCallback = [this](){return this->BufferTickHasNoEffect(); };
-      }
-      else
-      {
-        term();
-        init();
-      }
-    }
-  }
-  */
+  return node->m_tickCallback();
 }
 

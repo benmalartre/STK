@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_READER_H
+#define STK_CAPI_READER_H
 #pragma once
 
 #include "common.h"
@@ -20,29 +22,26 @@ typedef enum STKReaderParam {
 }STKREADERParam;
 
 typedef union STKReaderMOD{
-    FileLoop* m_loop;
-    FileWvIn* m_file;
+    stk::FileLoop* m_loop;
+    stk::FileWvIn* m_file;
 }STKReaderMOD;
 
-struct STKNode;
-typedef struct STKReader : public STKNode{
-
-	std::function<StkFloat()> m_tickCallback;
-	float m_frequency;
-	STKReaderMode m_mode;
+struct STKReader : public STKNode{
+    float m_frequency;
+    STKReaderMode m_mode;
     STKReaderMOD m_r;
-	std::string m_filename;
-}STKReader;
+    std::string m_filename;
+};
 
 // constructor
 EXPORT STKReader* STKReaderCreate();
 // destructor
-static void STKReaderDelete(STKReader* reader);
+void STKReaderDelete(STKReader* reader);
 
 // overrides
-static void STKReaderReset(STKReader* reader);
-static void STKReaderInit(STKReader* reader);
-static void STKReaderTerm(STKReader* reader);
+void STKReaderReset(STKReader* reader);
+void STKReaderInit(STKReader* reader);
+void STKReaderTerm(STKReader* reader);
  
 // functions
 static inline StkFloat STKReaderTickFileWvIn(STKReader* reader);
@@ -63,3 +62,5 @@ EXPORT void STKSetReaderScalar(STKReader* reader, STKReaderParam param, StkFloat
 EXPORT void STKSetReaderFilename(STKReader* reader, const char* filename);
 EXPORT void STKResetReader(STKReader* reader);
 EXPORT StkFloat STKGetReaderFileSampleRate(STKReader* reader);
+
+#endif // STK_CAPI_READER_H

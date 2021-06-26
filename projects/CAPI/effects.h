@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_EFFECT_H
+#define STK_CAPI_EFFECT_H
 #pragma once
 
 #include "common.h"
@@ -59,10 +61,9 @@ union STKEffectFX
 };
 
 typedef struct STKEffect : public STKNode{
-    std::function<StkFloat()> m_tickCallback;
     STKEffectFX m_fx;
-	STKNode* m_source;
-	STKEffectType m_fxtype;
+    STKNode* m_source;
+    STKEffectType m_fxtype;
 }STKEffect;
 
 
@@ -70,12 +71,12 @@ typedef struct STKEffect : public STKNode{
 STKEffect* STKEffectCreate(STKNode* source, STKEffectType type);
 
 // destructor
-static void STKEffectDelete(STKEffect* fx);
+void STKEffectDelete(STKEffect* fx);
 
 // functions
-static void STKEffectReset(STKEffect* fx){ fx->m_outidx = 0; };
-static void STKEffectInit(STKEffect* fx);
-static void STKEffectTerm(STKEffect* fx);
+inline void STKEffectReset(STKEffect* fx){ fx->m_outidx = 0; };
+void STKEffectInit(STKEffect* fx);
+void STKEffectTerm(STKEffect* fx);
 
 // tick functions
 static StkFloat STKEffectTickEnvelope(STKEffect* fx);
@@ -92,10 +93,10 @@ static StkFloat STKEffectTickHasNoEffect(STKEffect* fx);
 EXPORT StkFloat STKEffectTick(STKEffect* fx, unsigned int channel = 0);
 
 // functions
-static STKEffectType STKEffectGetType(STKEffect* fx);
-static void STKEffectSetType(STKEffect* fx, STKEffectType type);
-static void STKEffectSetScalar(STKEffect* fx, StkFloat scalar, STKEffectParam param);
-static void STKEffectSetHasNoEffect(STKEffect* fx, bool hasnoeffect);
+STKEffectType STKEffectGetType(STKEffect* fx);
+void STKEffectSetType(STKEffect* fx, STKEffectType type);
+void STKEffectSetScalar(STKEffect* fx, StkFloat scalar, STKEffectParam param);
+void STKEffectSetHasNoEffect(STKEffect* fx, bool hasnoeffect);
 
 
 // ----------------------------------------------------------------------
@@ -103,3 +104,5 @@ static void STKEffectSetHasNoEffect(STKEffect* fx, bool hasnoeffect);
 // ----------------------------------------------------------------------
 EXPORT void STKSetEffectType(STKEffect* effect, STKEffectType type);
 EXPORT void STKSetEffectScalar(STKEffect* effect, STKEffectParam param, StkFloat scalar);
+
+#endif // STK_CAPI_EFFECT_H

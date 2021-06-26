@@ -4,39 +4,53 @@
 #include "readers.h"
 #include "filters.h"
 #include "exports.h"
+#include "generators.h"
+
 
 // ----------------------------------------------------------------------
-//    ROOT NODES
+//    NODES
 // ----------------------------------------------------------------------
-void STKStreamRemoveRootNode(STKStream* stream, STKNode* node){
-    stream->m_roots.push_back(node);
+void STKStreamRemoveNode(STKStream* stream, STKNode* node)
+{
+  if(node->m_isroot) {
+    for (int i = 0; i<stream->m_roots.size(); ++i) {
+      if (stream->m_roots[i] == node) {
+        stream->m_roots.erase(stream->m_roots.begin() + i);
+      }
+    }
+  }
+  for (int i = 0; i<stream->m_nodes.size(); ++i) {
+    if (stream->m_nodes[i] == node) {
+      stream->m_nodes.erase(stream->m_nodes.begin() + i);
+    }
+  }
+  delete node;
 }
 
-void STKStreamAddRootNode(STKStream* stream, STKNode* node){
-    for(int i=0;i<stream->m_roots.size();i++){
-        if(stream->m_roots[i] == node){
-            stream->m_roots.erase(stream->m_roots.begin()+i);
-        }
-    }
+void STKStreamAddNode(STKStream* stream, STKNode* node, bool isRoot)
+{
+  stream->m_nodes.push_back(node);
+  if(isRoot) {
+    stream->m_roots.push_back(node);
+  }
 }
 
 // ----------------------------------------------------------------------
 //	STK ADD GENERATOR NODE
 // ----------------------------------------------------------------------
-STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, StkFloat frequency, bool isRoot)
+STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, float frequency, bool isRoot)
 {
-	STKNode* node = (STKNode*) STKGeneratorCreate(type, frequency);
-	STKNodeSetStream(node, stream);
-	STKNodeIncrementNumOutput(node);
-	if (isRoot)
-	{
-		STKNodeSetIsRoot(node, true);
-		stream->m_roots.push_back(node);
-	}
+  STKNode* node = (STKNode*) STKGeneratorCreate(type, frequency);
 
-	else STKNodeSetIsRoot(node, false);
-		
-	return node;
+  STKNodeSetStream(node, stream);
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
+  stream->m_nodes.push_back(node);
+  return node;
 }
 
 // ----------------------------------------------------------------------
@@ -44,16 +58,17 @@ STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, StkFloa
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddEnvelope(STKStream* stream, STKEnvelopeType type, STKNode* source, bool isRoot)
 {
-	STKNode* node = (STKNode*) STKEnvelopeCreate(type, source);
-	STKNodeIncrementNumOutput(node);
-	if (isRoot)
-	{
-		STKNodeSetIsRoot(node, true);
-		stream->m_roots.push_back(node);
-	}
-	else STKNodeSetIsRoot(node, false);
+  STKNode* node = (STKNode*) STKEnvelopeCreate(type, source);
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
 
-	return node;
+  stream->m_nodes.push_back(node);
+
+  return node;
 }
 
 // ----------------------------------------------------------------------
@@ -61,21 +76,18 @@ STKNode* STKStreamAddEnvelope(STKStream* stream, STKEnvelopeType type, STKNode* 
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmeticMode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
 {
-	STKNode* node = (STKNode*)STKArythmeticCreate(lhs, rhs, mode);
-	if(lhs)STKNodeIncrementNumOutput(lhs);
-	if(rhs)STKNodeIncrementNumOutput(rhs);
+  STKNode* node = (STKNode*)STKArythmeticCreate(lhs, rhs, mode);
+  if(lhs)STKNodeIncrementNumOutput(lhs);
+  if(rhs)STKNodeIncrementNumOutput(rhs);
 
-	STKNodeIncrementNumOutput(node);
-	if (isRoot)
-	{
-	    STKNodeSetIsRoot(node, true);
-	    stream->m_roots.push_back(node);
-	}
-	else STKNodeSetIsRoot(node, false);
-
-	return node;
-	
-	return NULL;
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
+  stream->m_nodes.push_back(node);
+  return node;
 }
 
 // ----------------------------------------------------------------------
@@ -83,18 +95,18 @@ STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmeticMode mode, STKNo
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNode* source, bool isRoot)
 {
-	STKNode* node = (STKNode*)STKEffectCreate(source, type);
-	
-	STKNodeIncrementNumOutput(source);
-	STKNodeIncrementNumOutput(node);
-	if (isRoot)
-	{
-		STKNodeSetIsRoot(node, true);
-		stream->m_roots.push_back(node);
-	}
-	else STKNodeSetIsRoot(node, false);
-		
-	return node;
+  STKNode* node = (STKNode*)STKEffectCreate(source, type);
+
+  STKNodeIncrementNumOutput(source);
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
+  stream->m_nodes.push_back(node);
+    
+  return node;
 }
 
 // ----------------------------------------------------------------------
@@ -102,18 +114,17 @@ STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNode* sour
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* source, bool isRoot)
 {
-	STKNode* node = (STKNode*)STKFilterCreate(source, type);
+  STKNode* node = (STKNode*)STKFilterCreate(source, type);
 
-	STKNodeIncrementNumOutput(source);
-	STKNodeIncrementNumOutput(node);
-	if (isRoot)
-	{
-		STKNodeSetIsRoot(node, true);
-		stream->m_roots.push_back(node);
-	}
-	else STKNodeSetIsRoot(node, false);
-
-	return node;
+  STKNodeIncrementNumOutput(source);
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
+  stream->m_nodes.push_back(node);
+  return node;
 }
 
 
@@ -122,18 +133,17 @@ STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* sour
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 {
-	STKNode* node = (STKNode*)STKBufferCreate(previous);
-	STKNodeSetStream(node, stream);
-	STKNodeIncrementNumOutput(node);
-	if (isRoot)
-	{
-		STKNodeSetIsRoot(node, true);
-		stream->m_roots.push_back(node);
-	}
+  STKNode* node = (STKNode*)STKBufferCreate(previous);
+  STKNodeSetStream(node, stream);
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
+  stream->m_nodes.push_back(node);
 
-	else STKNodeSetIsRoot(node, false);
-
-	return node;
+  return node;
 }
 
 // ----------------------------------------------------------------------
@@ -141,20 +151,18 @@ STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot)
 {
-    STKReader* reader = new STKReader();
-    STKNode* node = static_cast<STKNode*>(reader);
-    STKNodeSetStream(node, stream);
-    STKNodeIncrementNumOutput(node);
-    if (isRoot)
-    {
-        STKNodeSetIsRoot(node, true);
-        stream->m_roots.push_back(node);
-    }
-    
-    else STKNodeSetIsRoot(node, false);
-    STKReaderSetFile(reader, filename);
-    return node;
-    
+  STKReader* node = STKReaderCreate();
+  STKNodeSetStream(node, stream);
+  STKNodeIncrementNumOutput(node);
+  if (isRoot) {
+    stream->m_roots.push_back(node);
+    STKNodeSetIsRoot(node, true);
+  }
+  else STKNodeSetIsRoot(node, false);
+
+  STKReaderSetFile(node, filename);
+  stream->m_nodes.push_back(node);
+  return node;
 }
 
 // ----------------------------------------------------------------------
@@ -163,28 +171,30 @@ STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *data)
 {	
-	STKStream* stream = (STKStream *)data;
-	StkFloat *samples = (StkFloat *)outputBuffer;
-	size_t numRoots = stream->m_roots.size();
-	if (!numRoots)return 0;
-	float weight = 1.0 / numRoots;
-	for (unsigned int i = 0; i < nBufferFrames; i++)
-	{
-		*samples = 0;
-		for (unsigned int j = 0; j < numRoots; ++j)
-			*samples += STKNodeTick(stream->m_roots[j]) * weight;
-		samples++;
-
-	}
-
-	return 0;
+  
+  STKStream* stream = (STKStream *)data;
+  StkFloat *samples = (StkFloat *)outputBuffer;
+  size_t numRoots = stream->m_roots.size();
+  if (!numRoots)return 0;
+  
+  float weight = 1.0 / (float)numRoots;
+  for (unsigned int i = 0; i < nBufferFrames; i++)
+  {
+    *samples = 0;
+    for (unsigned int j = 0; j < numRoots; ++j)
+      *samples += STKNodeTick(stream->m_roots[j]) * weight;
+    samples++;
+  }
+  
+  return 0;
 }
 
 STKStream* STKStreamSetup(RtAudio* DAC, int numChannels)
 {
+  
 	STKStream* stream = new STKStream();
 	stream->m_dac = DAC;
-
+  
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
 	parameters.deviceId = DAC->getDefaultOutputDevice();

@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_BUFFER_H
+#define STK_CAPI_BUFFER_H
 #pragma once
 
 #include "common.h"
@@ -47,16 +49,18 @@ static void STKBufferInit(STKBuffer* b, int rate);
 static void STKBufferTerm(STKBuffer* b);
 
 // functions
-static void STKBufferSetScalar(STKBuffer* b, StkFloat scalar){ b->m_scalar = scalar; };
-static void STKBufferSetHasNoEffect(STKBuffer* b, bool hasnoeffect);
-static void STKBufferSetSource(STKBuffer* b, STKNode* node);
-static STKNode* STKBufferGetSource(STKBuffer* b){ return b->m_source; };
-static StkFloat STKBufferGet(STKBuffer* b);
-static void STKBufferSet(STKBuffer* b, StkFloat v);
-static inline StkFloat STKBufferTickBuffer(STKBuffer* b);
-static inline StkFloat STKBufferTickHasNoEffect(STKBuffer* b);
-static StkFloat STKBufferTick(STKBuffer* b, unsigned int channel = 0);
+inline void STKBufferSetScalar(STKBuffer* b, StkFloat scalar){ b->m_scalar = scalar; };
+void STKBufferSetHasNoEffect(STKBuffer* b, bool hasnoeffect);
+void STKBufferSetSource(STKBuffer* b, STKNode* node);
+inline STKNode* STKBufferGetSource(STKBuffer* b){ return b->m_source; };
+StkFloat STKBufferGet(STKBuffer* b);
+void STKBufferSet(STKBuffer* b, StkFloat v);
+inline StkFloat STKBufferTickBuffer(STKBuffer* b);
+inline StkFloat STKBufferTickHasNoEffect(STKBuffer* b);
+StkFloat STKBufferTick(STKBuffer* b, unsigned int channel = 0);
 
 EXPORT void STKSetBufferScalar(STKBuffer* buffer, StkFloat scalar);
 EXPORT void STKSetBufferPrevious(STKBuffer* buffer, STKNode* node);
 EXPORT void STKGetBufferSample(STKBuffer* buffer, StkFloat* datas);
+
+#endif // STK_CAPI_BUFFER_H

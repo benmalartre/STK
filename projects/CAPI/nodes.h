@@ -1,3 +1,5 @@
+#ifndef STK_CAPI_NODE_H
+#define STK_CAPI_NODE_H
 #pragma once
 
 #include "Stk.h"
@@ -5,18 +7,17 @@
 
 struct STKStream;
 
-struct STKNode{
-    bool m_hasnoeffect;
-    bool m_isroot;
-    int m_noutput;
-    int m_outidx;
-    StkFloat m_volume;
-    STKStream* m_stream;
-    STKNodeType m_type;
+struct STKNode {
+  STKStream* m_stream;
+  STKNodeType m_type;
+  bool m_hasnoeffect;
+  bool m_isroot;
+  int m_noutput;
+  int m_outidx;
+  StkFloat m_volume;
     
+  std::function<StkFloat()> m_tickCallback;
 };
-
-EXPORT StkFloat STKNodeTick(STKNode* node);
 
 EXPORT void STKNodeSetVolume(STKNode* node, StkFloat volume);
 EXPORT void STKNodeIncrementNumOutput(STKNode*);
@@ -26,4 +27,6 @@ EXPORT bool STKNodeIsRoot(STKNode*);
 EXPORT void STKNodeSetStream(STKNode*, STKStream* stream);
 EXPORT STKStream* STKNodeGetStream(STKNode*);
 EXPORT StkFloat STKNodeUpdate(STKNode*, StkFloat value);
+EXPORT StkFloat STKNodeTick(STKNode* node);
 
+#endif //STK_CAPI_NODE_H

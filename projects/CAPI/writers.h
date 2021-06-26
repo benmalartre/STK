@@ -1,4 +1,6 @@
 
+#ifndef STK_CAPI_WRITER_H
+#define STK_CAPI_WRITER_H
 #pragma once
 
 #include "common.h"
@@ -9,18 +11,16 @@
 
 typedef enum STKWriterMode {
     
-}STKWriterMode;
+} STKWriterMode;
 
 typedef enum STKWriterParam {
     
-}STKWriterParam;
+} STKWriterParam;
 
 struct STKWriter : public STKNode{
-	std::function<StkFloat()> m_tickCallback;
-	FileWvOut m_file;
-	std::string m_filename;
+    FileWvOut m_file;
+    std::string m_filename;
 };
-
 
 // constructor
 STKWriter* STKWriterCreate();
@@ -41,4 +41,4 @@ EXPORT StkFloat STKWriterTick(STKWriter* w, unsigned int channel = 0);
 EXPORT void STKWriterSetFile(STKWriter* writer, std::string filename);
 EXPORT void STKWriterSetHasNoEffect(STKWriter* writer, bool hasnoeffect);;
 
-
+#endif

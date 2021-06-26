@@ -1,4 +1,5 @@
 #include "filters.h"
+#include "exports.h"
 //--------------------------------------------------------------------
 // STKFilter Node Constructor
 //--------------------------------------------------------------------
@@ -20,7 +21,7 @@ STKFilter* STKFilterCreate(STKNode* source, STKFilterType type)
 //--------------------------------------------------------------------
 void STKFilterDelete(STKFilter* filter)
 {
-	STKFilterTerm(filter);
+	  STKFilterTerm(filter);
     delete filter;
 }
 

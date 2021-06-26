@@ -54,24 +54,22 @@ void STKReaderReset(STKReader* reader){
 //--------------------------------------------------------------------
 void STKReaderInit(STKReader* r)
 {
-	switch (r->m_mode)
-	{
-		case READER_FILEWVIN:
-		{
-			r->m_r.m_file = new FileWvIn();
-			r->m_mode = READER_FILEWVIN;
-			r->m_tickCallback = [r](){ return STKReaderTickFileWvIn(r); };
-			break;
-		}
-
-		case READER_FILELOOP:
-		{
-			r->m_r.m_loop = new FileLoop();
-			r->m_mode = READER_FILELOOP;
-			r->m_tickCallback = [r](){ return STKReaderTickFileLoop(r); };
-			break;
-		}
-	}
+    switch (r->m_mode)
+    {
+        case READER_FILEWVIN:
+        {
+            r->m_r.m_file = new FileWvIn();
+            r->m_tickCallback = [r](){ return STKReaderTickFileWvIn(r); };
+            break;
+        }
+    
+        case READER_FILELOOP:
+        {
+            r->m_r.m_loop = new FileLoop();
+            r->m_tickCallback = [r](){ return STKReaderTickFileLoop(r); };
+            break;
+        }
+    }
 }
 
 //--------------------------------------------------------------------
@@ -95,7 +93,7 @@ void STKReaderTerm(STKReader* r)
 //--------------------------------------------------------------------
 StkFloat STKReaderTick(STKReader* r, unsigned int channel )
 {
-	return r->m_tickCallback();
+  return r->m_tickCallback();
 }
 
 void STKReaderSetFile(STKReader* r, const char* filename)
@@ -139,7 +137,6 @@ void STKReaderSetFile(STKReader* r, const char* filename)
     break;
     }
   }
-
 };
 
 StkFloat STKReaderGetFileSampleRate(STKReader* reader){
