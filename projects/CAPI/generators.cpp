@@ -95,39 +95,39 @@ void STKGeneratorInit(STKGenerator* g)
 //--------------------------------------------------------------------
 void STKGeneratorTerm(STKGenerator* g)
 {
-    switch(g->m_gentype)
+  switch(g->m_gentype)
+  {
+    case GENERATOR_ASYMP:
     {
-        case GENERATOR_ASYMP:
-        {
-	        if (g->m_g.m_asymp)delete g->m_g.m_asymp;
-            break;
-        }
-        case GENERATOR_NOISE:
-        {
-	        if (g->m_g.m_noise)delete g->m_g.m_noise;
-            break;
-        }
-        case GENERATOR_BLIT:
-        {
-            if (g->m_g.m_blit)delete g->m_g.m_blit;
-            break;
-        }
-        case GENERATOR_BLITSAW:
-        {
-            if (g->m_g.m_blitsaw)delete g->m_g.m_blitsaw;
-            break;
-        }
-        case GENERATOR_BLITSQUARE:
-        {
-	        if (g->m_g.m_blitsquare)delete g->m_g.m_blitsquare;
-            break;
-        }
-        case GENERATOR_SINEWAVE:
-        {
-            if (g->m_g.m_sinewave)delete g->m_g.m_sinewave;
-            break;
-        }
+      if (g->m_g.m_asymp)delete g->m_g.m_asymp;
+        break;
     }
+    case GENERATOR_NOISE:
+    {
+      if (g->m_g.m_noise)delete g->m_g.m_noise;
+        break;
+    }
+    case GENERATOR_BLIT:
+    {
+      if (g->m_g.m_blit)delete g->m_g.m_blit;
+        break;
+    }
+    case GENERATOR_BLITSAW:
+    {
+      if (g->m_g.m_blitsaw)delete g->m_g.m_blitsaw;
+        break;
+    }
+    case GENERATOR_BLITSQUARE:
+    {
+      if (g->m_g.m_blitsquare)delete g->m_g.m_blitsquare;
+        break;
+    }
+    case GENERATOR_SINEWAVE:
+    {
+      if (g->m_g.m_sinewave)delete g->m_g.m_sinewave;
+        break;
+    }
+  }
 }
 
 //--------------------------------------------------------------------
@@ -135,43 +135,43 @@ void STKGeneratorTerm(STKGenerator* g)
 //--------------------------------------------------------------------
 void STKGeneratorReset(STKGenerator* g)
 {
-	g->m_outidx = 0;
-	switch (g->m_gentype)
-	{
-        case GENERATOR_ASYMP:
-        {
-            break;
-        }
-            
-        case GENERATOR_NOISE:
-        {
-            break;
-        }
+  g->m_outidx = 0;
+  switch (g->m_gentype)
+  {
+    case GENERATOR_ASYMP:
+    {
+      break;
+    }
+        
+    case GENERATOR_NOISE:
+    {
+      break;
+    }
 
-		case GENERATOR_BLITSAW:
-		{
-			g->m_g.m_blitsaw->reset();
-			break;
-		}
+    case GENERATOR_BLITSAW:
+    {
+      g->m_g.m_blitsaw->reset();
+      break;
+    }
 
-		case GENERATOR_BLITSQUARE:
-		{
-			g->m_g.m_blitsquare->reset();
-			break;
-		}
+    case GENERATOR_BLITSQUARE:
+    {
+      g->m_g.m_blitsquare->reset();
+      break;
+    }
             
-        case GENERATOR_SINEWAVE:
-        {
-            g->m_g.m_sinewave->reset();
-            break;
-        }
-            
-        case GENERATOR_BLIT:
-        {
-            g->m_g.m_blit->reset();
-            break;
-        }
-	}
+    case GENERATOR_SINEWAVE:
+    {
+      g->m_g.m_sinewave->reset();
+      break;
+    }
+        
+    case GENERATOR_BLIT:
+    {
+      g->m_g.m_blit->reset();
+      break;
+    }
+  }
 }
 
 //--------------------------------------------------------------------
@@ -179,12 +179,12 @@ void STKGeneratorReset(STKGenerator* g)
 //--------------------------------------------------------------------
 void STKGeneratorSetType(STKGenerator* g, STKGeneratorType type)
 {
-	if (g->m_gentype != type)
-	{
-		STKGeneratorTerm(g);
-		g->m_gentype = type;
-		STKGeneratorInit(g);
-	}
+  if (g->m_gentype != type)
+  {
+    STKGeneratorTerm(g);
+    g->m_gentype = type;
+    STKGeneratorInit(g);
+  }
 }
 
 //--------------------------------------------------------------------
@@ -192,34 +192,34 @@ void STKGeneratorSetType(STKGenerator* g, STKGeneratorType type)
 //--------------------------------------------------------------------
 void STKGeneratorSetScalar(STKGenerator* g, STKGeneratorParam param, StkFloat scalar)
 {
-	switch (g->m_gentype){
-		case GENERATOR_ASYMP:
-		{
-			if (param == GENERATOR_T60)g->m_g.m_asymp->setT60(scalar);
-			else if (param == GENERATOR_TARGET)g->m_g.m_asymp->setTarget(scalar);
-			else if (param == GENERATOR_TAU)g->m_g.m_asymp->setTau(scalar);
-			else if (param == GENERATOR_TIME)g->m_g.m_asymp->setTime(scalar);
-			else if (param == GENERATOR_VALUE)g->m_g.m_asymp->setValue(scalar);
-			break;
-		}
-		case GENERATOR_NOISE:
-		{
-			if(param == GENERATOR_SEED)g->m_g.m_noise->setSeed((unsigned)scalar);
-			break;
-		}
-		case GENERATOR_BLITSAW:
-		{
-			if (param == GENERATOR_FREQUENCY)g->m_g.m_blitsaw->setFrequency(scalar);
-			else if (param == GENERATOR_HARMONICS)g->m_g.m_blitsaw->setHarmonics((unsigned)scalar);
-			break;
-		}
-		case GENERATOR_BLITSQUARE:
-		{
-			if (param == GENERATOR_FREQUENCY)g->m_g.m_blitsquare->setFrequency(scalar);
-			else if (param == GENERATOR_PHASE)g->m_g.m_blitsquare->setPhase(scalar);
-			else if (param == GENERATOR_HARMONICS)g->m_g.m_blitsquare->setHarmonics((unsigned)scalar);
-			break;
-		}
+  switch (g->m_gentype){
+    case GENERATOR_ASYMP:
+    {
+      if (param == GENERATOR_T60)g->m_g.m_asymp->setT60(scalar);
+      else if (param == GENERATOR_TARGET)g->m_g.m_asymp->setTarget(scalar);
+      else if (param == GENERATOR_TAU)g->m_g.m_asymp->setTau(scalar);
+      else if (param == GENERATOR_TIME)g->m_g.m_asymp->setTime(scalar);
+      else if (param == GENERATOR_VALUE)g->m_g.m_asymp->setValue(scalar);
+      break;
+    }
+    case GENERATOR_NOISE:
+    {
+      if(param == GENERATOR_SEED)g->m_g.m_noise->setSeed((unsigned)scalar);
+      break;
+    }
+    case GENERATOR_BLITSAW:
+    {
+      if (param == GENERATOR_FREQUENCY)g->m_g.m_blitsaw->setFrequency(scalar);
+      else if (param == GENERATOR_HARMONICS)g->m_g.m_blitsaw->setHarmonics((unsigned)scalar);
+      break;
+    }
+    case GENERATOR_BLITSQUARE:
+    {
+      if (param == GENERATOR_FREQUENCY)g->m_g.m_blitsquare->setFrequency(scalar);
+      else if (param == GENERATOR_PHASE)g->m_g.m_blitsquare->setPhase(scalar);
+      else if (param == GENERATOR_HARMONICS)g->m_g.m_blitsquare->setHarmonics((unsigned)scalar);
+      break;
+    }
         case GENERATOR_BLIT:
         {
             if (param == GENERATOR_FREQUENCY)g->m_g.m_blit->setFrequency(scalar);
@@ -227,14 +227,14 @@ void STKGeneratorSetScalar(STKGenerator* g, STKGeneratorParam param, StkFloat sc
             else if (param == GENERATOR_HARMONICS)g->m_g.m_blit->setHarmonics((unsigned)scalar);
             break;
         }
-		case GENERATOR_SINEWAVE:
-		{
-			if (param == GENERATOR_FREQUENCY)g->m_g.m_sinewave->setFrequency(scalar);
-			else if (param == GENERATOR_PHASE)g->m_g.m_sinewave->addPhase(scalar);
-			else if (param == GENERATOR_PHASEOFFSET)g->m_g.m_sinewave->addPhase(scalar);
-			break;
-		}
-	}
+    case GENERATOR_SINEWAVE:
+    {
+      if (param == GENERATOR_FREQUENCY)g->m_g.m_sinewave->setFrequency(scalar);
+      else if (param == GENERATOR_PHASE)g->m_g.m_sinewave->addPhase(scalar);
+      else if (param == GENERATOR_PHASEOFFSET)g->m_g.m_sinewave->addPhase(scalar);
+      break;
+    }
+  }
 }
 
 //--------------------------------------------------------------------
@@ -261,60 +261,60 @@ void STKGeneratorSetHasNoEffect(STKGenerator* g, bool hasnoeffect)
 //--------------------------------------------------------------------
 StkFloat STKGeneratorTickAsymp(STKGenerator* g)
 {
-	if (g->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_asymp->tick()*g->m_volume);
-	else
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_asymp->lastOut());
+  if (g->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_asymp->tick()*g->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_asymp->lastOut());
 }
 StkFloat STKGeneratorTickNoise(STKGenerator* g)
 {
-	if (g->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_noise->tick()*g->m_volume);
-	else
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_noise->lastOut());
+  if (g->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_noise->tick()*g->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_noise->lastOut());
 }
 
 StkFloat STKGeneratorTickBlitSaw(STKGenerator* g)
 {
-	if (g->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsaw->tick()*g->m_volume);
-	else
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsaw->lastOut());
+  if (g->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsaw->tick()*g->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsaw->lastOut());
 }
 
 StkFloat STKGeneratorTickBlitSquare(STKGenerator* g)
 {
-	if (g->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsquare->tick()*g->m_volume);
-	else
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsquare->lastOut());
+  if (g->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsquare->tick()*g->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsquare->lastOut());
 }
 
 StkFloat STKGeneratorTickBlit(STKGenerator* g)
 {
-    if (g->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_blit->tick()*g->m_volume);
-    else
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_blit->lastOut());
+  if (g->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_blit->tick()*g->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_blit->lastOut());
 }
 
 StkFloat STKGeneratorTickSineWave(STKGenerator* g)
 {
-	if (g->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_sinewave->tick()*g->m_volume);
-	else
-        return STKNodeUpdate((STKNode*)g, g->m_g.m_sinewave->lastOut());
+  if (g->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_sinewave->tick()*g->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)g, g->m_g.m_sinewave->lastOut());
 }
 
 StkFloat STKGeneratorTickHasNoEffect()
 {
-	return 0;
+  return 0;
 }
 
 StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel)
 {
-  return g->m_g.m_sinewave->tick();
-	return g->m_tickCallback();
+  //return g->m_g.m_sinewave->tick();
+  return g->m_tickCallback();
 }
 
 // ----------------------------------------------------------------------
@@ -322,14 +322,14 @@ StkFloat STKGeneratorTick(STKGenerator* g, unsigned int channel)
 // ----------------------------------------------------------------------
 void STKSetGeneratorType(STKGenerator* generator, STKGeneratorType type)
 {
-	STKGeneratorSetType(generator, type);
+  STKGeneratorSetType(generator, type);
 }
 
 void STKSetGeneratorScalar(STKGenerator* generator, STKGeneratorParam param, StkFloat scalar)
 {
-	STKGeneratorSetScalar(generator, param, scalar);
+  STKGeneratorSetScalar(generator, param, scalar);
 }
 
 int STKGetGeneratorType(STKGenerator* node){
-    return (int)STKGeneratorGetType(node);
+  return (int)STKGeneratorGetType(node);
 }

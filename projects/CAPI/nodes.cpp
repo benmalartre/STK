@@ -6,14 +6,13 @@
 //--------------------------------------------------------------------
 void STKNodeSetVolume(STKNode* node, StkFloat volume)
 {
-    node->m_volume = volume;
+  node->m_volume = volume;
 }
 
 StkFloat STKNodeUpdate(STKNode* node, StkFloat value)
 {
-    node->m_outidx = (node->m_outidx + 1) % node->m_noutput;
-
-    return value;
+  //node->m_outidx = (node->m_outidx + 1) % node->m_noutput;
+  return value;
 }
 
 void STKNodeIncrementNumOutput(STKNode* node){
