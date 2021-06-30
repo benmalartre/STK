@@ -151,7 +151,8 @@ STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 // ----------------------------------------------------------------------
 STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot)
 {
-  STKReader* node = STKReaderCreate();
+  STKReader* reader = STKReaderCreate();
+  STKNode* node = (STKNode*)reader;
   STKNodeSetStream(node, stream);
   STKNodeIncrementNumOutput(node);
   if (isRoot) {
@@ -160,7 +161,8 @@ STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot
   }
   else STKNodeSetIsRoot(node, false);
 
-  STKReaderSetFile(node, filename);
+  STKReaderInit(reader);
+  STKReaderSetFile(reader, filename);
   stream->m_nodes.push_back(node);
   return node;
 }

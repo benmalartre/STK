@@ -9,28 +9,28 @@
 #include "FileLoop.h"
 
 typedef enum STKReaderMode {
-    READER_FILEWVIN,
-    READER_FILELOOP
+  READER_FILEWVIN,
+  READER_FILELOOP
 }STKReaderMode;
 
 typedef enum STKReaderParam {
-    READER_RATE,
-    READER_FREQUENCY,
-    READER_ADD_TIME,
-    READER_ADD_PHASE,
-    READER_ADD_PHASE_OFFSET
+  READER_RATE,
+  READER_FREQUENCY,
+  READER_ADD_TIME,
+  READER_ADD_PHASE,
+  READER_ADD_PHASE_OFFSET
 }STKREADERParam;
 
-typedef union STKReaderMOD{
-    stk::FileLoop* m_loop;
-    stk::FileWvIn* m_file;
-}STKReaderMOD;
+typedef union STKReaderImpl{
+  stk::FileLoop* m_loop;
+  stk::FileWvIn* m_file;
+}STKReaderImpl;
 
 struct STKReader : public STKNode{
-    float m_frequency;
-    STKReaderMode m_mode;
-    STKReaderMOD m_r;
-    std::string m_filename;
+  float m_frequency;
+  STKReaderMode m_mode;
+  STKReaderImpl m_r;
+  std::string m_filename;
 };
 
 // constructor
