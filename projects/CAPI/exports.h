@@ -16,6 +16,7 @@ EXPORT RtAudio* STKInit();
 EXPORT void STKTerm(RtAudio* DAC);
 EXPORT void STKSetSampleRate(float rate);
 EXPORT int STKGetDevices(RtAudio* DAC);
+EXPORT StkFloat STKNodeTick(STKNode* node);
 
 /*
 class STKStream;

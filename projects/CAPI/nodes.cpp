@@ -11,11 +11,11 @@ void STKNodeSetVolume(STKNode* node, StkFloat volume)
 
 StkFloat STKNodeUpdate(STKNode* node, StkFloat value)
 {
-  //node->m_outidx = (node->m_outidx + 1) % node->m_noutput;
+  node->m_outidx = (node->m_outidx + 1) % node->m_noutput;
   return value;
 }
 
-void STKNodeIncrementNumOutput(STKNode* node){
+void STKNodeIncrementNumOutputs(STKNode* node){
     node->m_noutput++;
 }
 
@@ -25,9 +25,8 @@ void STKNodeDecrementNumOutput(STKNode* node){
 
 void STKNodeSetIsRoot(STKNode* node, bool isRoot){
     node->m_isroot = isRoot;
-    if(node->m_stream ){
-        if(!isRoot)STKStreamRemoveNode(node->m_stream, node);
-        else STKStreamAddNode(node->m_stream, node, isRoot);
+    if(node->m_stream ) {
+      STKStreamAddNode(node->m_stream, node, isRoot);
     }
 }
 

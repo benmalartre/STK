@@ -44,7 +44,7 @@ typedef enum STKGeneratorParam{
 
 
 // generators union
-typedef union STKGeneratorGEN
+typedef union STKGeneratorImpl
 {
     stk::Asymp* m_asymp;
     stk::Noise* m_noise;
@@ -55,11 +55,11 @@ typedef union STKGeneratorGEN
     stk::SingWave* m_singwave;
     stk::Modulate* m_modulate;
     stk::Granulate* m_granulate;
-}STKGeneratorGEN;
+}STKGeneratorImpl;
 
 // structure
 struct STKGenerator : public STKNode{
-    STKGeneratorGEN m_g;
+    STKGeneratorImpl m_g;
     STKGeneratorType m_gentype;
     float m_frequency;
 };

@@ -18,20 +18,32 @@ void STKStreamRemoveNode(STKStream* stream, STKNode* node)
         stream->m_roots.erase(stream->m_roots.begin() + i);
       }
     }
-  }
-  for (int i = 0; i<stream->m_nodes.size(); ++i) {
-    if (stream->m_nodes[i] == node) {
-      stream->m_nodes.erase(stream->m_nodes.begin() + i);
+  } else {
+    for (int i = 0; i<stream->m_nodes.size(); ++i) {
+      if (stream->m_nodes[i] == node) {
+        stream->m_nodes.erase(stream->m_nodes.begin() + i);
+      }
     }
   }
-  delete node;
 }
 
 void STKStreamAddNode(STKStream* stream, STKNode* node, bool isRoot)
 {
-  stream->m_nodes.push_back(node);
   if(isRoot) {
     stream->m_roots.push_back(node);
+  } else {
+    stream->m_nodes.push_back(node);
+  }
+}
+
+static void STKNodeSetup(STKStream* stream, STKNode* node, bool isRoot=true)
+{
+  STKNodeSetStream(node, stream);
+  STKNodeIncrementNumOutputs(node);
+  if (isRoot) {
+    STKNodeSetIsRoot(node, true);
+  } else {
+    STKNodeSetIsRoot(node, false);
   }
 }
 
@@ -41,15 +53,7 @@ void STKStreamAddNode(STKStream* stream, STKNode* node, bool isRoot)
 STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, float frequency, bool isRoot)
 {
   STKNode* node = (STKNode*) STKGeneratorCreate(type, frequency);
-
-  STKNodeSetStream(node, stream);
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-  stream->m_nodes.push_back(node);
+  STKNodeSetup(stream, node, isRoot);
   return node;
 }
 
@@ -59,15 +63,7 @@ STKNode* STKStreamAddGenerator(STKStream* stream, STKGeneratorType type, float f
 STKNode* STKStreamAddEnvelope(STKStream* stream, STKEnvelopeType type, STKNode* source, bool isRoot)
 {
   STKNode* node = (STKNode*) STKEnvelopeCreate(type, source);
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-
-  stream->m_nodes.push_back(node);
-
+  STKNodeSetup(stream, node, isRoot);
   return node;
 }
 
@@ -77,16 +73,10 @@ STKNode* STKStreamAddEnvelope(STKStream* stream, STKEnvelopeType type, STKNode* 
 STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmeticMode mode, STKNode* lhs, STKNode* rhs, bool isRoot)
 {
   STKNode* node = (STKNode*)STKArythmeticCreate(lhs, rhs, mode);
-  if(lhs)STKNodeIncrementNumOutput(lhs);
-  if(rhs)STKNodeIncrementNumOutput(rhs);
-
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-  stream->m_nodes.push_back(node);
+  STKNodeSetup(stream, node, isRoot);
+  if(lhs)STKNodeIncrementNumOutputs(lhs);
+  if(rhs)STKNodeIncrementNumOutputs(rhs);
+  STKNodeIncrementNumOutputs(node);
   return node;
 }
 
@@ -96,16 +86,8 @@ STKNode* STKStreamAddArythmetic(STKStream* stream, STKArythmeticMode mode, STKNo
 STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNode* source, bool isRoot)
 {
   STKNode* node = (STKNode*)STKEffectCreate(source, type);
-
-  STKNodeIncrementNumOutput(source);
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-  stream->m_nodes.push_back(node);
-    
+  STKNodeSetup(stream, node, isRoot);
+  STKNodeIncrementNumOutputs(source);
   return node;
 }
 
@@ -115,15 +97,8 @@ STKNode* STKStreamAddEffect(STKStream* stream, STKEffectType type, STKNode* sour
 STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* source, bool isRoot)
 {
   STKNode* node = (STKNode*)STKFilterCreate(source, type);
-
-  STKNodeIncrementNumOutput(source);
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-  stream->m_nodes.push_back(node);
+  STKNodeSetup(stream, node, isRoot);
+  STKNodeIncrementNumOutputs(source);
   return node;
 }
 
@@ -134,15 +109,7 @@ STKNode* STKStreamAddFilter(STKStream* stream, STKFilterType type, STKNode* sour
 STKNode* STKStreamAddBuffer(STKStream* stream, STKNode* previous, bool isRoot)
 {
   STKNode* node = (STKNode*)STKBufferCreate(previous);
-  STKNodeSetStream(node, stream);
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-  stream->m_nodes.push_back(node);
-
+  STKNodeSetup(stream, node, isRoot);
   return node;
 }
 
@@ -153,17 +120,10 @@ STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot
 {
   STKReader* reader = STKReaderCreate();
   STKNode* node = (STKNode*)reader;
-  STKNodeSetStream(node, stream);
-  STKNodeIncrementNumOutput(node);
-  if (isRoot) {
-    stream->m_roots.push_back(node);
-    STKNodeSetIsRoot(node, true);
-  }
-  else STKNodeSetIsRoot(node, false);
-
+  STKNodeSetup(stream, node, isRoot);
   STKReaderInit(reader);
   STKReaderSetFile(reader, filename);
-  stream->m_nodes.push_back(node);
+  
   return node;
 }
 

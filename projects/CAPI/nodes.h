@@ -20,7 +20,7 @@ struct STKNode {
 };
 
 EXPORT void STKNodeSetVolume(STKNode* node, StkFloat volume);
-EXPORT void STKNodeIncrementNumOutput(STKNode*);
+EXPORT void STKNodeIncrementNumOutputs(STKNode*);
 EXPORT void STKNodeDecrementNumOutputs(STKNode*);
 EXPORT void STKNodeSetIsRoot(STKNode*, bool isRoot);
 EXPORT bool STKNodeIsRoot(STKNode*);
