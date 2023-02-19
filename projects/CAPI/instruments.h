@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STK_CAPI_INSTRUMENT_H
+#define STK_CAPI_INSTRUMENT_H
 
 #include "common.h"
 #include "nodes.h"
@@ -66,25 +67,40 @@ enum STKInstrumentParam{
 
 union STKInstrument
 {
-  Clarinet* m_onezero;
-  OnePole* m_onepole;
-  PoleZero* m_polezero;
-  TwoZero* m_twozero;
-  TwoPole* m_twopole;
-  BiQuad* m_biquad;
-  FormSwep* m_formswep;
-  Delay* m_delay;
-  DelayL* m_delayl;
-  DelayA* m_delaya;
-  LentPitShift* m_lentpitshift;
-  Chorus* m_chorus;
+  Clarinet* m_clarinet;
+  BlowHole* m_blowhole;
+  Saxofony* m_saxofony;
+  Flute* m_flute;
+  Brass* m_brass;
+  BlowBotl* m_blowbtl;
+  Bowed* m_bowed;
+  Plucked* m_plucked;
+  StifKarp* m_stifkarp;
+  Sitar* m_sitar;
+  Mandolin* m_mandolin;
+  Rhodey* m_rhodey;
+  Wurley* m_wurley;
+  TubeBell* m_tubebell;
+  HevyMetl* m_hevymtl;
+  PercFlut* m_percflut;
+  BeeThree* m_beethree;
+  Moog* m_moog;
+  FMVoices* m_fmvoices;
+  VoicForm* m_voicform;
+  Resonate* m_resonate;
+  Drummer* m_drummer;
+  BandedWG* m_bandedwg;
+  Shakers* m_shakers;
+  ModalBar* m_modelbar;
+  Mesh2D* m_mesh2D;
+  Whistle* m_whistle;
 };
 
 
 struct STKInstruments : public STKNode{
-  STKInstrument m_i;
+  STKInstrument* m_i;
   STKNode* m_source;
-  STKInstrumentType m_type;
+  STKInstrumentType m_instrumentType;
   std::function<StkFloat()> m_tickCallback;
 };
 
@@ -98,7 +114,7 @@ void STKInstrumentDelete(STKInstruments* i);
 
 // functions
 
-void STKInstrumentReset(STKInstruments* i){ i->m_outidx = 0; };
+void STKInstrumentReset(STKInstruments* i);
 void STKInstrumentInit(STKInstruments* i);
 void STKInstrumentTerm(STKInstruments* i);
 
@@ -111,7 +127,7 @@ inline StkFloat STKInstrumentTickBrass(STKInstruments* i);
 inline StkFloat STKInstrumentTickBlowBotl(STKInstruments* i);
 inline StkFloat STKInstrumentTickBowed(STKInstruments* i);
 inline StkFloat STKInstrumentTickPlucked(STKInstruments* i);
-inline StkFloat STKInstrumentTickStiffKarp(STKInstruments* i);
+inline StkFloat STKInstrumentTickStifKarp(STKInstruments* i);
 inline StkFloat STKInstrumentTickSitar(STKInstruments* i);
 inline StkFloat STKInstrumentTickMandolin(STKInstruments* i);
 inline StkFloat STKInstrumentTickRhodey(STKInstruments* i);
@@ -137,10 +153,9 @@ StkFloat STKInstrumentTick(STKInstruments* i, unsigned int channel = 0);
 // ----------------------------------------------------------------------
 //	STK FILTER NODE SETTER
 // ----------------------------------------------------------------------
-EXPORT STKInstrumentType STKInstrumentGetType(STKInstruments* i){ 
-  return i->m_type; 
-};
+EXPORT STKInstrumentType STKInstrumentGetType(STKInstruments* i);
 EXPORT void STKInstrumentSetType(STKInstrumentType type);
 EXPORT void STKInstrumentSetScalar(float scalar, STKInstrumentParam param);
 EXPORT void STKInstrumentSetHasNoEffect(bool hasnoeffect);
 
+#endif // STK_CAPI_INSTRUMENT_H

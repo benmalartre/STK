@@ -1,191 +1,436 @@
-#include "filters.h"
+#include "instruments.h"
 //--------------------------------------------------------------------
 // STKFilter Node Constructor
 //--------------------------------------------------------------------
-STKFilterCreate(STKNode* source, Type type)
+STKInstruments* STKInstrumentCreate(STKNode* source, STKInstrumentType type)
 {
-	m_source = source;
-	m_volume = 1.0f;
-	m_type = type;
-	m_noutput = 0;
-	m_outidx = 0;
-	init();
+  STKInstruments* instruments = new STKInstruments();
+  instruments->m_type = STK_INSTRUMENT;
+  instruments->m_source = source;
+  instruments->m_volume = 1.0f;
+  instruments->m_instrumentType = INSTRUMENT_CLARINET;
+  STKInstrumentInit(instruments);
 }
 
 //--------------------------------------------------------------------
-// STKFilter Node Constructor
+// STKInstruments Node Destructor
 //--------------------------------------------------------------------
-STKFilter::~STKFilter()
+void STKInstrumentDelete(STKInstruments* instrument)
 {
-	term();
+  STKInstrumentTerm(instrument);
+  delete instrument;
 }
+//--------------------------------------------------------------------
+// STKInstruments Node Init
+//--------------------------------------------------------------------
+void STKInstrumentInit(STKInstruments* instrument)
+{
+  switch (instrument->m_instrumentType)
+  {
+    case INSTRUMENT_CLARINET:
+    {
+      instrument->m_i->m_clarinet = new Clarinet();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickClarinet(instrument); };
+      break;
+    }
+    case INSTRUMENT_BLOWHOLE:
+    {
+      instrument->m_i->m_blowhole = new BlowHole(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickBlowHole(instrument); };
+      break;
+    }
+    case INSTRUMENT_SAXOFONY:
+    {
+      instrument->m_i->m_saxofony = new Saxofony(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickSaxophony(instrument); };
+      break;
+    }
+    case INSTRUMENT_FLUTE:
+    {
+      instrument->m_i->m_flute = new Flute(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickFlute(instrument); };
+      break;
+    }
+    case INSTRUMENT_BRASS:
+    {
+      instrument->m_i->m_brass = new Brass(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickBrass(instrument); };
+      break;
+    }
+    case INSTRUMENT_BLOWBOTL:
+    {
+      instrument->m_i->m_blowbtl = new BlowBotl();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickBlowBotl(instrument); };
+      break;
+    }
+    case INSTRUMENT_BOWED:
+    {
+      instrument->m_i->m_bowed = new Bowed(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickBowed(instrument); };
+      break;
+    }
+    case INSTRUMENT_PLUCKED:
+    {
+      instrument->m_i->m_plucked = new Plucked(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickPlucked(instrument); };
+      break;
+    }
+    case INSTRUMENT_STIFKARP:
+    {
+      instrument->m_i->m_stifkarp = new StifKarp(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickStifKarp(instrument); };
+      break;
+    }
+    case INSTRUMENT_SITAR:
+    {
+      instrument->m_i->m_sitar = new Sitar(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickSitar(instrument); };
+      break;
+    }
+    case INSTRUMENT_MANDOLIN:
+    {
+      instrument->m_i->m_mandolin = new Mandolin(110);
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickMandolin(instrument); };
+      break;
+    }
+    case INSTRUMENT_RHODEY:
+    {
+      instrument->m_i->m_rhodey = new Rhodey();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickRhodey(instrument); };
+      break;
+    }
+    case INSTRUMENT_WURLEY:
+    {
+      instrument->m_i->m_wurley = new Wurley();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickWurley(instrument); };
+      break;
+    }
+    case INSTRUMENT_TUBEBELL:
+    {
+      instrument->m_i->m_tubebell = new TubeBell();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickTubeBell(instrument); };
+      break;
+    }
+    case INSTRUMENT_HEAVYMETL:
+    {
+      instrument->m_i->m_hevymtl = new HevyMetl();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickHeavyMetl(instrument); };
+      break;
+    }
+    case INSTRUMENT_PERCFLUT:
+    {
+      instrument->m_i->m_percflut = new PercFlut();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickPercFlut(instrument); };
+      break;
+    }
+    case INSTRUMENT_BEETHREE:
+    {
+      instrument->m_i->m_beethree = new BeeThree();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickBeeThree(instrument); };
+      break;
+    }
+    case INSTRUMENT_MOOG:
+    {
+      instrument->m_i->m_moog = new Moog();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickMoog(instrument); };
+      break;
+    }
+    case INSTRUMENT_FMVOICES:
+    {
+      instrument->m_i->m_fmvoices = new FMVoices();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickFMVoices(instrument); };
+      break;
+    }
+    case INSTRUMENT_VOICFORM:
+    {
+      instrument->m_i->m_voicform = new VoicForm();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickVoicForm(instrument); };
+      break;
+    }
+    case INSTRUMENT_RESONATE:
+    {
+      instrument->m_i->m_resonate = new Resonate();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickResonate(instrument); };
+      break;
+    }
+    case INSTRUMENT_DRUMMER:
+    {
+      instrument->m_i->m_drummer = new Drummer();
+      instrument->m_tickCallback = [instrument]() { return STKInstrumentTickDrummer(instrument); };
+      break;
+    }
+    /*
+      INSTRUMENT_BANDEDWG,
+      INSTRUMENT_SHAKERS,
+      INSTRUMENT_MODALBAR,
+      INSTRUMENT_MESH2D,
+      INSTRUMENT_WHISTLE
+    */
+    default:
+    {
+      return;
+    }
+  }
+}
+
 
 //--------------------------------------------------------------------
-// STKFilter Node Init
+// STKInstruments Node Term
 //--------------------------------------------------------------------
-void STKFilter::init()
-{
-	switch (m_type)
-	{
-		case Type::ONEZERO:
-		{
-			m_onezero = new OneZero();
-			m_tickCallback = [this](){ return this->FilterTickOneZero(); };
-			break;
-		}
-		case Type::POLEZERO:
-		{
-			m_polezero = new PoleZero();
-			m_tickCallback = [this](){ return this->FilterTickPoleZero(); };
-			break;
-		}
-		case Type::TWOZERO:
-		{
-			m_twozero = new TwoZero();
-			m_tickCallback = [this](){ return this->FilterTickTwoZero(); };
-			break;
-		}
-		case Type::TWOPOLE:
-		{
-			m_twopole = new TwoPole();
-			m_tickCallback = [this](){ return this->FilterTickTwoPole(); };
-			break;
-		}
-		case Type::BIQUAD:
-		{
-			m_biquad = new BiQuad();
-			m_tickCallback = [this](){ return this->FilterTickBiQuad(); };
-			break;
-		}
-		case Type::FORMSWEP:
-		{
-			m_formswep = new FormSwep();
-			m_tickCallback = [this](){ return this->FilterTickFormSwep(); };
-			break;
-		}
-		case Type::DELAY:
-		{
-			m_delay = new Delay();
-			m_tickCallback = [this](){ return this->FilterTickDelay(); };
-			break;
-		}
-		case Type::DELAYA:
-		{
-			m_delaya = new DelayA();
-			m_tickCallback = [this](){ return this->FilterTickDelayA(); };
-			break;
-		}
-		case Type::DELAYL:
-		{
-			m_delayl = new DelayL();
-			m_tickCallback = [this](){ return this->FilterTickDelayL(); };
-			break;
-		}
-		default:
-		{
-			return;
-		}
-	}
-}
-
-
-//--------------------------------------------------------------------
-// STKFilter Node Term
-//--------------------------------------------------------------------
-void STKFilter::term()
+void STKInstrumentTerm(STKInstruments* instrument)
 {
 }
 
 
 //--------------------------------------------------------------------
-// STKFilter Node Tick()
+// STKInstruments Node Tick()
 //--------------------------------------------------------------------
-StkFloat STKFilter::FilterTickOneZero()
+StkFloat STKInstrumentTickClarinet(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_onezero->tick(m_source->tick()))*m_volume;
-	else return update(m_onezero->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_clarinet->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_clarinet->lastOut());
 }
 
-StkFloat STKFilter::FilterTickOnePole()
+inline StkFloat STKInstrumentTickBlowHole(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_onepole->tick(m_source->tick()))*m_volume;
-	else return update(m_onepole->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_blowhole->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_blowhole->lastOut());
 }
 
-StkFloat STKFilter::FilterTickPoleZero()
+inline StkFloat STKInstrumentTickSaxophony(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_polezero->tick(m_source->tick()))*m_volume;
-	else return update(m_polezero->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_saxofony->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_saxofony->lastOut());
 }
 
-StkFloat STKFilter::FilterTickTwoZero()
+inline StkFloat STKInstrumentTickFlute(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_twozero->tick(m_source->tick()))*m_volume;
-	else return update(m_twozero->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_flute->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_flute->lastOut());
 }
 
-StkFloat STKFilter::FilterTickTwoPole()
+inline StkFloat STKInstrumentTickBrass(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_twopole->tick(m_source->tick()))*m_volume;
-	else return update(m_twopole->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_brass->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_brass->lastOut());
 }
 
-StkFloat STKFilter::FilterTickBiQuad()
+
+inline StkFloat STKInstrumentTickBlowBotl(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_biquad->tick(m_source->tick()))*m_volume;
-	else return update(m_biquad->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_blowbtl->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_blowbtl->lastOut());
 }
 
-StkFloat STKFilter::FilterTickFormSwep()
+inline StkFloat STKInstrumentTickBowed(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_formswep->tick(m_source->tick()))*m_volume;
-	else return update(m_formswep->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_bowed->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_bowed->lastOut());
 }
 
-StkFloat STKFilter::FilterTickDelay()
+inline StkFloat STKInstrumentTickPlucked(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_delay->tick(m_source->tick()))*m_volume;
-	else return update(m_delay->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_plucked->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_plucked->lastOut());
 }
 
-StkFloat STKFilter::FilterTickDelayA()
+inline StkFloat STKInstrumentTickStifKarp(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_delaya->tick(m_source->tick()))*m_volume;
-	else return update(m_delaya->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_stifkarp->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_stifkarp->lastOut());
 }
 
-StkFloat STKFilter::FilterTickDelayL()
+inline StkFloat STKInstrumentTickSitar(STKInstruments* i)
 {
-	if (m_outidx == 0) return update(m_delayl->tick(m_source->tick()))*m_volume;
-	else return update(m_delayl->lastOut())*m_volume;
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_sitar->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_sitar->lastOut());
 }
 
-StkFloat STKFilter::FilterTickHasNoEffect()
+inline StkFloat STKInstrumentTickMandolin(STKInstruments* i)
 {
-	return m_source->tick();
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_mandolin->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_mandolin->lastOut());
 }
 
-StkFloat STKFilter::tick(unsigned int channel)
+inline StkFloat STKInstrumentTickRhodey(STKInstruments* i)
 {
-	return m_tickCallback();
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_rhodey->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_rhodey->lastOut());
 }
 
+inline StkFloat STKInstrumentTickWurley(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_wurley->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_wurley->lastOut());
+}
+
+inline StkFloat STKInstrumentTickTubeBell(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_tubebell->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_tubebell->lastOut());
+}
+
+inline StkFloat STKInstrumentTickHeavyMetl(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_hevymtl->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_hevymtl->lastOut());
+}
+
+inline StkFloat STKInstrumentTickPercFlut(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_percflut->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_percflut->lastOut());
+}
+
+inline StkFloat STKInstrumentTickBeeThree(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_beethree->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_beethree->lastOut());
+}
+
+inline StkFloat STKInstrumentTickMoog(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_moog->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_moog->lastOut());
+}
+
+inline StkFloat STKInstrumentTickFMVoices(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_fmvoices->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_fmvoices->lastOut());
+}
+
+inline StkFloat STKInstrumentTickVoicForm(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_voicform->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_voicform->lastOut());
+}
+
+inline StkFloat STKInstrumentTickResonate(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_resonate->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_resonate->lastOut());
+}
+
+inline StkFloat STKInstrumentTickDrummer(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_drummer->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_drummer->lastOut());
+}
+
+inline StkFloat STKInstrumentTickBandedWG(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_bandedwg->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_bandedwg->lastOut());
+}
+
+
+inline StkFloat STKInstrumentTickShakers(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_shakers->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_shakers->lastOut());
+}
+
+inline StkFloat STKInstrumentTickModalBar(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_modelbar->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_modelbar->lastOut());
+}
+
+inline StkFloat STKInstrumentTickMesh2D(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_mesh2D->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_mesh2D->lastOut());
+}
+
+inline StkFloat STKInstrumentTickWhistle(STKInstruments* i)
+{
+  if (i->m_outidx == 0)
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_whistle->tick() * i->m_volume);
+  else
+    return STKNodeUpdate((STKNode*)i, i->m_i->m_whistle->lastOut());
+}
+
+inline StkFloat STKInstrumentTickHasNoEffect(STKInstruments* i)
+{
+  return 0.f;
+}
+
+
+StkFloat STKInstrumentTick(STKInstruments* i, unsigned int channel)
+{
+  return i->m_tickCallback();
+}
 //--------------------------------------------------------------------
 // STKEffect Node Change Type
 //--------------------------------------------------------------------
-void STKFilter::setType(Type type)
+void STKInstrumentsSetType(STKInstruments* instrument, STKInstrumentType type)
 {
+  /*
 	if (type != m_type){
 		term();
 		m_type = type;
 		init();
 	}
+  */
 }
 
 //--------------------------------------------------------------------
 // STKEffect Node Change Scalar
 //--------------------------------------------------------------------
-void STKFilter::setScalar(StkFloat scalar, Param param)
+void STKInstrumentsSetScalar(StkFloat scalar, STKInstrumentParam param)
 {
 	/*
 	switch (m_type){
@@ -251,33 +496,35 @@ void STKFilter::setScalar(StkFloat scalar, Param param)
 }
 
 //--------------------------------------------------------------------
-// STKFilter Set Has No Effect
+// STKInstruments Set Has No Effect
 //--------------------------------------------------------------------
-void STKFilter::setHasNoEffect(bool hasnoeffect)
+void STKInstrumentsSetHasNoEffect(STKInstruments* instrument, bool hasnoeffect)
 {
-	if (hasnoeffect != m_hasnoeffect)
+	if (hasnoeffect != instrument->m_hasnoeffect)
 	{
 		if (hasnoeffect)
 		{
-			m_tickCallback = [this](){return this->FilterTickHasNoEffect(); };
+      instrument->m_tickCallback = [instrument]() {return STKInstrumentTickHasNoEffect(instrument); };
 		}
 		else
 		{
-			term();
-			init();
+			STKInstrumentTerm(instrument);
+			STKInstrumentInit(instrument);
 		}
 	}
 }
 
 // ----------------------------------------------------------------------
-//	STK FILTER NODE SETTER
+//	STK INSTRUMENTS NODE SETTER
 // ----------------------------------------------------------------------
-void STKSetFilterType(STKFilter* filter, STKFilter::Type type)
+void STKSetInstrumentType(STKInstruments* instrument, STKInstrumentType type)
 {
-	filter->setType(type);
+  STKInstrumentTerm(instrument);
+  instrument->m_instrumentType = type;
+  STKInstrumentInit(instrument);
 }
 
-void STKSetFilterScalar(STKFilter* filter, STKFilter::Param param, StkFloat scalar)
+void STKSetInstrumentScalar(STKInstruments* instrument, STKInstrumentParam param, StkFloat scalar)
 {
-	filter->setScalar(scalar, param);
+  //filter->setScalar(scalar, param);
 }

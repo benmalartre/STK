@@ -1,22 +1,30 @@
 
 #include "../CAPI/common.h"
+#include "../CAPI/exports.h"
 #include "../CAPI/streams.h"
 #include "../CAPI/generators.h"
+#include "../CAPI/arythmetics.h"
 #include <vector>
 #include <cstdlib>
 #include <iostream>
 
-std::vector<STKNode*> nodes;
 bool running = false;
 float getRandomFrequency(){
     return ((float)rand() / (float)RAND_MAX) * 256.f + 128.f;
 }
 
 STKNode* getGenerator(STKStream* stream){
-    STKNode* generator = STKAddGenerator(stream,
-                                        STKGenerator::SINEWAVE_GENERATOR,
-                                        getRandomFrequency());
-    return generator;
+    STKNode* generator1 = STKGeneratorCreate(STKGeneratorType::GENERATOR_SINEWAVE,
+      getRandomFrequency());
+    STKStreamAddNode(stream, generator1, false);
+    STKNode* generator2 = STKGeneratorCreate(STKGeneratorType::GENERATOR_SINEWAVE,
+      getRandomFrequency());
+    STKStreamAddNode(stream, generator2, false);
+    STKNode* effect1 = STKStreamAddEffect(stream, STKEffectType::EFFECT_NREV, generator1, true);
+    STKNode* effect2 = STKStreamAddEffect(stream, STKEffectType::EFFECT_NREV, generator2, false);
+    //STKNode* blender = STKStreamAddArythmetic(stream, STKArythmeticMode::ARYTHMETIC_BLEND, effect1, effect2, true);
+    //STKSetArythmeticScalar((STKArythmetic*)blender, 0.5f);
+    return effect1;
 }
 
 int getNumGenerators(){
@@ -29,15 +37,11 @@ int getNumGenerators(){
 void setupGenerators(STKStream* stream, int numGenerators){
     if(running){
         STKStreamStop(stream);
-        for(int i=0;i<nodes.size();++i){
-            STKRemoveNode(stream, nodes[i]);
-        }
-        nodes.clear();
+        STKStreamRemoveAllNodes(stream);
     }
     
     for(int i=0;i<numGenerators;++i){
         STKNode* node = getGenerator(stream);
-        nodes.push_back(node);
     }
     STKStreamStart(stream);
     running = true;
@@ -54,7 +58,7 @@ void setupGenerators(STKStream* stream, int numGenerators){
 
 int main(){
     RtAudio* DAC = STKInit();
-    STKStream* stream = STKStreamSetup(DAC, 1);
+    STKStream* stream = STKStreamSetup(DAC, 2);
     
     int numGenerators = getNumGenerators();
     if(numGenerators > 0){

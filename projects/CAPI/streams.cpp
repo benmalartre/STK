@@ -1,11 +1,12 @@
-#include "streams.h"
-#include "buffers.h"
 #include "nodes.h"
+#include "buffers.h"
 #include "readers.h"
 #include "filters.h"
-#include "exports.h"
 #include "generators.h"
-
+#include "arythmetics.h"
+#include "envelopes.h"
+#include "effects.h"
+#include "streams.h"
 
 // ----------------------------------------------------------------------
 //    NODES
@@ -16,15 +17,32 @@ void STKStreamRemoveNode(STKStream* stream, STKNode* node)
     for (int i = 0; i<stream->m_roots.size(); ++i) {
       if (stream->m_roots[i] == node) {
         stream->m_roots.erase(stream->m_roots.begin() + i);
+        delete node;
+        break;
       }
     }
   } else {
     for (int i = 0; i<stream->m_nodes.size(); ++i) {
       if (stream->m_nodes[i] == node) {
         stream->m_nodes.erase(stream->m_nodes.begin() + i);
+        delete node;
+        break;
       }
     }
   }
+}
+
+void STKStreamRemoveAllNodes(STKStream* stream)
+{
+  for (int i = 0; i < stream->m_roots.size(); ++i) {
+    delete stream->m_roots[i];
+  }
+  stream->m_roots.clear();
+
+  for (int i = 0; i < stream->m_nodes.size(); ++i) {
+    delete stream->m_nodes[i];
+  }
+  stream->m_nodes.clear();
 }
 
 void STKStreamAddNode(STKStream* stream, STKNode* node, bool isRoot)
@@ -133,7 +151,6 @@ STKNode* STKStreamAddReader(STKStream* stream, const char* filename, bool isRoot
 int STKStreamTick(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	double streamTime, RtAudioStreamStatus status, void *data)
 {	
-  
   STKStream* stream = (STKStream *)data;
   StkFloat *samples = (StkFloat *)outputBuffer;
   size_t numRoots = stream->m_roots.size();

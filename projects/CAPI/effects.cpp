@@ -11,7 +11,7 @@ STKEffect* STKEffectCreate(STKNode* source, STKEffectType type)
   fx->m_volume = 1.0f;
   fx->m_fxtype = type;
   fx->m_type = STK_EFFECT;
-  fx->m_noutput = 0;
+  fx->m_noutput = 1;
   fx->m_outidx = 0;
   STKEffectInit(fx);
   return fx;
@@ -110,97 +110,102 @@ void STKEffectTerm(STKEffect* fx)
 StkFloat STKEffectTickEnvelope(STKEffect* fx)
 {
 	if (fx->m_outidx == 0)
-        return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_envelope->tick()) *
-            STKNodeTick(fx->m_source) *
-            fx->m_volume;
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_envelope->tick()) *
+      STKNodeTick(fx->m_source) * fx->m_volume;
     
 	else
-        return STKNodeUpdate((STKNode*) fx, fx->m_fx.m_envelope->lastOut()) *
-            STKNodeTick(fx->m_source) *
-            fx->m_volume;
+    return STKNodeUpdate((STKNode*) fx, fx->m_fx.m_envelope->lastOut()) *
+      STKNodeTick(fx->m_source) * fx->m_volume;
 }
 
 StkFloat STKEffectTickPRCRev(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
-	else return update(m_prcrev->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_prcrev->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  } else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_prcrev->lastOut()) * fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickJCRev(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_jcrev->tick(m_source->tick()))* m_volume;
-	else return update(m_jcrev->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_jcrev->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_jcrev->lastOut()) * fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickNRev(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_nrev->tick(m_source->tick()))* m_volume;
-	else return update(m_nrev->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_nrev->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_nrev->lastOut()) * fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickFreeVerb(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_freeverb->tick(m_source->tick()))* m_volume;
-	else return update(m_freeverb->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_freeverb->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_freeverb->lastOut()) * fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickEcho(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_prcrev->tick(m_source->tick()))* m_volume;
-	else return update(m_prcrev->lastOut())* m_volume;
-	return m_echo->tick(m_source->tick())* m_volume;
-    */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_prcrev->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_prcrev->lastOut()) * fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickPitShift(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_pitshift->tick(m_source->tick()))* m_volume;
-	else return update(m_pitshift->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_pitshift->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_pitshift->lastOut()) * fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickLentPitShift(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
-	else return update(m_lentpitshift->tick(m_source->tick()))* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_lentpitshift->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return 0.f;// STKNodeUpdate((STKNode*)fx, fx->m_fx.m_lentpitshift->lastOut())* fx->m_volume;
+  }
 }
 
 StkFloat STKEffectTickChorus(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_chorus->tick(m_source->tick()))* m_volume;
-	else return update(m_chorus->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_chorus->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_chorus->lastOut()) * fx->m_volume;
+  }
 
 }
 
 StkFloat STKEffectTickMoog(STKEffect* fx)
 {
-    /*
-	if (m_outidx == 0) return update(m_moog->tick(m_source->tick()))* m_volume;
-	else return update(m_moog->lastOut())* m_volume;
-     */
-    return 0;
+  if (fx->m_outidx == 0) {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_moog->tick(STKNodeTick(fx->m_source)) * fx->m_volume);
+  }
+  else {
+    return STKNodeUpdate((STKNode*)fx, fx->m_fx.m_moog->lastOut()) * fx->m_volume;
+  }
 
 }
 

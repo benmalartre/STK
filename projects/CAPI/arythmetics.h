@@ -1,22 +1,8 @@
 #ifndef STK_ARYTHMETIC_H
 #define STK_ARYTHMETIC_H
 
-#pragma once
-
 #include "common.h"
 #include "nodes.h"
-
-enum STKArythmeticMode{
-	ARYTHMETIC_ADD,
-	ARYTHMETIC_SUB,
-	ARYTHMETIC_MULTIPLY,
-	ARYTHMETIC_SCALE,
-	ARYTHMETIC_SCALEADD,
-	ARYTHMETIC_SCALESUB,
-	ARYTHMETIC_MIX,
-	ARYTHMETIC_BLEND,
-	ARYTHMETIC_SHIFT
-};
 
 struct STKArythmetic : public STKNode {
   STKNode* m_lhs;

@@ -17,30 +17,6 @@
 #include "Granulate.h"
 
 using namespace stk;
-// generator types
-typedef enum STKGeneratorType{
-    GENERATOR_ASYMP,
-    GENERATOR_NOISE,
-    GENERATOR_BLIT,
-    GENERATOR_BLITSAW,
-    GENERATOR_BLITSQUARE,
-    GENERATOR_SINEWAVE
-}STKGeneratorType;
-
-
-// generator params
-typedef enum STKGeneratorParam{
-    GENERATOR_T60,                    // asymp t60
-    GENERATOR_TARGET,                 // asymp target
-    GENERATOR_TAU,                    // asymp tau
-    GENERATOR_TIME,                   // asymp time
-    GENERATOR_VALUE,                  // asymp value
-    GENERATOR_FREQUENCY,              // waves frequency
-    GENERATOR_HARMONICS,              // waves harmonics
-    GENERATOR_PHASE,                  // waves phase
-    GENERATOR_PHASEOFFSET,            // sine wave phase offset
-    GENERATOR_SEED,                   // noise seed
-}STKGeneratorParam;
 
 
 // generators union

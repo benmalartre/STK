@@ -15,36 +15,6 @@
 #include "Chorus.h"
 #include "Moog.h"
 
-enum STKEffectType{
-    EFFECT_ENVELOPE,
-    EFFECT_PRCREV,
-    EFFECT_JCREV,
-    EFFECT_NREV,
-    EFFECT_FREEVERB,
-    EFFECT_ECHO,
-    EFFECT_PITSHIFT,
-    EFFECT_LENTPITSHIFT,
-    EFFECT_CHORUS,
-    EFFECT_MOOG
-};
-
-enum STKEffectParam{
-    EFFECT_RATE,            // envelope rate
-    EFFECT_TIME,            // envelope time
-    EFFECT_TARGET,            // envelope target
-    EFFECT_VALUE,            // envelope value
-    EFFECT_T60,            // prcrev, jcrev, nrev T60
-    EFFECT_MIX,            // freeverb effect mix
-    EFFECT_ROOMSIZE,        // freeverb room size
-    EFFECT_DAMPING,        // freeverb damping
-    EFFECT_WIDTH,            // freeverb width
-    EFFECT_MODE,            // freeverb mode
-    EFFECT_DELAY,            // echo delay
-    EFFECT_MAXIMUMDELAY,    // echo maximum delay
-    EFFECT_SHIFT,            // pitshift and lentpitshift
-    EFFECT_MODDEPTH,        // chorus/moog mod depth
-    EFFECT_MODFREQUENCY    // chorus/moog mod frequency
-};
 
 union STKEffectFX
 {

@@ -1,31 +1,22 @@
 #ifndef STK_CAPI_STREAM_H
 #define STK_CAPI_STREAM_H
-#pragma once
 
-#include "common.h"
 #include <math.h>
+#include <vector>
+#include "common.h"
+
 //#include <map>
-#include "generators.h"
-#include "envelopes.h"
-#include "arythmetics.h"
-#include "effects.h"
-#include "filters.h"
-#include "buffers.h"
-#include "readers.h"
-
-struct STKNode;
-struct STKReader;
-
 typedef struct STKStream {
   RtAudio* m_dac;
   short m_channels;
   std::vector<STKNode*> m_nodes;
   std::vector<STKNode*> m_roots;
-  //std::map<STKNode*, std::vector<STKNode*> > m_dependencies;
 } STKStream;
+struct STKNode;
 
 EXPORT void STKStreamAddNode(STKStream* stream, STKNode* node, bool isRoot);
 EXPORT void STKStreamRemoveNode(STKStream* stream, STKNode* node);
+EXPORT void STKStreamRemoveAllNodes(STKStream* stream);
 
 EXPORT STKStream* STKStreamSetup(RtAudio* DAC, int numChannels);
 

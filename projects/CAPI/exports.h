@@ -3,13 +3,7 @@
 #pragma once
 
 #include "common.h"
-#include "nodes.h"
-#include "streams.h"
-#include "nodes.h"
-#include "generators.h"
-#include "readers.h"
-//#include "instruments.h"
-#include "writers.h"
+struct STKNode;
 
 // exported functions
 EXPORT RtAudio* STKInit();

@@ -51,8 +51,3 @@ int STKGetDevices(RtAudio* DAC)
   return 0;
 }
 
-StkFloat STKNodeTick(STKNode* node) 
-{
-  return node->m_tickCallback();
-}
-

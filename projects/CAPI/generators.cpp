@@ -17,7 +17,7 @@ STKGenerator* STKGeneratorCreate(STKGeneratorType type, StkFloat frequency)
   g->m_g.m_modulate = NULL;
   g->m_g.m_granulate = NULL;
 
-  g->m_noutput = 0;
+  g->m_noutput = 1;
   g->m_volume = 1.0;
   g->m_outidx = 0;
   g->m_type = STK_GENERATOR;
@@ -262,48 +262,48 @@ void STKGeneratorSetHasNoEffect(STKGenerator* g, bool hasnoeffect)
 StkFloat STKGeneratorTickAsymp(STKGenerator* g)
 {
   if (g->m_outidx == 0)
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_asymp->tick()*g->m_volume);
+    return STKNodeUpdate(g, g->m_g.m_asymp->tick()*g->m_volume);
   else
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_asymp->lastOut());
+    return STKNodeUpdate(g, g->m_g.m_asymp->lastOut());
 }
 StkFloat STKGeneratorTickNoise(STKGenerator* g)
 {
   if (g->m_outidx == 0)
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_noise->tick()*g->m_volume);
+    return STKNodeUpdate(g, g->m_g.m_noise->tick()*g->m_volume);
   else
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_noise->lastOut());
+    return STKNodeUpdate(g, g->m_g.m_noise->lastOut());
 }
 
 StkFloat STKGeneratorTickBlitSaw(STKGenerator* g)
 {
   if (g->m_outidx == 0)
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsaw->tick()*g->m_volume);
+    return STKNodeUpdate(g, g->m_g.m_blitsaw->tick()*g->m_volume);
   else
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsaw->lastOut());
+    return STKNodeUpdate(g, g->m_g.m_blitsaw->lastOut());
 }
 
 StkFloat STKGeneratorTickBlitSquare(STKGenerator* g)
 {
   if (g->m_outidx == 0)
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsquare->tick()*g->m_volume);
+    return STKNodeUpdate(g, g->m_g.m_blitsquare->tick()*g->m_volume);
   else
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_blitsquare->lastOut());
+    return STKNodeUpdate(g, g->m_g.m_blitsquare->lastOut());
 }
 
 StkFloat STKGeneratorTickBlit(STKGenerator* g)
 {
   if (g->m_outidx == 0)
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_blit->tick()*g->m_volume);
+    return STKNodeUpdate(g, g->m_g.m_blit->tick()*g->m_volume);
   else
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_blit->lastOut());
+    return STKNodeUpdate(g, g->m_g.m_blit->lastOut());
 }
 
 StkFloat STKGeneratorTickSineWave(STKGenerator* g)
 {
   if (g->m_outidx == 0)
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_sinewave->tick()*g->m_volume);
+    return STKNodeUpdate(g, g->m_g.m_sinewave->tick()*g->m_volume);
   else
-    return STKNodeUpdate((STKNode*)g, g->m_g.m_sinewave->lastOut());
+    return STKNodeUpdate(g, g->m_g.m_sinewave->lastOut());
 }
 
 StkFloat STKGeneratorTickHasNoEffect()

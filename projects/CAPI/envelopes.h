@@ -8,27 +8,6 @@
 #include "ADSR.h"
 #include "Asymp.h"
 
-enum STKEnvelopeType {
-    ENVELOPE_ENVELOPE,
-    ENVELOPE_ADSR,
-    ENVELOPE_ASYMP
-};
-
-enum STKEnvelopeParam {
-    ENVELOPE_ATTACK_RATE,
-    ENVELOPE_ATTACK_TARGET,
-    ENVELOPE_ATTACK_TIME,
-    ENVELOPE_DECAY_RATE,
-    ENVELOPE_DECAY_TIME,
-    ENVELOPE_SUSTAIN_LEVEL,
-    ENVELOPE_RELEASE_RATE,
-    ENVELOPE_RELEASE_TIME,
-    ENVELOPE_TARGET,
-    ENVELOPE_VALUE,
-    ENVELOPE_RATE,
-    ENVELOPE_TIME
-};
-
 union STKEnvelopeENV
 {
     Envelope* m_envelope;
