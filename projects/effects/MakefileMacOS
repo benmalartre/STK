@@ -1,8 +1,8 @@
 # =============================================================
-# Tibetant MakefileMacOS
+# Effects MakefileMacOS
 # =============================================================
 
-EXE_NAME = Tibetant
+EXE_NAME = Effects
 
 # make sure these are in your path
 #
@@ -76,22 +76,31 @@ DEST = $(DSTDIR)
 # variable definitions
 #
 SOURCES = $(STK_PATH)/Stk.cpp
-SOURCES += $(STK_PATH)/BeeThree.cpp
+SOURCES += $(STK_PATH)/Envelope.cpp
+SOURCES += $(STK_PATH)/SineWave.cpp
+SOURCES += $(STK_PATH)/Delay.cpp
+SOURCES += $(STK_PATH)/DelayL.cpp
+SOURCES += $(STK_PATH)/OnePole.cpp
+SOURCES += $(STK_PATH)/Echo.cpp
+SOURCES += $(STK_PATH)/PitShift.cpp
+SOURCES += $(STK_PATH)/Chorus.cpp
+SOURCES += $(STK_PATH)/LentPitShift.cpp
+SOURCES += $(STK_PATH)/PRCRev.cpp
+SOURCES += $(STK_PATH)/JCRev.cpp
+SOURCES += $(STK_PATH)/NRev.cpp
+SOURCES += $(STK_PATH)/FreeVerb.cpp
 SOURCES += $(STK_PATH)/FileRead.cpp
 SOURCES += $(STK_PATH)/FileWvIn.cpp
 SOURCES += $(STK_PATH)/FileLoop.cpp
-SOURCES += $(STK_PATH)/ADSR.cpp
-SOURCES += $(STK_PATH)/Fir.cpp
-SOURCES += $(STK_PATH)/DelayA.cpp
-SOURCES += $(STK_PATH)/DelayL.cpp
-SOURCES += $(STK_PATH)/SineWave.cpp
-SOURCES += $(STK_PATH)/TwoZero.cpp
-SOURCES += $(STK_PATH)/Blit.cpp
-SOURCES += $(STK_PATH)/Twang.cpp
+SOURCES += $(STK_PATH)/Mutex.cpp
+SOURCES += $(STK_PATH)/Socket.cpp
+SOURCES += $(STK_PATH)/Thread.cpp
+SOURCES += $(STK_PATH)/TcpServer.cpp
+SOURCES += $(STK_PATH)/RtMidi.cpp
+SOURCES += $(STK_PATH)/Skini.cpp
+SOURCES += $(STK_PATH)/Messager.cpp
 SOURCES += $(STK_PATH)/RtAudio.cpp
-SOURCES += $(STK_PATH)/FM.cpp
-SOURCES += $(SRCDIR)/sequencer.cpp
-SOURCES += $(SRCDIR)/main.cpp
+SOURCES += $(SRCDIR)/effects.cpp
 
 OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
 
@@ -124,20 +133,20 @@ test:
 	 +@make -f $(SRCDIR)/MakefileMacOS
 	 #
 	 @echo "_______________________________________________________________"
-	 @echo "		Build Tibetant Executable :"
+	 @echo "		Build Effects Executable :"
 	 @echo "		Here : $(DEST)"
 	 #
-	 @cp Tibetant $(DEST)
+	 @cp Effects $(DEST)
 
 deploy:
 	 +@make -f $(SRCDIR)/MakefileMacOS clean
 	 +@make -f $(SRCDIR)/MakefileMacOS
 	 #
 	 @echo "_______________________________________________________________"
-	 @echo "		Deploy Tibetant Executable :"
+	 @echo "		Deploy Effects Executable :"
 	 @echo "		Here : $(DEST)"
 	 #
-	 @cp Tibetant $(DEST)
+	 @cp Effects $(DEST)
 
 %.o :	%.c
 	 $(CC) -c $(INCLUDES) $(CFLAGS) $< -o $@

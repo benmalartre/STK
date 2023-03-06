@@ -1,25 +1,21 @@
 #include <iostream>
 #include <SineWave.h>
+#include <Blit.h>
+#include <Bowed.h>
+#include <Twang.h>
 #include <RtAudio.h>
+#include "sequencer.h"
 using namespace stk;
 
 #define FRAMES_BLOCK_SIZE 1024
 
 
-struct HHNode {
-  std::vector<STKNode*> _childrens;
-
-};
-
-struct HHStream {
-  short num_channels;
-  RtAudio dac;
-
-};
-
 struct TickData {
-  float frequency[6];
-  SineWave *generator[5];
+  Sequencer *sequencer;
+  Twang *twang;
+  Blit *blit;
+  SineWave *frequency;
+  SineWave *generator;
   SineWave *lfo;
   StkFloat base_frequency;
   StkFloat scaler;
@@ -36,25 +32,38 @@ static float PositiveSineWaveTick(SineWave* wave, float multiplier)
 {
   return (wave->tick() + 1) * 0.5+ 0.2;
 }
+
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
   TickData *data = (TickData *) userData;
-  register StkFloat *samples = (StkFloat *) outputBuffer;
-
-
+  StkFloat *samples = (StkFloat *) outputBuffer;
+  Sequencer *sequencer = data->sequencer;
+  uint64_t timeIdx = sequencer->TimeToIndex(streamTime);
+  std::cout << "timeIdx " << timeIdx << std::endl;
+  int time = sequencer->Get(0, timeIdx);
+  data->generator->setFrequency(time);
   for ( unsigned int i=0; i<nBufferFrames; i++ ) {
+    
+    float sample = data->generator->tick() + data->lfo->tick() * 0.25f;
+    for(int i=0; i < data->num_channels; ++i) {
+      *samples++ = sample;
+    }
+    /*
     data->generator->addPhaseOffset(
       data->frequency->tick());
     float sample = 
       data->generator->tick() + data->lfo->tick() * 0.25f;
+    if(int(streamTime) % 2 < 1)sample += data->blit->tick();
+    else sample += data->twang->tick(120);
     for(int i=0; i < data->num_channels; ++i) {
       *samples++ = sample;
     }
+    */
   }
 
   if ( data->counter > 80000 )
-    data->done = true;
+    data->done = true; 
 
   return 0;
 }
@@ -88,10 +97,19 @@ int main()
   }
 
   try {
-    // Define and load the BeeThree instrument
+    // initialize tick data
+    data.sequencer = new Sequencer;
+    data.sequencer->SetLength(16);
+    data.sequencer->AddTrack();
+    for (size_t i = 0; i < 16; ++i) {
+      data.sequencer->SetTime(0, i, Sequencer::Time(rand()));
+    }
+    
     data.generator = new SineWave();
     data.lfo = new SineWave();
     data.frequency = new SineWave();
+    data.blit = new Blit();
+    data.twang = new Twang();
   }
   catch ( StkError & ) {
     goto cleanup;
@@ -101,6 +119,8 @@ int main()
   data.lfo->setFrequency(0.25);
   data.frequency->setFrequency(1);
   data.generator->setFrequency(data.base_frequency);
+  data.blit->setHarmonics(7);
+  data.sequencer->Start();
 
 
   try {
@@ -126,6 +146,9 @@ int main()
  cleanup:
   delete data.generator;
   delete data.lfo;
+  delete data.frequency;
+  delete data.blit;
+  delete data.twang;
 
   return 0;
 }
