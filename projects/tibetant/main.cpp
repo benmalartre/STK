@@ -36,17 +36,17 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   StkFloat *samples = (StkFloat *) outputBuffer;
   Sequencer *sequencer = &data->sequencer;
   uint64_t timeIdx = sequencer->timeToIndex(streamTime);
-  std::cout << "timeIdx " << timeIdx << std::endl;
-  int time = sequencer->get(0, timeIdx);
-  data->generator.setFrequency(time);
   data->counter++;
   if(data->counter > 32) {
     data->counter = 0;
-    data->generator.setWaveForm(data->waveFormIdx++);
+    Sequencer::Track* track = sequencer->getTrack(0);
+    if(track)track->setWaveForm(data->waveFormIdx++);
   }
   for ( unsigned int i=0; i<nBufferFrames; i++ ) {
+    float sample = 0.0;
+    for(auto& track: sequencer->getTracks()) sample += track.tick();
     
-    float sample = data->generator.tick();//data->generator.tick();
+    //float sample = data->generator.tick();
     for(int i=0; i < data->num_channels; ++i) {
       *samples++ = sample;
     }

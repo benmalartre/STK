@@ -26,7 +26,7 @@ void WaveGenerator::setWaveForm(int8_t index)
   if(index == _waveFormIdx)return;
   if(_generator) delete _generator;
 
-  switch(index % 5) {
+  switch(index % 6) {
     case BLIT:
       _generator = new stk::Blit();
       ((stk::Blit*)_generator)->setFrequency(_frequency);
@@ -56,15 +56,15 @@ void WaveGenerator::setWaveForm(int8_t index)
       _tickImpl = &WaveGenerator::_sineWaveTick;
       break;
 
-    /*
     case SINGWAVE:
-      _generator = new stk::SingWave()
+      _generator = new stk::SingWave( (stk::Stk::rawwavePath() + "impuls20.raw").c_str(), true );
       ((stk::SingWave*)_generator)->setFrequency(_frequency);
-      _tickImpl = &_singWaveTick;
+      _tickImpl = &WaveGenerator::_singWaveTick;
       break;
-    */
+
   }
-  _waveFormIdx = index % 5;
+  _waveFormIdx = index % 6;
+  std::cout << "waveform index " << _waveFormIdx << std::endl;
 }
 
 void WaveGenerator::setFrequency(float frequency)
@@ -92,13 +92,9 @@ void WaveGenerator::setFrequency(float frequency)
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
       break;
 
-    /*
     case SINGWAVE:
-      _generator = new stk::SingWave()
       ((stk::SingWave*)_generator)->setFrequency(_frequency);
-      _tickImpl = &_singWaveTick;
       break;
-    */
   }
 }
 

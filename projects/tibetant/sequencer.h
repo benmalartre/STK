@@ -25,9 +25,12 @@ public:
     void setWaveForm(int index);
     void setTime(uint64_t time, const Time& value);
 
+    stk::StkFloat tick();
+
     private:
     Sequence        _times;
     WaveGenerator   _generator;
+    float           _stereo; // -1.0 (full left) -> 1.0 (full right), default 0.0 (balanced)
   };
 
 private:
@@ -46,11 +49,12 @@ public:
   uint32_t numTracks();
   Track* addTrack();
   void removeTrack(uint32_t trackIdx);
+  Track* getTrack(uint32_t trackIdx);
   void setTime(uint32_t trackIdx, uint64_t time, const Time& value);
-  int get(uint32_t trackIdx, uint64_t timeIdx);
+  stk::StkFloat tick(uint32_t trackIdx, uint64_t timeIdx);
+  std::vector<Track>& getTracks(){return _tracks;};
   void start();
   void stop();
-  float tick(size_t trackIdx);
   uint64_t timeToIndex(double time);
 
   
