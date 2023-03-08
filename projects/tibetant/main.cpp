@@ -1,51 +1,52 @@
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <SineWave.h>
 #include <Blit.h>
 #include <Bowed.h>
-#include <Twang.h>
+#include <Plucked.h>
 #include <RtAudio.h>
+#include "generator.h"
 #include "sequencer.h"
 using namespace stk;
 
 #define FRAMES_BLOCK_SIZE 1024
 
 
+
 struct TickData {
-  Sequencer *sequencer;
-  Twang *twang;
-  Blit *blit;
-  SineWave *frequency;
-  SineWave *generator;
-  SineWave *lfo;
-  StkFloat base_frequency;
-  StkFloat scaler;
-  long counter;
-  short num_channels;
-  bool done;
+  Sequencer     sequencer;
+  WaveGenerator generator;
+  size_t        waveFormIdx;
+  StkFloat      base_frequency;
+  StkFloat      scaler;
+  long          counter;
+  short         num_channels;
+  bool          done;
 
   // Default constructor.
   TickData()
-    : generator(NULL), lfo(NULL), scaler(1.0), counter(0), done( false ) {}
+    : scaler(1.0), counter(0), done( false ) {}
 };
 
-static float PositiveSineWaveTick(SineWave* wave, float multiplier)
-{
-  return (wave->tick() + 1) * 0.5+ 0.2;
-}
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
   TickData *data = (TickData *) userData;
   StkFloat *samples = (StkFloat *) outputBuffer;
-  Sequencer *sequencer = data->sequencer;
-  uint64_t timeIdx = sequencer->TimeToIndex(streamTime);
+  Sequencer *sequencer = &data->sequencer;
+  uint64_t timeIdx = sequencer->timeToIndex(streamTime);
   std::cout << "timeIdx " << timeIdx << std::endl;
-  int time = sequencer->Get(0, timeIdx);
-  data->generator->setFrequency(time);
+  int time = sequencer->get(0, timeIdx);
+  data->generator.setFrequency(time);
+  data->counter++;
+  if(data->counter > 32) {
+    data->counter = 0;
+    data->generator.setWaveForm(data->waveFormIdx++);
+  }
   for ( unsigned int i=0; i<nBufferFrames; i++ ) {
     
-    float sample = data->generator->tick() + data->lfo->tick() * 0.25f;
+    float sample = data->generator.tick();//data->generator.tick();
     for(int i=0; i < data->num_channels; ++i) {
       *samples++ = sample;
     }
@@ -68,10 +69,129 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   return 0;
 }
 
+static int BASS[16] = {
+  0b10000000,
+  0b10001000,
+  0b10000000,
+  0b10001000,
+  0b10000000,
+  0b10001000,
+  0b10000000,
+  0b10001000
+};
+
+static int DRUM[16] = {
+  0b01010101,
+  0b01010111,
+  0b01010101,
+  0b01010111,
+  0b01010101,
+  0b01010111,
+  0b01010101,
+  0b01010111
+};
+
+GLFWwindow* openWindow(size_t width, size_t height)
+{
+  //glfwWindowHint(GLFW_DECORATED, false);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#else
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#endif
+  glfwWindowHint(GLFW_STENCIL_BITS, 8);
+  glfwWindowHint(GLFW_SAMPLES, 4);
+  
+  GLFWwindow* window = glfwCreateWindow(width,height,"Jivaro",NULL,NULL);
+
+   // window datas
+  //glfwSetWindowUserPointer(window, this);
+
+  // set current opengl context
+  glfwMakeContextCurrent(window);
+  glfwSwapInterval(1);
+
+  //GetContextVersionInfos();
+  // load opengl functions
+  //GarchGLApiLoad();
+  //pxr::GlfContextCaps::InitInstance();
+  //pxr::GlfContextCaps const& caps = pxr::GlfContextCaps::GetInstance();
+  /*
+  CreateFontAtlas();
+  InitializeIcons();
+
+  // setup callbacks
+  glfwSetWindowSizeCallback(_window, ResizeCallback);
+  glfwSetMouseButtonCallback(_window, ClickCallback);
+  glfwSetScrollCallback(_window, ScrollCallback);
+  glfwSetKeyCallback(_window, KeyboardCallback);
+  glfwSetCharCallback(_window, CharCallback);
+  glfwSetCursorPosCallback(_window, MouseMoveCallback);
+  glfwSetWindowFocusCallback(_window, FocusCallback);
+  glfwSetInputMode(_window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+  // create main splittable view
+  _mainView = new View(NULL, pxr::GfVec2f(0,0), pxr::GfVec2f(_width, _height));
+  _mainView->SetWindow(this);
+  _splitter = new SplitterUI(_mainView);
+    
+  Resize(_width, _height);
+
+  glGenVertexArrays(1, &_vao);
+
+  GLSLProgram* pgm = InitShapeShader((void*)this);
+  _tool.SetProgram(pgm);
+  */
+  // ui
+  //SetupImgui();
+  //glfwMakeContextCurrent(NULL);
+  return window;
+}
+
+void draw(GLFWwindow* window)
+{
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+  glfwMakeContextCurrent(window);
+  //ImGui::SetCurrentContext(_context);
+  
+  //glBindVertexArray(_vao);
+  // start the imgui frame
+  //ImGui_ImplOpenGL3_NewFrame();
+  //ImGui_ImplGlfw_NewFrame();
+  //ImGui::NewFrame();
+
+  // render the imgui frame
+  //ImGui::Render();
+  
+  glViewport(0, 0, width, height);
+
+  glClearColor(
+    (float)rand()/(float)RAND_MAX, 
+    (float)rand()/(float)RAND_MAX,
+    (float)rand()/(float)RAND_MAX, 
+    1.0);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  //glBindVertexArray(0);
+
+  glFinish();
+  glFlush();
+  glfwSwapBuffers(window);
+  glfwPollEvents();
+}
 
 int main()
 {
-  
+  // OpenGL window
+  glfwInit();
+  GLFWwindow* window = openWindow(1200, 800);
+  std::cout << "window : " << window << std::endl;
+
   // Set the global sample rate and rawwave path before creating class instances.
   Stk::setSampleRate( 44100.0 );
   Stk::setRawwavePath( "../../rawwaves/" );
@@ -93,48 +213,41 @@ int main()
   }
   catch ( RtAudioError& error ) {
     error.printMessage();
-    goto cleanup;
+    return 0;
   }
 
-  try {
-    // initialize tick data
-    data.sequencer = new Sequencer;
-    data.sequencer->SetLength(16);
-    data.sequencer->AddTrack();
-    for (size_t i = 0; i < 16; ++i) {
-      data.sequencer->SetTime(0, i, Sequencer::Time(rand()));
-    }
-    
-    data.generator = new SineWave();
-    data.lfo = new SineWave();
-    data.frequency = new SineWave();
-    data.blit = new Blit();
-    data.twang = new Twang();
-  }
-  catch ( StkError & ) {
-    goto cleanup;
-  }
+
+  data.sequencer.setLength(16);
+  data.sequencer.addTrack();
+  for(size_t t = 0; t < 16; ++t)
+    data.sequencer.setTime(0, t, BASS[t]);
+
+  data.sequencer.addTrack();
+  for(size_t t = 0; t < 16; ++t)
+    data.sequencer.setTime(0, t, DRUM[t]);
 
   data.base_frequency = 96;
-  data.lfo->setFrequency(0.25);
-  data.frequency->setFrequency(1);
-  data.generator->setFrequency(data.base_frequency);
-  data.blit->setHarmonics(7);
-  data.sequencer->Start();
-
+  /*
+  data.lfo.setFrequency(64.0);
+  data.frequency.setFrequency(1);
+  data.generator.setFrequency(data.base_frequency);
+  data.blit.setHarmonics(7);
+  */
+  data.sequencer.start();
 
   try {
     dac.startStream();
   }
   catch ( RtAudioError &error ) {
     error.printMessage();
-    goto cleanup;
+    return 0;
   }
-
-  // Block waiting until callback signals done.
-  while ( !data.done )
-    Stk::sleep( 100 );
   
+  while (!glfwWindowShouldClose(window)) {
+   Stk::sleep( 100 );
+   draw(window);
+  }
+    
   // Shut down the callback and output stream.
   try {
     dac.closeStream();
@@ -142,13 +255,4 @@ int main()
   catch ( RtAudioError &error ) {
     error.printMessage();
   }
-
- cleanup:
-  delete data.generator;
-  delete data.lfo;
-  delete data.frequency;
-  delete data.blit;
-  delete data.twang;
-
-  return 0;
 }

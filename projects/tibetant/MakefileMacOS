@@ -13,6 +13,8 @@ LD          = clang++
 SRCDIR := .
 DSTDIR := .
 
+GLFW_DIR = /Users/malartrebenjamin/Documents/RnD/glfw/build
+
 # settings
 #
 CFLAGS = -DPLATFORM_DARWIN \
@@ -43,7 +45,7 @@ C++FLAGS = $(CFLAGS) \
 # includes
 #
 STK_INCLUDES = ../../include
-INCLUDES = -I$(STK_INCLUDES) -I$(SRCDIR)
+INCLUDES = -I$(STK_INCLUDES) -I$(SRCDIR) -I$(GLFW_DIR)/include
 
 # sources
 #
@@ -57,6 +59,10 @@ LIBS += -framework CoreAudio
 LIBS += -framework CoreAudioKit
 LIBS += -framework CoreMIDI
 LIBS += -framework CoreMIDIServer
+LIBS += -framework Cocoa
+LIBS += -framework IOKit
+LIBS += -framework OpenGL
+LIBS += $(GLFW_DIR)/src/libglfw3.a
 
 
 LIBS_PATH =
@@ -77,6 +83,10 @@ DEST = $(DSTDIR)
 #
 SOURCES = $(STK_PATH)/Stk.cpp
 SOURCES += $(STK_PATH)/BeeThree.cpp
+SOURCES += $(STK_PATH)/Noise.cpp
+SOURCES += $(STK_PATH)/Blit.cpp
+SOURCES += $(STK_PATH)/BlitSaw.cpp
+SOURCES += $(STK_PATH)/BlitSquare.cpp
 SOURCES += $(STK_PATH)/FileRead.cpp
 SOURCES += $(STK_PATH)/FileWvIn.cpp
 SOURCES += $(STK_PATH)/FileLoop.cpp
@@ -85,11 +95,17 @@ SOURCES += $(STK_PATH)/Fir.cpp
 SOURCES += $(STK_PATH)/DelayA.cpp
 SOURCES += $(STK_PATH)/DelayL.cpp
 SOURCES += $(STK_PATH)/SineWave.cpp
+SOURCES += $(STK_PATH)/SingWave.cpp
 SOURCES += $(STK_PATH)/TwoZero.cpp
-SOURCES += $(STK_PATH)/Blit.cpp
+SOURCES += $(STK_PATH)/OneZero.cpp
+SOURCES += $(STK_PATH)/OnePole.cpp
+SOURCES += $(STK_PATH)/Envelope.cpp
+SOURCES += $(STK_PATH)/Modulate.cpp
 SOURCES += $(STK_PATH)/Twang.cpp
+SOURCES += $(STK_PATH)/Plucked.cpp
 SOURCES += $(STK_PATH)/RtAudio.cpp
 SOURCES += $(STK_PATH)/FM.cpp
+SOURCES += $(SRCDIR)/generator.cpp
 SOURCES += $(SRCDIR)/sequencer.cpp
 SOURCES += $(SRCDIR)/main.cpp
 
