@@ -20,8 +20,7 @@ public:
   public:
 
     Track(uint64_t length=64) 
-      : _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 2))
-      , _times(Sequence(length))
+      : _times(Sequence(length))
     {};
 
     void setLength(uint64_t length);
@@ -30,13 +29,12 @@ public:
     void noteOn(size_t timeIdx);
     void noteOff();
 
-    stk::StkFrames& tick();
+    stk::StkFrames& tick(uint64_t timeIdx);
 
   private:
     Sequence        _times;
     WaveGenerator   _generator;
     float           _stereo; // -1.0 (full left) -> 1.0 (full right), default 0.0 (balanced)
-    stk::StkFrames  _frames;
   };
 
 private:

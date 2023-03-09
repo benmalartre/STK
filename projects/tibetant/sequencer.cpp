@@ -20,8 +20,13 @@ void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
 
 void Sequencer::Track::noteOn(size_t timeIdx)
 {
-  _generator.setFrequency((float)_times[timeIdx]);
-  _generator.noteOn();
+  float frequency = (float)_times[timeIdx % _times.size()];
+  if(frequency > 1.f) {
+    _generator.setFrequency((float)_times[timeIdx % _times.size()]);
+    _generator.noteOn();
+  } else {
+    _generator.noteOff();
+  }
 }
 
 void Sequencer::Track::noteOff()
@@ -29,8 +34,9 @@ void Sequencer::Track::noteOff()
   _generator.noteOff();
 }
 
-stk::StkFrames& Sequencer::Track::tick()
+stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
 {
+  noteOn(timeIdx);
   return _generator.tick();
 }
 
@@ -134,7 +140,7 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
   memset(&frames[0], 0.f, frames.size() * sizeof(stk::StkFloat));
   uint64_t timeIdx = (uint64_t) _time;
   for(auto& track: _tracks) {
-    frames += track.tick();
+    frames += track.tick(timeIdx % _length);
   }
   _time += 0.1;
   return frames;

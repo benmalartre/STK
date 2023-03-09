@@ -1,4 +1,7 @@
+
+#include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <SineWave.h>
 #include <Blit.h>
@@ -11,7 +14,38 @@ using namespace stk;
 
 #define FRAMES_BLOCK_SIZE 1024
 
+// initialize
+void initGL()
+{
+	int err = gl3wInit();
+	// initialize gl3w
+	if (err)
+	{
+		switch (err)
+		{
+		case  GL3W_ERROR_LIBRARY_OPEN:
+			std::cerr << "GL3W_ERROR_LIBRARY_OPEN" << std::endl;
+			return;
+		case GL3W_ERROR_INIT:
+			std::cerr << "GL3W_ERROR_INIT" << std::endl;
+			return;
+		case GL3W_ERROR_OPENGL_VERSION:
+			std::cerr << "GL3W_ERROR_OPENGL_VERSION" << std::endl;
+			return;
+		default:
+			std::cerr << "GL3W_ERROR_UNKNOWN" << std::endl;
+			return;
+		}
+	}
+	else std::cerr << "GL3W_INITIALIZED!!!" << std::endl;
+}
 
+void termGL()
+{
+	std::cerr << "Should Term LIB GL..."  << std::endl;
+	gl3wTerm();
+	//close_libgl();
+}
 
 struct TickData {
   stk::StkFrames  frames;
@@ -36,26 +70,12 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   TickData *data = (TickData *) userData;
   StkFloat *samples = (StkFloat *) outputBuffer;
   Sequencer *sequencer = &data->sequencer;
-  uint64_t timeIdx = sequencer->timeToIndex(streamTime);
-
-  Sequencer::Track* track = sequencer->getTrack(0);
-  if(track) {
-    //track->setWaveForm(data->waveFormIdx++);
-    track->noteOn(timeIdx);
-  }
-
-
-  data->counter++;
-  if(data->counter > 8) {
-    data->counter = 0;
-    
-  }
-
   sequencer->tick(data->frames);
   //stk::StkFrames& frames = data->generator.tick();
   for ( unsigned int i=0; i < data->frames.size(); ++i ) {
-    for(size_t n = 0; n < data->num_channels; ++n)
+    for(size_t n = 0; n < data->num_channels; ++n) {
       *samples++ = data->frames[i];
+    }
   }
   /*
   for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {
@@ -82,19 +102,13 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 static uint8_t BASS[16] = {
-  220, 210, 200, 190, 180, 170, 160, 150,
-  225, 215, 205, 195, 185, 175, 165, 155
+  110, 0, 0, 0, 110, 0, 0, 0,
+  110, 0, 0, 0, 110, 0, 55, 0
 };
 
 static uint8_t DRUM[16] = {
-  0b01010101,
-  0b01010111,
-  0b01010101,
-  0b01010111,
-  0b01010101,
-  0b01010111,
-  0b01010101,
-  0b01010111
+  0, 0, 200, 0, 0, 0, 200, 200,
+  0, 0, 200, 0, 0, 0, 200, 200
 };
 
 GLFWwindow* openWindow(size_t width, size_t height)
@@ -119,7 +133,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
 
   // set current opengl context
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  //glfwSwapInterval(1);
 
   //GetContextVersionInfos();
   // load opengl functions
@@ -155,6 +169,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
   // ui
   //SetupImgui();
   //glfwMakeContextCurrent(NULL);
+  glfwPollEvents();
   return window;
 }
 
@@ -196,7 +211,19 @@ int main()
   // OpenGL window
   glfwInit();
   GLFWwindow* window = openWindow(1200, 800);
-  std::cout << "window : " << window << std::endl;
+
+  glfwMakeContextCurrent(window);
+
+	if (gl3wInit()) {
+		std::cerr << "failed to initialize OpenGL" << std::endl;
+		return -1;
+	}
+	if (!gl3wIsSupported(3, 2)) {
+		std::cerr << "OpenGL 3.2 not supported" << std::endl;
+		return -1;
+	}
+	std::cerr << "OpenGL " <<  glGetString(GL_VERSION) <<", GLSL " << 
+	       glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
   // Set the global sample rate and rawwave path before creating class instances.
   Stk::setSampleRate( 44100.0 );
@@ -210,11 +237,13 @@ int main()
   parameters.deviceId = dac.getDefaultOutputDevice();
   parameters.nChannels = 2;
   data.num_channels = parameters.nChannels;
-  
+  data.frames.resize(RT_BUFFER_SIZE, data.num_channels);
   RtAudioFormat format = 
     ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
   unsigned int bufferFrames = RT_BUFFER_SIZE;
-  data.frames = stk::StkFrames(bufferFrames, data.num_channels);
+
+  std::cout << "!nitialized data" << std::endl;
+  
   try {
     dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), 
     &bufferFrames, &tick, (void *)&data );
@@ -224,23 +253,19 @@ int main()
     return 0;
   }
 
-
+  std::cout << "stk opened stream" << std::endl;
   data.sequencer.setLength(16);
-  data.sequencer.addTrack();
+  std::cout << "stk sequencer set length" << std::endl;
+  Sequencer::Track* bass = data.sequencer.addTrack();
+  std::cout << "stk sequencer bass " << bass << std::endl;
   for(size_t t = 0; t < 16; ++t)
     data.sequencer.setTime(0, t, BASS[t]);
 /*
-  data.sequencer.addTrack();
+  Sequencer::Track* drum = data.sequencer.addTrack();
+  drum->setWaveForm(3);
   for(size_t t = 0; t < 16; ++t)
-    data.sequencer.setTime(0, t, DRUM[t]);
+    data.sequencer.setTime(1, t, DRUM[t]);
 */
-  data.base_frequency = 96;
-  /*
-  data.lfo.setFrequency(64.0);
-  data.frequency.setFrequency(1);
-  data.generator.setFrequency(data.base_frequency);
-  data.blit.setHarmonics(7);
-  */
   data.sequencer.start();
 
   try {
@@ -263,4 +288,7 @@ int main()
   catch ( RtAudioError &error ) {
     error.printMessage();
   }
+
+  glfwTerminate();
+  gl3wTerm();
 }

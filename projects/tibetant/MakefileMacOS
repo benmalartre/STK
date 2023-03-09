@@ -14,6 +14,7 @@ SRCDIR := .
 DSTDIR := .
 
 GLFW_DIR = /Users/malartrebenjamin/Documents/RnD/glfw/build
+GL3W_DIR = $(SRCDIR)/gl3w
 
 # settings
 #
@@ -45,7 +46,7 @@ C++FLAGS = $(CFLAGS) \
 # includes
 #
 STK_INCLUDES = ../../include
-INCLUDES = -I$(STK_INCLUDES) -I$(SRCDIR) -I$(GLFW_DIR)/include
+INCLUDES = -I$(GL3W_DIR) -I$(GLFW_DIR)/include -I$(STK_INCLUDES) -I$(SRCDIR) 
 
 # sources
 #
@@ -81,7 +82,8 @@ DEST = $(DSTDIR)
 
 # variable definitions
 #
-SOURCES = $(STK_PATH)/Stk.cpp
+SOURCES = $(GL3W_DIR)/gl3w.cpp
+SOURCES += $(STK_PATH)/Stk.cpp
 SOURCES += $(STK_PATH)/BeeThree.cpp
 SOURCES += $(STK_PATH)/Noise.cpp
 SOURCES += $(STK_PATH)/Blit.cpp
