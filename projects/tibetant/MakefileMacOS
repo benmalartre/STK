@@ -83,8 +83,8 @@ DEST = $(DSTDIR)
 
 # variable definitions
 #
-SOURCES = $(GL3W_DIR)/gl3w.cpp
-SOURCES += $(IMGUI_DIR)/imgui.cpp
+#SOURCES = $(GL3W_DIR)/gl3w.cpp
+SOURCES = $(IMGUI_DIR)/imgui.cpp
 SOURCES += $(IMGUI_DIR)/imgui_stdlib.cpp
 SOURCES += $(IMGUI_DIR)/imgui_impl_glfw.cpp
 SOURCES += $(IMGUI_DIR)/imgui_impl_opengl3.cpp

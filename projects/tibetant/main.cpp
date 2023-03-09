@@ -1,4 +1,5 @@
 
+//#include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
 // Dear ImGui
@@ -88,7 +89,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+  glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #else
@@ -104,7 +105,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
 
   // set current opengl context
   glfwMakeContextCurrent(window);
-  //glfwSwapInterval(1);
+  glfwSwapInterval(1);
 
   //GetContextVersionInfos();
   // load opengl functions
@@ -145,33 +146,40 @@ GLFWwindow* openWindow(size_t width, size_t height)
 
 void draw(GLFWwindow* window)
 {
-  int width, height;
-  glfwGetWindowSize(window, &width, &height);
-  glfwMakeContextCurrent(window);
-  //ImGui::SetCurrentContext(_context);
-  
-  //glBindVertexArray(_vao);
   // start the imgui frame
-  //ImGui_ImplOpenGL3_NewFrame();
-  //ImGui_ImplGlfw_NewFrame();
-  //ImGui::NewFrame();
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
 
-  // render the imgui frame
-  //ImGui::Render();
+  static float f = 0.0f;
+  static bool show_test_window = true;
+  static bool show_another_window = false;
+  static ImVec4 clear_color = ImColor(114, 144, 154);
+
+  // Rendering
+  int display_w, display_h;
+  glfwGetFramebufferSize(window, &display_w, &display_h);
+  glViewport(0, 0, display_w, display_h);
+  glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+  glClear(GL_COLOR_BUFFER_BIT);
   
-  glViewport(0, 0, width, height);
+  ImGui::Text("Hello, world!");
+  
+  ImGui::SetNextWindowPos(ImVec2(0, 0));
+  ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
+  ImGui::Begin("window");
+  ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+  ImGui::ColorEdit3("clear color", (float*)&clear_color);
+  if (ImGui::Button("Test Window")) show_test_window ^= 1;
+  if (ImGui::Button("Another Window")) show_another_window ^= 1;
+  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+  
+  ImGui::End();
+  
+  ImGui::Render();
 
-  glClearColor(
-    (float)rand()/(float)RAND_MAX, 
-    (float)rand()/(float)RAND_MAX,
-    (float)rand()/(float)RAND_MAX, 
-    1.0);
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-  //glBindVertexArray(0);
-
-  glFinish();
-  glFlush();
+  glViewport(0, 0, display_w, display_h);
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   glfwSwapBuffers(window);
   glfwPollEvents();
 }
@@ -181,8 +189,15 @@ int main()
   // OpenGL window
   glfwInit();
   GLFWwindow* window = openWindow(1200, 800);
-
   glfwMakeContextCurrent(window);
+  //gl3wInit();
+  // Setup ImGui binding
+  IMGUI_CHECKVERSION();
+  ImGuiContext* context = ImGui::CreateContext();
+  ImGui::SetCurrentContext(context);
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 330 ");
+  
 
   // Set the global sample rate and rawwave path before creating class instances.
   Stk::setSampleRate( 44100.0 );
@@ -247,6 +262,6 @@ int main()
   catch ( RtAudioError &error ) {
     error.printMessage();
   }
-
+  ImGui_ImplGlfw_Shutdown();
   glfwTerminate();
 }
