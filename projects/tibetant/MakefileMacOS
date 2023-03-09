@@ -91,6 +91,7 @@ SOURCES += $(IMGUI_DIR)/imgui_impl_opengl3.cpp
 SOURCES += $(IMGUI_DIR)/imgui_draw.cpp
 SOURCES += $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/imgui_tables.cpp
+SOURCES += $(IMGUI_DIR)/imgui_knobs.cpp
 SOURCES += $(STK_PATH)/Stk.cpp
 SOURCES += $(STK_PATH)/BeeThree.cpp
 SOURCES += $(STK_PATH)/Noise.cpp

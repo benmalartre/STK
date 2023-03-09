@@ -1,5 +1,4 @@
 
-#include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
 // Dear ImGui
@@ -17,41 +16,6 @@
 #include "generator.h"
 #include "sequencer.h"
 using namespace stk;
-
-#define FRAMES_BLOCK_SIZE 1024
-
-// initialize
-void initGL()
-{
-	int err = gl3wInit();
-	// initialize gl3w
-	if (err)
-	{
-		switch (err)
-		{
-		case  GL3W_ERROR_LIBRARY_OPEN:
-			std::cerr << "GL3W_ERROR_LIBRARY_OPEN" << std::endl;
-			return;
-		case GL3W_ERROR_INIT:
-			std::cerr << "GL3W_ERROR_INIT" << std::endl;
-			return;
-		case GL3W_ERROR_OPENGL_VERSION:
-			std::cerr << "GL3W_ERROR_OPENGL_VERSION" << std::endl;
-			return;
-		default:
-			std::cerr << "GL3W_ERROR_UNKNOWN" << std::endl;
-			return;
-		}
-	}
-	else std::cerr << "GL3W_INITIALIZED!!!" << std::endl;
-}
-
-void termGL()
-{
-	std::cerr << "Should Term LIB GL..."  << std::endl;
-	gl3wTerm();
-	//close_libgl();
-}
 
 struct TickData {
   stk::StkFrames  frames;
@@ -176,7 +140,6 @@ GLFWwindow* openWindow(size_t width, size_t height)
   // ui
   //SetupImgui();
   //glfwMakeContextCurrent(NULL);
-  glfwPollEvents();
   return window;
 }
 
@@ -220,17 +183,6 @@ int main()
   GLFWwindow* window = openWindow(1200, 800);
 
   glfwMakeContextCurrent(window);
-
-	if (gl3wInit()) {
-		std::cerr << "failed to initialize OpenGL" << std::endl;
-		return -1;
-	}
-	if (!gl3wIsSupported(3, 2)) {
-		std::cerr << "OpenGL 3.2 not supported" << std::endl;
-		return -1;
-	}
-	std::cerr << "OpenGL " <<  glGetString(GL_VERSION) <<", GLSL " << 
-	       glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
   // Set the global sample rate and rawwave path before creating class instances.
   Stk::setSampleRate( 44100.0 );
@@ -297,5 +249,4 @@ int main()
   }
 
   glfwTerminate();
-  gl3wTerm();
 }
