@@ -15,9 +15,21 @@ void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
   if(timeIdx >= _times.size()){
     _times.resize(timeIdx+1);
   }
+  _times[timeIdx] = value;
 }
 
-stk::StkFloat Sequencer::Track::tick()
+void Sequencer::Track::noteOn(size_t timeIdx)
+{
+  _generator.setFrequency((float)_times[timeIdx]);
+  _generator.noteOn();
+}
+
+void Sequencer::Track::noteOff()
+{
+  _generator.noteOff();
+}
+
+stk::StkFrames& Sequencer::Track::tick()
 {
   return _generator.tick();
 }
@@ -85,15 +97,16 @@ Sequencer::Track* Sequencer::getTrack(uint32_t trackIdx)
 void Sequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
 {
   if(_tracks.size() <= trackIdx) {
-    std::cerr << "Invalid Track Index : " << trackIdx << 
+    std::cerr << "Invalid track index : " << trackIdx << 
     " (max = " << (_tracks.size() - 1) << ")" << std::endl;
     return;
   }
   if(_length <= timeIdx) {
-    std::cerr << "Invalid Time Index : " << timeIdx << 
+    std::cerr << "Invalid time index : " << timeIdx << 
     " (max = " << (_length - 1) << ")" << std::endl;
     return;
   }
+  std::cout << "set time : " << timeIdx << ": " << (int)time << std::endl;
   _tracks[trackIdx].setTime(timeIdx, time);
 }
 
@@ -114,13 +127,15 @@ uint64_t Sequencer::timeToIndex(double time)
   return index % _length;
 }
 
-stk::StkFloat Sequencer::tick(uint32_t trackIdx, uint64_t timeIdx)
+stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
 {
-  if(!_running) return 0;
-  if(trackIdx > _tracks.size()) {
-    std::cerr << "Invalid Track Index : " << trackIdx << 
-    " (max = " << (_tracks.size() - 1) << ")" << std::endl;
-    return 0;
+  if(!_running) return frames;
+
+  memset(&frames[0], 0.f, frames.size() * sizeof(stk::StkFloat));
+  uint64_t timeIdx = (uint64_t) _time;
+  for(auto& track: _tracks) {
+    frames += track.tick();
   }
-  return _tracks[trackIdx].tick();
+  _time += 0.1;
+  return frames;
 }

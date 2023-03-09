@@ -13,24 +13,30 @@
 
 class Sequencer {
 public:
-  using Time = std::bitset<8>;
+  using Time = uint8_t;
   using Sequence = std::vector<Time>;
 
   class Track {
-    public:
+  public:
 
-    Track(uint64_t length=64) : _times(Sequence(length)){};
+    Track(uint64_t length=64) 
+      : _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 2))
+      , _times(Sequence(length))
+    {};
 
     void setLength(uint64_t length);
     void setWaveForm(int index);
     void setTime(uint64_t time, const Time& value);
+    void noteOn(size_t timeIdx);
+    void noteOff();
 
-    stk::StkFloat tick();
+    stk::StkFrames& tick();
 
-    private:
+  private:
     Sequence        _times;
     WaveGenerator   _generator;
     float           _stereo; // -1.0 (full left) -> 1.0 (full right), default 0.0 (balanced)
+    stk::StkFrames  _frames;
   };
 
 private:
@@ -49,10 +55,11 @@ public:
   uint32_t numTracks();
   Track* addTrack();
   void removeTrack(uint32_t trackIdx);
+  std::vector<Track>& getTracks(){return _tracks;};
   Track* getTrack(uint32_t trackIdx);
   void setTime(uint32_t trackIdx, uint64_t time, const Time& value);
-  stk::StkFloat tick(uint32_t trackIdx, uint64_t timeIdx);
-  std::vector<Track>& getTracks(){return _tracks;};
+  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel=0);
+  
   void start();
   void stop();
   uint64_t timeToIndex(double time);

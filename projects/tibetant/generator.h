@@ -26,25 +26,19 @@ static const char* SIGNAL_NAME[6] = {
 class WaveGenerator {
 public:
   WaveGenerator();
-  stk::StkFloat tick();
+  stk::StkFrames& tick();
   void setWaveForm(int8_t index);
   void setFrequency(float frequency);
+  void noteOn();
+  void noteOff();
 
 private:
-  stk::StkFloat (WaveGenerator::*_tickImpl)();
-
-  stk::StkFloat _blitTick();
-  stk::StkFloat _blitSawTick();
-  stk::StkFloat _blitSquareTick();
-  stk::StkFloat _noiseTick();
-  stk::StkFloat _sineWaveTick();
-  stk::StkFloat _singWaveTick();
-
+  stk::StkFrames  _frames;
   stk::Generator* _generator;
   stk::ADSR       _envelope;
   stk::StkFloat   _frequency;
-  int8_t          _waveFormIdx;
-  int8_t          _envelopeIdx;
+  int             _waveFormIdx;
+  int             _envelopeIdx;
 };
 
 #endif // TX_GENERATOR_H

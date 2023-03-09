@@ -11,15 +11,21 @@ WaveGenerator::WaveGenerator()
   , _waveFormIdx(-1)
   , _envelopeIdx(-1)
   , _frequency(220)
+  , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 1))
 {
-  setWaveForm(0);
+  setWaveForm(2);
+  _envelope.setAllTimes(0.01, 0.005, 0.1, 0.05);
 }
 
-stk::StkFloat WaveGenerator::tick()
+stk::StkFrames& WaveGenerator::tick()
 {
-  if(!_generator)return 0.f;
-  return (this->*_tickImpl)();
-};
+  _generator->tick(_frames, 0);
+
+  stk::StkFrames frames(stk::RT_BUFFER_SIZE, 2); 
+  _frames *= _envelope.tick(frames, 0);
+
+  return _frames;
+}
 
 void WaveGenerator::setWaveForm(int8_t index)
 {
@@ -30,46 +36,39 @@ void WaveGenerator::setWaveForm(int8_t index)
     case BLIT:
       _generator = new stk::Blit();
       ((stk::Blit*)_generator)->setFrequency(_frequency);
-      _tickImpl = &WaveGenerator::_blitTick;
       break;
 
     case BLITSAW:
       _generator = new stk::BlitSaw();
       ((stk::BlitSaw*)_generator)->setFrequency(_frequency);
-      _tickImpl = &WaveGenerator::_blitSawTick;
       break;
 
     case BLITSQUARE:
       _generator = new stk::BlitSquare();
       ((stk::BlitSquare*)_generator)->setFrequency(_frequency);
-      _tickImpl = &WaveGenerator::_blitSquareTick;
       break;
 
     case NOISE:
       _generator = new stk::Noise();
-      _tickImpl = &WaveGenerator::_noiseTick;
       break;
 
     case SINEWAVE:
       _generator = new stk::SineWave();
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
-      _tickImpl = &WaveGenerator::_sineWaveTick;
       break;
 
     case SINGWAVE:
       _generator = new stk::SingWave( (stk::Stk::rawwavePath() + "impuls20.raw").c_str(), true );
       ((stk::SingWave*)_generator)->setFrequency(_frequency);
-      _tickImpl = &WaveGenerator::_singWaveTick;
       break;
 
   }
   _waveFormIdx = index % 6;
-  std::cout << "waveform index " << _waveFormIdx << std::endl;
 }
 
 void WaveGenerator::setFrequency(float frequency)
 {
-  if(std::abs(frequency - _frequency) < 0.0001)return;
+  if(frequency == _frequency)return;
   _frequency = frequency;
 
   switch(_waveFormIdx) {
@@ -98,32 +97,12 @@ void WaveGenerator::setFrequency(float frequency)
   }
 }
 
-stk::StkFloat WaveGenerator::_blitTick()
+void WaveGenerator::noteOn()
 {
-  return ((stk::Blit*)_generator)->tick();
+  _envelope.keyOn();
 }
 
-stk::StkFloat WaveGenerator::_blitSawTick()
+void WaveGenerator::noteOff()
 {
-  return ((stk::BlitSaw*)_generator)->tick();
-}
-
-stk::StkFloat WaveGenerator::_blitSquareTick()
-{
-  return ((stk::BlitSquare*)_generator)->tick();
-}
-
-stk::StkFloat WaveGenerator::_noiseTick()
-{
-  return ((stk::Noise*)_generator)->tick();
-}
-
-stk::StkFloat WaveGenerator::_sineWaveTick()
-{
-  return ((stk::SineWave*)_generator)->tick();
-}
-
-stk::StkFloat WaveGenerator::_singWaveTick()
-{
-  return ((stk::SingWave*)_generator)->tick();
+  _envelope.keyOff();
 }

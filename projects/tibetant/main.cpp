@@ -14,14 +14,15 @@ using namespace stk;
 
 
 struct TickData {
-  Sequencer     sequencer;
-  WaveGenerator generator;
-  size_t        waveFormIdx;
-  StkFloat      base_frequency;
-  StkFloat      scaler;
-  long          counter;
-  short         num_channels;
-  bool          done;
+  stk::StkFrames  frames;
+  Sequencer       sequencer;
+  WaveGenerator   generator;
+  size_t          waveFormIdx;
+  StkFloat        base_frequency;
+  StkFloat        scaler;
+  long            counter;
+  short           num_channels;
+  bool            done;
 
   // Default constructor.
   TickData()
@@ -36,32 +37,43 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   StkFloat *samples = (StkFloat *) outputBuffer;
   Sequencer *sequencer = &data->sequencer;
   uint64_t timeIdx = sequencer->timeToIndex(streamTime);
+
+  Sequencer::Track* track = sequencer->getTrack(0);
+  if(track) {
+    //track->setWaveForm(data->waveFormIdx++);
+    track->noteOn(timeIdx);
+  }
+
+
   data->counter++;
-  if(data->counter > 32) {
+  if(data->counter > 8) {
     data->counter = 0;
-    Sequencer::Track* track = sequencer->getTrack(0);
-    if(track)track->setWaveForm(data->waveFormIdx++);
-  }
-  for ( unsigned int i=0; i<nBufferFrames; i++ ) {
-    float sample = 0.0;
-    for(auto& track: sequencer->getTracks()) sample += track.tick();
     
-    //float sample = data->generator.tick();
-    for(int i=0; i < data->num_channels; ++i) {
-      *samples++ = sample;
-    }
-    /*
-    data->generator->addPhaseOffset(
-      data->frequency->tick());
-    float sample = 
-      data->generator->tick() + data->lfo->tick() * 0.25f;
-    if(int(streamTime) % 2 < 1)sample += data->blit->tick();
-    else sample += data->twang->tick(120);
-    for(int i=0; i < data->num_channels; ++i) {
-      *samples++ = sample;
-    }
-    */
   }
+
+  sequencer->tick(data->frames);
+  //stk::StkFrames& frames = data->generator.tick();
+  for ( unsigned int i=0; i < data->frames.size(); ++i ) {
+    for(size_t n = 0; n < data->num_channels; ++n)
+      *samples++ = data->frames[i];
+  }
+  /*
+  for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {
+    StkFloat *samples = (StkFloat *) outputBuffer;
+    stk::StkFrames& frames = sequencer->tick(data->frames, trackIdx, timeIdx);
+    for ( unsigned int i=0; i<frames.size(); i++ ) {
+      if(trackIdx == 0){
+        for(int i=0; i < data->num_channels; ++i) {
+          *samples++ = frames[i];
+        }
+      } else {
+        for(int i=0; i < data->num_channels; ++i) {
+          *samples++ += frames[i];
+        }
+      }
+    }
+  }
+  */
 
   if ( data->counter > 80000 )
     data->done = true; 
@@ -69,18 +81,12 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   return 0;
 }
 
-static int BASS[16] = {
-  0b10000000,
-  0b10001000,
-  0b10000000,
-  0b10001000,
-  0b10000000,
-  0b10001000,
-  0b10000000,
-  0b10001000
+static uint8_t BASS[16] = {
+  220, 210, 200, 190, 180, 170, 160, 150,
+  225, 215, 205, 195, 185, 175, 165, 155
 };
 
-static int DRUM[16] = {
+static uint8_t DRUM[16] = {
   0b01010101,
   0b01010111,
   0b01010101,
@@ -204,9 +210,11 @@ int main()
   parameters.deviceId = dac.getDefaultOutputDevice();
   parameters.nChannels = 2;
   data.num_channels = parameters.nChannels;
+  
   RtAudioFormat format = 
     ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
   unsigned int bufferFrames = RT_BUFFER_SIZE;
+  data.frames = stk::StkFrames(bufferFrames, data.num_channels);
   try {
     dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), 
     &bufferFrames, &tick, (void *)&data );
@@ -221,11 +229,11 @@ int main()
   data.sequencer.addTrack();
   for(size_t t = 0; t < 16; ++t)
     data.sequencer.setTime(0, t, BASS[t]);
-
+/*
   data.sequencer.addTrack();
   for(size_t t = 0; t < 16; ++t)
     data.sequencer.setTime(0, t, DRUM[t]);
-
+*/
   data.base_frequency = 96;
   /*
   data.lfo.setFrequency(64.0);
