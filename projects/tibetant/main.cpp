@@ -2,6 +2,12 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+// Dear ImGui
+#include <imgui/imgui.h>
+#include <imgui/imgui_stdlib.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include <iostream>
 #include <SineWave.h>
 #include <Blit.h>
@@ -72,10 +78,11 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   Sequencer *sequencer = &data->sequencer;
   sequencer->tick(data->frames);
   //stk::StkFrames& frames = data->generator.tick();
-  for ( unsigned int i=0; i < data->frames.size(); ++i ) {
-    for(size_t n = 0; n < data->num_channels; ++n) {
+  for ( unsigned int i=0; i < data->frames.size(); ++i) {
+    //for(size_t n = 0; n < data->num_channels; ++n) {
       *samples++ = data->frames[i];
-    }
+      //samples++;
+    //}
   }
   /*
   for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {

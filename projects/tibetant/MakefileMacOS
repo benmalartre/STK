@@ -15,6 +15,7 @@ DSTDIR := .
 
 GLFW_DIR = /Users/malartrebenjamin/Documents/RnD/glfw/build
 GL3W_DIR = $(SRCDIR)/gl3w
+IMGUI_DIR = $(SRCDIR)/imgui
 
 # settings
 #
@@ -46,7 +47,7 @@ C++FLAGS = $(CFLAGS) \
 # includes
 #
 STK_INCLUDES = ../../include
-INCLUDES = -I$(GL3W_DIR) -I$(GLFW_DIR)/include -I$(STK_INCLUDES) -I$(SRCDIR) 
+INCLUDES = -I$(GL3W_DIR) -I$(IMGUI_DIR) -I$(GLFW_DIR)/include -I$(STK_INCLUDES) -I$(SRCDIR) 
 
 # sources
 #
@@ -83,6 +84,13 @@ DEST = $(DSTDIR)
 # variable definitions
 #
 SOURCES = $(GL3W_DIR)/gl3w.cpp
+SOURCES += $(IMGUI_DIR)/imgui.cpp
+SOURCES += $(IMGUI_DIR)/imgui_stdlib.cpp
+SOURCES += $(IMGUI_DIR)/imgui_impl_glfw.cpp
+SOURCES += $(IMGUI_DIR)/imgui_impl_opengl3.cpp
+SOURCES += $(IMGUI_DIR)/imgui_draw.cpp
+SOURCES += $(IMGUI_DIR)/imgui_widgets.cpp
+SOURCES += $(IMGUI_DIR)/imgui_tables.cpp
 SOURCES += $(STK_PATH)/Stk.cpp
 SOURCES += $(STK_PATH)/BeeThree.cpp
 SOURCES += $(STK_PATH)/Noise.cpp

@@ -11,7 +11,7 @@ WaveGenerator::WaveGenerator()
   , _waveFormIdx(-1)
   , _envelopeIdx(-1)
   , _frequency(220)
-  , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 1))
+  , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 2))
 {
   setWaveForm(2);
   _envelope.setAllTimes(0.01, 0.005, 0.1, 0.05);
