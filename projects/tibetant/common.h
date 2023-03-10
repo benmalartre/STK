@@ -7,6 +7,7 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_plot.h>
+#include <imgui/imgui_knobs.h>
 
 // Standard Template Library
 #include <iostream>

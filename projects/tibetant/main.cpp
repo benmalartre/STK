@@ -32,9 +32,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   stk::StkFrames& frames = *(stk::StkFrames*) userData;
   stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
 
-  //sequencer.tick(frames);
-  //feedBuffers(frames);
-  //stk::StkFrames& frames = data->generator.tick();
+  sequencer.tick(frames);
+  feedBuffers(frames);
   for ( unsigned int i=0; i < frames.size(); ++i) {
     *samples++ = frames[i];
   }
@@ -86,7 +85,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_STENCIL_BITS, 8);
   glfwWindowHint(GLFW_SAMPLES, 4);
   
-  GLFWwindow* window = glfwCreateWindow(width,height,"Jivaro",NULL,NULL);
+  GLFWwindow* window = glfwCreateWindow(width,height,"Zamal Zound Zynthetizer",NULL,NULL);
 
    // window datas
   //glfwSetWindowUserPointer(window, this);
@@ -190,7 +189,10 @@ void draw(GLFWwindow* window)
   ImGui::End();
   */
 
-  drawPlot(display_w, display_h);
+  //drawPlot(display_w, display_h);
+  for(auto& track: sequencer.getTracks()) {
+    track->draw();
+  }
   
   ImGui::Render();
 
@@ -245,11 +247,10 @@ int main()
     sequencer.setTime(0, t, BASS[t]);
 
   Sequencer::Track* drum = sequencer.addTrack();
-/*
-  //drum->setWaveForm(3);
+  drum->setWaveForm(3);
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(1, t, DRUM[t]);
-*/
+
   sequencer.start();
 
   try {

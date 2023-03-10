@@ -1,3 +1,4 @@
+#include "common.h"
 #include "generator.h"
 #include <Blit.h>
 #include <BlitSaw.h>
@@ -9,12 +10,12 @@
 TxGenerator::TxGenerator() 
   : _generator(NULL)
   , _waveFormIdx(-1)
-  , _envelopeIdx(-1)
   , _frequency(220)
   , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 1))
 {
   setWaveForm(2);
   _envelope.setAllTimes(0.01, 0.005, 0.1, 0.05);
+  _lfo.setFrequency(12.f);
 }
 
 TxGenerator::~TxGenerator() 
@@ -30,8 +31,9 @@ stk::StkFrames& TxGenerator::tick()
   _generator->tick(_frames, 0);
   
   stk::StkFloat* samples = &_frames[0];
-  for(size_t i = 0; i < _frames.size(); ++i) {
-    *samples++ *= _envelope.tick();
+ for(size_t i = 0; i < _frames.size(); ++i, ++samples) {
+    *samples += _lfo.tick();
+    *samples *= _envelope.tick();
   }
   
   return _frames;
@@ -121,4 +123,14 @@ void TxGenerator::noteOn()
 void TxGenerator::noteOff()
 {
   _envelope.keyOff();
+}
+
+void TxGenerator::draw()
+{
+  static float value = 0;
+
+  if (ImGuiKnobs::Knob("frequency", &value, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick)) {
+    setFrequency(value);
+    std::cout << "frquency changed : " << _frequency << std::endl;
+  }
 }

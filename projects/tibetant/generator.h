@@ -1,6 +1,7 @@
 #include <Stk.h>
 #include <Generator.h>
 #include <ADSR.h>
+#include <SineWave.h>
 
 #ifndef TX_GENERATOR_H
 #define TX_GENERATOR_H
@@ -33,14 +34,15 @@ public:
   void setFrequency(float frequency);
   void noteOn();
   void noteOff();
+  void draw();
 
 private:
   stk::StkFrames  _frames;
   stk::Generator* _generator;
   stk::ADSR       _envelope;
+  stk::SineWave   _lfo;
   stk::StkFloat   _frequency;
   int             _waveFormIdx;
-  int             _envelopeIdx;
 };
 
 #endif // TX_GENERATOR_H

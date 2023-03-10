@@ -7,7 +7,7 @@ void Sequencer::Track::setLength(uint64_t length)
 
 void Sequencer::Track::setWaveForm(int index)
 {
-  _generator.setWaveForm(index);
+  _generator->setWaveForm(index);
 }
 
 void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
@@ -22,34 +22,38 @@ void Sequencer::Track::noteOn(size_t timeIdx)
 {
   float frequency = (float)_times[timeIdx % _times.size()];
   if(frequency > 1.f) {
-    _generator.setFrequency((float)_times[timeIdx % _times.size()]);
-    _generator.noteOn();
+    //_generator->setFrequency((float)_times[timeIdx % _times.size()]);
+    _generator->noteOn();
   } else {
-    _generator.noteOff();
+    _generator->noteOff();
   }
 }
 
 void Sequencer::Track::noteOff()
 {
-  _generator.noteOff();
+  _generator->noteOff();
 }
 
 stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
 {
   noteOn(timeIdx);
-  return _generator.tick();
+  return _generator->tick();
 }
 
 const stk::StkFrames& Sequencer::Track::frames() const
 {
-  return _generator.frames();
+  return _generator->frames();
 }
 
 const stk::StkFloat* Sequencer::Track::samples() const
 {
-  return (stk::StkFloat*)&_generator.frames();
+  return (stk::StkFloat*)&_generator->frames();
 }
 
+void Sequencer::Track::draw()
+{
+  _generator->draw();
+}
 
 Sequencer::Sequencer()
   : _bpm(60)
@@ -153,8 +157,9 @@ uint64_t Sequencer::timeToIndex(double time)
 
 stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
 {
+  std::cout << "sequencer tick called" << std::endl;
   if(!_running) return frames;
-
+  std::cout << "sequencer running" << std::endl;
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   
   uint64_t timeIdx = (uint64_t) _time;
@@ -168,7 +173,7 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
   }
   
   const float sampleTime = computeSampleTime();
-  _time += 60.f / _bpm * sampleTime;
+  _time += 60.f / _bpm * sampleTime * 8;
 
   return frames;
 }
