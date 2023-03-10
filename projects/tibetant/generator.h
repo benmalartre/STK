@@ -5,7 +5,7 @@
 #ifndef TX_GENERATOR_H
 #define TX_GENERATOR_H
 
-enum SIGNAL_TYPE {
+enum TX_SIGNAL_TYPE {
     BLIT,
     BLITSAW,
     BLITSQUARE,
@@ -14,7 +14,7 @@ enum SIGNAL_TYPE {
     SINGWAVE
 };
 
-static const char* SIGNAL_NAME[6] = {
+static const char* TX_SIGNAL_NAME[6] = {
   "Blit",
   "BliSaw",
   "BlitSquare",
@@ -23,10 +23,12 @@ static const char* SIGNAL_NAME[6] = {
   "SingWave"
 };
 
-class WaveGenerator {
+class TxGenerator {
 public:
-  WaveGenerator();
+  TxGenerator();
+  ~TxGenerator();
   stk::StkFrames& tick();
+  const stk::StkFrames& frames() const;
   void setWaveForm(int8_t index);
   void setFrequency(float frequency);
   void noteOn();

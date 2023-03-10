@@ -40,6 +40,16 @@ stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
   return _generator.tick();
 }
 
+const stk::StkFrames& Sequencer::Track::frames() const
+{
+  return _generator.frames();
+}
+
+const stk::StkFloat* Sequencer::Track::samples() const
+{
+  return (stk::StkFloat*)&_generator.frames();
+}
+
 
 Sequencer::Sequencer()
   : _bpm(60)
@@ -59,11 +69,17 @@ Sequencer::Sequencer(uint32_t bpm, uint32_t n, uint64_t length)
 {
 }
 
+Sequencer::~Sequencer()
+{
+  for(auto& track: _tracks)delete track;
+  _tracks.clear();
+}
+
 void Sequencer::setLength(uint64_t length)
 {
   _length = length;
   for(auto& track: _tracks) {
-    track.setLength(_length);
+    track->setLength(_length);
   }
 }
 
@@ -79,15 +95,17 @@ uint32_t Sequencer::numTracks()
 
 Sequencer::Track* Sequencer::addTrack()
 {
-  _tracks.push_back(Track(_length));
-  return &_tracks.back();
+  _tracks.push_back(new Track(_length));
+  return _tracks.back();
 }
 
 
 void Sequencer::removeTrack(uint32_t trackIdx)
 {
   if(_tracks.size() > trackIdx) {
+    Track* track = _tracks[trackIdx];
     _tracks.erase(_tracks.begin()+trackIdx);
+    delete track;
   }
 }
 
@@ -97,7 +115,7 @@ Sequencer::Track* Sequencer::getTrack(uint32_t trackIdx)
     std::cerr << "invalid track index !" << std::endl;
     return NULL;
   }
-  return &_tracks[trackIdx];
+  return _tracks[trackIdx];
 }
 
 void Sequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
@@ -113,7 +131,7 @@ void Sequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
     return;
   }
   std::cout << "set time : " << timeIdx << ": " << (int)time << std::endl;
-  _tracks[trackIdx].setTime(timeIdx, time);
+  _tracks[trackIdx]->setTime(timeIdx, time);
 }
 
 void Sequencer::start()
@@ -133,15 +151,24 @@ uint64_t Sequencer::timeToIndex(double time)
   return index % _length;
 }
 
-stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
+stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
 {
   if(!_running) return frames;
 
-  memset(&frames[0], 0.f, frames.size() * sizeof(stk::StkFloat));
+  memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
+  
   uint64_t timeIdx = (uint64_t) _time;
   for(auto& track: _tracks) {
-    frames += track.tick(timeIdx % _length);
+    const stk::StkFrames& cFrames = track->tick(timeIdx % _length);
+    for(size_t channelIdx = 0; channelIdx < 2; ++channelIdx) {
+      for(size_t frameIdx = 0; frameIdx < frames.size() / 2;  ++frameIdx) {
+        frames[frameIdx + channelIdx] += cFrames[frameIdx];
+      }
+    }
   }
-  _time += 0.1;
+  
+  const float sampleTime = computeSampleTime();
+  _time += 60.f / _bpm * sampleTime;
+
   return frames;
 }

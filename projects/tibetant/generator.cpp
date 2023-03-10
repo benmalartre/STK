@@ -6,33 +6,43 @@
 #include <SineWave.h>
 #include <SingWave.h>
 
-WaveGenerator::WaveGenerator() 
+TxGenerator::TxGenerator() 
   : _generator(NULL)
   , _waveFormIdx(-1)
   , _envelopeIdx(-1)
   , _frequency(220)
-  , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 2))
+  , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 1))
 {
   setWaveForm(2);
   _envelope.setAllTimes(0.01, 0.005, 0.1, 0.05);
 }
 
-stk::StkFrames& WaveGenerator::tick()
+TxGenerator::~TxGenerator() 
+{
+  if(_generator)delete _generator;
+}
+
+stk::StkFrames& TxGenerator::tick()
 {
   if(!_generator) {
-    //memset(&_frames[0], 0.f, _frames.size() * sizeof(stk::StkFloat));
     return _frames;
   }
   _generator->tick(_frames, 0);
+  
   stk::StkFloat* samples = &_frames[0];
-  for(size_t i = 0; i < _frames.size(); ++i, ++samples) {
-    *samples *= _envelope.tick();
+  for(size_t i = 0; i < _frames.size(); ++i) {
+    *samples++ *= _envelope.tick();
   }
-  //_frames *= _envelope.tick(_weights, 0);
+  
   return _frames;
 }
 
-void WaveGenerator::setWaveForm(int8_t index)
+const stk::StkFrames& TxGenerator::frames() const
+{
+  return _frames;
+}
+
+void TxGenerator::setWaveForm(int8_t index)
 {
   if(index == _waveFormIdx)return;
   std::cout << "set wave form" << _generator << std::endl;
@@ -72,7 +82,7 @@ void WaveGenerator::setWaveForm(int8_t index)
   _waveFormIdx = index % 6;
 }
 
-void WaveGenerator::setFrequency(float frequency)
+void TxGenerator::setFrequency(float frequency)
 {
   if(frequency == _frequency)return;
   _frequency = frequency;
@@ -103,12 +113,12 @@ void WaveGenerator::setFrequency(float frequency)
   }
 }
 
-void WaveGenerator::noteOn()
+void TxGenerator::noteOn()
 {
   _envelope.keyOn();
 }
 
-void WaveGenerator::noteOff()
+void TxGenerator::noteOff()
 {
   _envelope.keyOff();
 }

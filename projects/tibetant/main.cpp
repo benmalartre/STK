@@ -1,54 +1,45 @@
-
-//#include <GL/gl3w.h>
-#include <GLFW/glfw3.h>
-
-// Dear ImGui
-#include <imgui/imgui.h>
-#include <imgui/imgui_stdlib.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
-#include <iostream>
-#include <SineWave.h>
-#include <Blit.h>
-#include <Bowed.h>
-#include <Plucked.h>
-#include <RtAudio.h>
+#include "common.h"
 #include "generator.h"
 #include "sequencer.h"
-using namespace stk;
 
-struct TickData {
-  stk::StkFrames  frames;
-  Sequencer       sequencer;
-  WaveGenerator   generator;
-  size_t          waveFormIdx;
-  StkFloat        base_frequency;
-  StkFloat        scaler;
-  long            counter;
-  short           num_channels;
-  bool            done;
+Sequencer sequencer;
+stk::StkFrames frames;
 
-  // Default constructor.
-  TickData()
-    : scaler(1.0), counter(0), done( false ) {}
-};
+constexpr size_t TX_BUFFER_SIZE = 64 * stk::RT_BUFFER_SIZE;
+constexpr size_t TX_BUFFER_OFFSET = stk::RT_BUFFER_SIZE;
+stk::StkFloat buffer[TX_NUM_CHANNELS][TX_BUFFER_SIZE];
 
+static void shiftBuffers() {
+  for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
+    for(size_t i = 0; i < TX_BUFFER_SIZE - TX_BUFFER_OFFSET; ++i) {
+      buffer[n][i] = buffer[n][i + TX_BUFFER_OFFSET];
+    }
+  }
+}
+
+static void feedBuffers(const stk::StkFrames& frames) {
+  shiftBuffers();
+  for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
+    for(size_t i = 0; i < TX_BUFFER_OFFSET; ++i) {
+      buffer[n][TX_BUFFER_SIZE - i - 1] = frames[i + n];
+    }
+  }
+}
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
-  TickData *data = (TickData *) userData;
-  StkFloat *samples = (StkFloat *) outputBuffer;
-  Sequencer *sequencer = &data->sequencer;
-  sequencer->tick(data->frames);
+  stk::StkFrames& frames = *(stk::StkFrames*) userData;
+  stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
+
+  //sequencer.tick(frames);
+  //feedBuffers(frames);
   //stk::StkFrames& frames = data->generator.tick();
-  for ( unsigned int i=0; i < data->frames.size(); ++i) {
-    //for(size_t n = 0; n < data->num_channels; ++n) {
-      *samples++ = data->frames[i];
-      //samples++;
-    //}
+  for ( unsigned int i=0; i < frames.size(); ++i) {
+    *samples++ = frames[i];
   }
+  
+
   /*
   for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {
     StkFloat *samples = (StkFloat *) outputBuffer;
@@ -66,9 +57,6 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
     }
   }
   */
-
-  if ( data->counter > 80000 )
-    data->done = true; 
 
   return 0;
 }
@@ -144,6 +132,27 @@ GLFWwindow* openWindow(size_t width, size_t height)
   return window;
 }
 
+void drawPlot(int width, int height) {
+  ImGui::Begin("Plot Window", NULL);
+  ImGui::PlotConfig conf;
+  //conf.values.xs = x_data; // this line is optional
+  conf.values.ys = &buffer[0][0];
+  conf.values.count = TX_BUFFER_SIZE;
+  conf.scale.min = -3;
+  conf.scale.max = 1;
+  conf.tooltip.show = true;
+  conf.tooltip.format = "x=%.2f, y=%.2f";
+  conf.grid_x.show = false;
+  conf.grid_y.show = false;
+  conf.grid_x.size = 128;
+  conf.grid_y.size = 0.5;
+  conf.frame_size = ImVec2(width, height);
+  conf.line_thickness = 4.f;
+
+  ImGui::Plot("plot", conf);
+  ImGui::End();
+}
+
 void draw(GLFWwindow* window)
 {
   // start the imgui frame
@@ -162,7 +171,11 @@ void draw(GLFWwindow* window)
   glViewport(0, 0, display_w, display_h);
   glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT);
-  
+
+  ImGui::SetNextWindowPos(ImVec2(0, 0));
+  ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
+
+  /*
   ImGui::Text("Hello, world!");
   
   ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -175,6 +188,9 @@ void draw(GLFWwindow* window)
   ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
   
   ImGui::End();
+  */
+
+  drawPlot(display_w, display_h);
   
   ImGui::Render();
 
@@ -190,7 +206,7 @@ int main()
   glfwInit();
   GLFWwindow* window = openWindow(1200, 800);
   glfwMakeContextCurrent(window);
-  //gl3wInit();
+
   // Setup ImGui binding
   IMGUI_CHECKVERSION();
   ImGuiContext* context = ImGui::CreateContext();
@@ -200,47 +216,41 @@ int main()
   
 
   // Set the global sample rate and rawwave path before creating class instances.
-  Stk::setSampleRate( 44100.0 );
-  Stk::setRawwavePath( "../../rawwaves/" );
+  stk::Stk::setSampleRate( 44100.0 );
+  stk::Stk::setRawwavePath( "../../rawwaves/" );
 
-  TickData data;
   RtAudio dac;
 
   // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
   RtAudio::StreamParameters parameters;
   parameters.deviceId = dac.getDefaultOutputDevice();
-  parameters.nChannels = 2;
-  data.num_channels = parameters.nChannels;
-  data.frames.resize(RT_BUFFER_SIZE, data.num_channels);
+  parameters.nChannels = TX_NUM_CHANNELS;
+  frames.resize(stk::RT_BUFFER_SIZE, TX_NUM_CHANNELS);
   RtAudioFormat format = 
-    ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-  unsigned int bufferFrames = RT_BUFFER_SIZE;
-
-  std::cout << "!nitialized data" << std::endl;
+    ( sizeof(stk::StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+  unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
   
   try {
-    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), 
-    &bufferFrames, &tick, (void *)&data );
+    dac.openStream( &parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(), 
+    &bufferFrames, &tick, (void *)&frames );
   }
   catch ( RtAudioError& error ) {
     error.printMessage();
     return 0;
   }
 
-  std::cout << "stk opened stream" << std::endl;
-  data.sequencer.setLength(16);
-  std::cout << "stk sequencer set length" << std::endl;
-  Sequencer::Track* bass = data.sequencer.addTrack();
-  std::cout << "stk sequencer bass " << bass << std::endl;
+  sequencer.setLength(16);
+  Sequencer::Track* bass = sequencer.addTrack();
   for(size_t t = 0; t < 16; ++t)
-    data.sequencer.setTime(0, t, BASS[t]);
+    sequencer.setTime(0, t, BASS[t]);
+
+  Sequencer::Track* drum = sequencer.addTrack();
 /*
-  Sequencer::Track* drum = data.sequencer.addTrack();
-  drum->setWaveForm(3);
+  //drum->setWaveForm(3);
   for(size_t t = 0; t < 16; ++t)
-    data.sequencer.setTime(1, t, DRUM[t]);
+    sequencer.setTime(1, t, DRUM[t]);
 */
-  data.sequencer.start();
+  sequencer.start();
 
   try {
     dac.startStream();
@@ -251,8 +261,8 @@ int main()
   }
   
   while (!glfwWindowShouldClose(window)) {
-   Stk::sleep( 100 );
-   draw(window);
+    stk::Stk::sleep( 100 );
+    draw(window);
   }
     
   // Shut down the callback and output stream.
