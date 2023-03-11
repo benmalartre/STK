@@ -22,6 +22,7 @@ public:
     Track(uint64_t length=64) 
       : _times(Sequence(length))
       , _generator(new TxGenerator())
+      , _stereo(0.f)
     {};
 
     ~Track() {delete _generator;};
@@ -29,8 +30,8 @@ public:
     void setLength(uint64_t length);
     void setWaveForm(int index);
     void setTime(uint64_t time, const Time& value);
-    void noteOn(size_t timeIdx);
-    void noteOff();
+    void setFrequency(float frequency);
+    stk::StkFloat channelWeight(uint32_t channelIdx);
 
     stk::StkFrames& tick(uint64_t timeIdx);
     const stk::StkFrames& frames() const;

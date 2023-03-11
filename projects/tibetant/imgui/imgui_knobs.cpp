@@ -153,13 +153,13 @@ namespace ImGuiKnobs {
             ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset = 0;
 
             // Draw title
-            if (!(flags & ImGuiKnobFlags_NoTitle)) {
-                auto title_size = ImGui::CalcTextSize(label, NULL, false, width);
-
+            if (!(flags & ImGuiKnobFlags_NoTitle)) {           
+                
+                auto title_size = ImGui::CalcTextSize(label, NULL, true, width);
+                const char* text_end =  ImGui::FindRenderedTextEnd(label, NULL);
                 // Center title
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - title_size[0]) * 0.5f);
-
-                ImGui::Text("%s", label);
+                ImGui::TextEx(label, text_end);  
             }
 
             // Draw knob

@@ -18,7 +18,12 @@ void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
   _times[timeIdx] = value;
 }
 
-void Sequencer::Track::noteOn(size_t timeIdx)
+void Sequencer::Track::setFrequency(float frequency)
+{
+  _generator->setFrequency(frequency);
+}
+
+stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
 {
   float frequency = (float)_times[timeIdx % _times.size()];
   if(frequency > 1.f) {
@@ -27,17 +32,12 @@ void Sequencer::Track::noteOn(size_t timeIdx)
   } else {
     _generator->noteOff();
   }
-}
-
-void Sequencer::Track::noteOff()
-{
-  _generator->noteOff();
-}
-
-stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
-{
-  noteOn(timeIdx);
   return _generator->tick();
+}
+
+stk::StkFloat Sequencer::Track::channelWeight(uint32_t channelIdx)
+{
+  return _generator->stereoWeight(channelIdx);
 }
 
 const stk::StkFrames& Sequencer::Track::frames() const
@@ -157,23 +157,29 @@ uint64_t Sequencer::timeToIndex(double time)
 
 stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
 {
-  std::cout << "sequencer tick called" << std::endl;
   if(!_running) return frames;
-  std::cout << "sequencer running" << std::endl;
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
+  stk::StkFloat* samples = &frames[0];
   
   uint64_t timeIdx = (uint64_t) _time;
+
+  
   for(auto& track: _tracks) {
+    stk::StkFloat channelWeights[TX_NUM_CHANNELS];
+    for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
+      channelWeights[n] = track->channelWeight(n);
+      std::cout << "channel " << n << " weight: " << channelWeights[n] << std::endl;
+    }
     const stk::StkFrames& cFrames = track->tick(timeIdx % _length);
-    for(size_t channelIdx = 0; channelIdx < 2; ++channelIdx) {
-      for(size_t frameIdx = 0; frameIdx < frames.size() / 2;  ++frameIdx) {
-        frames[frameIdx + channelIdx] += cFrames[frameIdx];
+    for(size_t frameIdx = 0; frameIdx < stk::RT_BUFFER_SIZE;  ++frameIdx) {
+      for(size_t channelIdx = 0; channelIdx < TX_NUM_CHANNELS; ++channelIdx) {
+        *samples++ += cFrames[frameIdx] * channelWeights[channelIdx];
       }
     }
   }
   
   const float sampleTime = computeSampleTime();
-  _time += 60.f / _bpm * sampleTime * 8;
+  _time += 60.f / _bpm * sampleTime;
 
   return frames;
 }

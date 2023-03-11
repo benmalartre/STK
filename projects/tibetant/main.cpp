@@ -85,7 +85,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_STENCIL_BITS, 8);
   glfwWindowHint(GLFW_SAMPLES, 4);
   
-  GLFWwindow* window = glfwCreateWindow(width,height,"Zamal Zound Zynthetizer",NULL,NULL);
+  GLFWwindow* window = glfwCreateWindow(width,height,"7ound",NULL,NULL);
 
    // window datas
   //glfwSetWindowUserPointer(window, this);
@@ -243,11 +243,13 @@ int main()
 
   sequencer.setLength(16);
   Sequencer::Track* bass = sequencer.addTrack();
+  bass->setFrequency(60.f);
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(0, t, BASS[t]);
 
   Sequencer::Track* drum = sequencer.addTrack();
-  drum->setWaveForm(3);
+  drum->setWaveForm(4);
+  drum->setFrequency(88.f);
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(1, t, DRUM[t]);
 
