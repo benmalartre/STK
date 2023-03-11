@@ -1,14 +1,14 @@
 #include <Stk.h>
 #include <Generator.h>
-#include <ADSR.h>
-#include <SineWave.h>
+#include "node.h"
+#include "lfo.h"
 
 #ifndef TX_GENERATOR_H
 #define TX_GENERATOR_H
 
 #define TX_NUM_SIGNAL 6
 
-enum TX_SIGNAL_TYPE {
+enum TX_WAVEFORM_TYPE {
     BLIT,
     BLITSAW,
     BLITSQUARE,
@@ -17,7 +17,7 @@ enum TX_SIGNAL_TYPE {
     SINGWAVE
 };
 
-static const char* TX_SIGNAL_NAME[6] = {
+static const char* TX_WAVEFORM_NAME[6] = {
   "Blit",
   "BlitSaw",
   "BlitSquare",
@@ -26,29 +26,22 @@ static const char* TX_SIGNAL_NAME[6] = {
   "SingWave"
 };
 
-class TxGenerator {
+class TxGenerator : public TxNode {
 public:
-  TxGenerator();
+  TxGenerator(const std::string& name);
   ~TxGenerator();
-  stk::StkFrames& tick();
-  const stk::StkFrames& frames() const;
+  stk::StkFrames& tick() override;
   void setWaveForm(int8_t index);
   void setFrequency(const stk::StkFloat& frequency);
-  void setStereo(const stk::StkFloat& stereo);
-  void noteOn();
-  void noteOff();
-  void draw();
-  stk::StkFloat stereoWeight(uint32_t channelIdx);
+  void setHarmonics(int harmonics);
+  void draw() override;
 
 private:
-  std::string     _name;
-  stk::StkFrames  _frames;
   stk::Generator* _generator;
-  stk::ADSR       _envelope;
-  stk::SineWave   _lfo;
+  TxLfo*          _lfo;
   stk::StkFloat   _frequency;
-  stk::StkFloat   _stereo;
   int             _waveFormIdx;
+  int             _harmonics;
 };
 
 #endif // TX_GENERATOR_H

@@ -6,12 +6,13 @@
 #include <iostream>
 
 #include "common.h"
+#include "node.h"
 #include "generator.h"
 
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
 
-class Sequencer {
+class Sequencer : public TxNode{
 public:
   using Time = uint8_t;
   using Sequence = std::vector<Time>;
@@ -19,10 +20,9 @@ public:
   class Track {
   public:
 
-    Track(uint64_t length=64) 
+    Track(const std::string& name, uint64_t length=64) 
       : _times(Sequence(length))
-      , _generator(new TxGenerator())
-      , _stereo(0.f)
+      , _generator(new TxGenerator(name))
     {};
 
     ~Track() {delete _generator;};
@@ -41,16 +41,15 @@ public:
   private:
     Sequence        _times;
     TxGenerator*    _generator;
-    float           _stereo; // -1.0 (full left) -> 1.0 (full right), default 0.0 (balanced)
   };
 
 private:
-  std::vector<Track*>     _tracks;
-  uint32_t                _n;
-  uint32_t                _bpm;
-  double                  _time;
-  uint64_t                _length;
-  bool                    _running;
+  std::vector<Track*> _tracks;
+  int                 _n;
+  int                 _bpm;
+  double              _time;
+  int                 _length;
+  bool                _running;
 
 public:
   Sequencer();
@@ -59,16 +58,17 @@ public:
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);
   uint32_t numTracks();
-  Track* addTrack();
+  Track* addTrack(const std::string& name);
   void removeTrack(uint32_t trackIdx);
   std::vector<Track*>& getTracks(){return _tracks;};
   Track* getTrack(uint32_t trackIdx);
   void setTime(uint32_t trackIdx, uint64_t time, const Time& value);
-  stk::StkFrames& tick(stk::StkFrames& frames);
+  stk::StkFrames& tick();
   
   void start();
   void stop();
   uint64_t timeToIndex(double time);
+  void draw();
 
   
 };

@@ -29,10 +29,9 @@ static void feedBuffers(const stk::StkFrames& frames) {
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
-  stk::StkFrames& frames = *(stk::StkFrames*) userData;
   stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
 
-  sequencer.tick(frames);
+  const stk::StkFrames& frames = sequencer.tick();
   feedBuffers(frames);
   for ( unsigned int i=0; i < frames.size(); ++i) {
     *samples++ = frames[i];
@@ -190,6 +189,7 @@ void draw(GLFWwindow* window)
   */
 
   //drawPlot(display_w, display_h);
+  sequencer.draw();
   for(auto& track: sequencer.getTracks()) {
     track->draw();
   }
@@ -242,12 +242,12 @@ int main()
   }
 
   sequencer.setLength(16);
-  Sequencer::Track* bass = sequencer.addTrack();
+  Sequencer::Track* bass = sequencer.addTrack("Bass");
   bass->setFrequency(60.f);
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(0, t, BASS[t]);
 
-  Sequencer::Track* drum = sequencer.addTrack();
+  Sequencer::Track* drum = sequencer.addTrack("Drum");
   drum->setWaveForm(4);
   drum->setFrequency(88.f);
   for(size_t t = 0; t < 16; ++t)

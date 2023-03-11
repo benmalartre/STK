@@ -25,13 +25,6 @@ void Sequencer::Track::setFrequency(float frequency)
 
 stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
 {
-  float frequency = (float)_times[timeIdx % _times.size()];
-  if(frequency > 1.f) {
-    //_generator->setFrequency((float)_times[timeIdx % _times.size()]);
-    _generator->noteOn();
-  } else {
-    _generator->noteOff();
-  }
   return _generator->tick();
 }
 
@@ -56,7 +49,8 @@ void Sequencer::Track::draw()
 }
 
 Sequencer::Sequencer()
-  : _bpm(60)
+  : TxNode("TxSequencer", TX_NUM_CHANNELS)
+  , _bpm(60)
   , _n(4)
   , _length(8)
   , _time(0.0)
@@ -65,7 +59,8 @@ Sequencer::Sequencer()
 }
 
 Sequencer::Sequencer(uint32_t bpm, uint32_t n, uint64_t length)
-  : _bpm(bpm)
+  : TxNode("TxSequencer", TX_NUM_CHANNELS)
+  , _bpm(bpm)
   , _n(n)
   , _length(length)
   , _time(0.0)
@@ -97,9 +92,9 @@ uint32_t Sequencer::numTracks()
   return _tracks.size();
 }
 
-Sequencer::Track* Sequencer::addTrack()
+Sequencer::Track* Sequencer::addTrack(const std::string& name)
 {
-  _tracks.push_back(new Track(_length));
+  _tracks.push_back(new Track(name, _length));
   return _tracks.back();
 }
 
@@ -155,15 +150,15 @@ uint64_t Sequencer::timeToIndex(double time)
   return index % _length;
 }
 
-stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
+stk::StkFrames& Sequencer::tick()
 {
-  if(!_running) return frames;
-  memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
+  memset(&_frames[0], 0, _frames.size() * sizeof(stk::StkFloat));
+  if(!_active) return _frames;
   
   uint64_t timeIdx = (uint64_t) _time;
-  
+
   for(auto& track: _tracks) {
-    stk::StkFloat* samples = &frames[0];
+    stk::StkFloat* samples = &_frames[0];
     stk::StkFloat channelWeights[TX_NUM_CHANNELS];
     for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
       channelWeights[n] = track->channelWeight(n);
@@ -179,5 +174,30 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
   const float sampleTime = computeSampleTime();
   _time += 60.f / _bpm * sampleTime;
 
-  return frames;
+  return _frames;
+}
+
+void Sequencer::draw()
+{
+  ImGui::Begin("Sequencer", NULL);
+  
+  if (ImGuiKnobs::KnobInt("BPM", &_bpm, 1, 240, 1, "%ibpm", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
+    setBPM(_bpm);
+  }
+  std::cout << "bpm : " << _bpm << std::endl;
+  ImGui::SameLine();
+
+  
+  ImGui::BeginGroup();
+  if(ImGui::Checkbox("Active", &_active)) {
+    if(!_active) clearSamples();
+  }
+  ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
+  
+  if (ImGui::SliderFloat("Stereo", &_stereo, -1.f, 1.f)) {
+  }
+
+
+  ImGui::EndGroup();
+  ImGui::End();
 }

@@ -8,54 +8,37 @@
 #include <SingWave.h>
 
 
-TxGenerator::TxGenerator() 
-  : _generator(NULL)
+TxGenerator::TxGenerator(const std::string& name) 
+  : TxNode(name)
+  , _generator(NULL)
+  , _lfo(new TxLfo(name + "_lfo"))
   , _waveFormIdx(-1)
-  , _frequency(220)
-  , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 1))
-  , _name(computeHiddenName("TxGenerator", this))
+  , _frequency(220.f)
+  , _harmonics(3)
 {
+  _inputs.push_back(TxParameter("Frequency", 20.f, 3000.f, _frequency));
+  _inputs[0].connect(_lfo);
   setWaveForm(BLIT);
-  _envelope.setAllTimes(0.01, 0.005, 0.1, 0.05);
-  _lfo.setFrequency(2.f);
+  setHarmonics(_harmonics);
 }
 
 TxGenerator::~TxGenerator() 
 {
-  if(_generator)delete _generator;
+  if(_lfo) delete _lfo;
+  if(_generator) delete _generator;
 }
 
 stk::StkFrames& TxGenerator::tick()
 {
-  if(!_generator) {
+  if(!_generator || !_active || !_dirty) {
     return _frames;
   }
+  //_dirty = false;
+  setFrequency(_inputs[0].tick());
   _generator->tick(_frames, 0);
-  /*
-  stk::StkFloat* samples = &_frames[0];
-  for(size_t i = 0; i < _frames.size(); ++i, ++samples) {
-    *samples += _lfo.tick();
-    *samples *= _envelope.tick();
-  }
-  */
+  for(size_t f = 0; f < _frames.size(); ++f)
+    _frames[f] *= _volume;
   return _frames;
-}
-
-const stk::StkFrames& TxGenerator::frames() const
-{
-  return _frames;
-}
-
-stk::StkFloat TxGenerator::stereoWeight(uint32_t channelIdx)
-{
-  if(_stereo == 0.f) return 0.5f;
-
-  const stk::StkFloat nrm = _stereo * 0.5f + 0.5f;
-  if(channelIdx == 0) {
-    return 1.f - nrm;
-  } else {
-    return nrm;
-  }
 }
 
 void TxGenerator::setWaveForm(int8_t index)
@@ -67,7 +50,6 @@ void TxGenerator::setWaveForm(int8_t index)
     case BLIT:
       _generator = new stk::Blit();
       ((stk::Blit*)_generator)->setFrequency(_frequency);
-      ((stk::Blit*)_generator)->setHarmonics(3);
       break;
 
     case BLITSAW:
@@ -128,19 +110,28 @@ void TxGenerator::setFrequency(const stk::StkFloat& frequency)
   }
 }
 
-void TxGenerator::setStereo(const stk::StkFloat& stereo)
+void TxGenerator::setHarmonics(int harmonics)
 {
-  _stereo = stereo;
-}
+  _harmonics = harmonics;
 
-void TxGenerator::noteOn()
-{
-  _envelope.keyOn();
-}
+  switch(_waveFormIdx) {
+    case BLIT:
+      ((stk::Blit*)_generator)->setHarmonics(_harmonics);
+      break;
 
-void TxGenerator::noteOff()
-{
-  _envelope.keyOff();
+    case BLITSAW:
+      ((stk::BlitSaw*)_generator)->setHarmonics(_harmonics);
+      break;
+
+    case BLITSQUARE:
+      ((stk::BlitSquare*)_generator)->setHarmonics(_harmonics);
+      break;
+
+    case NOISE:
+    case SINEWAVE:
+    case SINGWAVE:
+      break;
+  }
 }
 
 void TxGenerator::draw()
@@ -151,14 +142,23 @@ void TxGenerator::draw()
     setFrequency(_frequency);
   }
   ImGui::SameLine();
+
+  if (ImGuiKnobs::KnobInt("Harmonics", &_harmonics, 1, 9, 1, "%i", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
+    setHarmonics(_harmonics);
+  }
+  ImGui::SameLine();    
   
   ImGui::BeginGroup();
-  if (ImGui::BeginCombo("Signal", TX_SIGNAL_NAME[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
+  if(ImGui::Checkbox("Active", &_active)) {
+    if(!_active) clearSamples();
+  }
+  ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
+  if (ImGui::BeginCombo("Signal", TX_WAVEFORM_NAME[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
   {
     for (int n = 0; n < TX_NUM_SIGNAL; ++n)
     {
       const bool is_selected = (_waveFormIdx == n);
-      if (ImGui::Selectable(TX_SIGNAL_NAME[n], is_selected)) {
+      if (ImGui::Selectable(TX_WAVEFORM_NAME[n], is_selected)) {
         setWaveForm(n);
       }
       // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)

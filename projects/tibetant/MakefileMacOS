@@ -117,7 +117,9 @@ SOURCES += $(STK_PATH)/Twang.cpp
 SOURCES += $(STK_PATH)/Plucked.cpp
 SOURCES += $(STK_PATH)/RtAudio.cpp
 SOURCES += $(STK_PATH)/FM.cpp
+SOURCES += $(SRCDIR)/node.cpp
 SOURCES += $(SRCDIR)/generator.cpp
+SOURCES += $(SRCDIR)/lfo.cpp
 SOURCES += $(SRCDIR)/sequencer.cpp
 SOURCES += $(SRCDIR)/main.cpp
 
