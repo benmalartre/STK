@@ -13,7 +13,7 @@ TxGenerator::TxGenerator()
   , _waveFormIdx(-1)
   , _frequency(220)
   , _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, 1))
-  , _name(computeHiddenLabel("Frequency", this))
+  , _name(computeHiddenName("TxGenerator", this))
 {
   setWaveForm(BLIT);
   _envelope.setAllTimes(0.01, 0.005, 0.1, 0.05);
@@ -145,10 +145,13 @@ void TxGenerator::noteOff()
 
 void TxGenerator::draw()
 {
-  if (ImGuiKnobs::Knob(_name.c_str(), &_frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
+  ImGui::Begin(_name.c_str(), NULL);
+  
+  if (ImGuiKnobs::Knob("Frequency", &_frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
     setFrequency(_frequency);
   }
   ImGui::SameLine();
+  
   ImGui::BeginGroup();
   if (ImGui::BeginCombo("Signal", TX_SIGNAL_NAME[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
   {
@@ -164,9 +167,11 @@ void TxGenerator::draw()
     }
     ImGui::EndCombo();
   }
+  
   if (ImGui::SliderFloat("Stereo", &_stereo, -1.f, 1.f)) {
-    std::cout << "stereo changed..." << std::endl;
   }
 
+
   ImGui::EndGroup();
+  ImGui::End();
 }

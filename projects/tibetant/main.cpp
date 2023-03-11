@@ -171,8 +171,8 @@ void draw(GLFWwindow* window)
   glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  ImGui::SetNextWindowPos(ImVec2(0, 0));
-  ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
+  //ImGui::SetNextWindowPos(ImVec2(0, 0));
+  //ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
 
   /*
   ImGui::Text("Hello, world!");

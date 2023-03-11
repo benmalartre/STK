@@ -159,16 +159,14 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames)
 {
   if(!_running) return frames;
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
-  stk::StkFloat* samples = &frames[0];
   
   uint64_t timeIdx = (uint64_t) _time;
-
   
   for(auto& track: _tracks) {
+    stk::StkFloat* samples = &frames[0];
     stk::StkFloat channelWeights[TX_NUM_CHANNELS];
     for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
       channelWeights[n] = track->channelWeight(n);
-      std::cout << "channel " << n << " weight: " << channelWeights[n] << std::endl;
     }
     const stk::StkFrames& cFrames = track->tick(timeIdx % _length);
     for(size_t frameIdx = 0; frameIdx < stk::RT_BUFFER_SIZE;  ++frameIdx) {

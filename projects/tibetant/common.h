@@ -25,7 +25,7 @@ static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
 };
 
-static std::string computeHiddenLabel(const char* prefix, void* ptr) 
+static std::string computeHiddenName(const char* prefix, void* ptr) 
 {
   return std::string(prefix)+ std::string("##") + std::to_string((size_t)ptr);
 }
