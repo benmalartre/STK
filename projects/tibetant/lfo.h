@@ -10,7 +10,8 @@ class TxLfo : public TxNode {
 public:
   TxLfo(const std::string& name);
   ~TxLfo();
-  stk::StkFrames& tick() override;
+  stk::StkFloat tick(void) override;
+  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setFrequency(const stk::StkFloat& frequency);
   void draw() override;
 

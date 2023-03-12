@@ -27,10 +27,15 @@ static const char* TX_WAVEFORM_NAME[6] = {
 };
 
 class TxGenerator : public TxNode {
+enum Parameters {
+  FREQUENCY = 2,
+  HARMONICS = 3
+};
 public:
   TxGenerator(const std::string& name);
   ~TxGenerator();
-  stk::StkFrames& tick() override;
+  stk::StkFloat tick(void) override;
+  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setWaveForm(int8_t index);
   void setFrequency(const stk::StkFloat& frequency);
   void setHarmonics(int harmonics);

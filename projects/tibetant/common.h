@@ -20,6 +20,13 @@
 #define TX_COMMON_H
 
 #define TX_NUM_CHANNELS 2
+
+#define RANDOM_0_1 ((float)rand() / (float)RAND_MAX)
+
+#define RANDOM_0_X(HI) ((float)rand() / (float) RAND_MAX * (HI))
+
+#define RANDOM_LO_HI(LO, HI) ((LO) + (float)rand() / \
+  (float)(RAND_MAX / ((HI) - (LO))))
  
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();

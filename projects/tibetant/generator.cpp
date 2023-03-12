@@ -13,12 +13,12 @@ TxGenerator::TxGenerator(const std::string& name)
   , _generator(NULL)
   , _lfo(new TxLfo(name + "_lfo"))
   , _waveFormIdx(-1)
-  , _frequency(220.f)
+  , _frequency(110.f)
   , _harmonics(3)
 {
-  _inputs.push_back(TxParameter("Frequency", 20.f, 3000.f, _frequency));
-  _inputs.push_back(TxParameter("Harmonics", 1, 9, _harmonics));
-  _inputs[1].connect(_lfo);
+  _inputs.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, _frequency));
+  _inputs.push_back(new TxParameterFloat("Harmonics", 0, 16, _harmonics));
+  //_inputs[1]->connect(_lfo);
   setWaveForm(BLIT);
 }
 
@@ -28,18 +28,49 @@ TxGenerator::~TxGenerator()
   if(_generator) delete _generator;
 }
 
-stk::StkFrames& TxGenerator::tick()
+stk::StkFloat TxGenerator::tick(void)
 {
   if(!_generator || !_active || !_dirty) {
-    return _frames;
+    return 0.f;
   }
   //_dirty = false;
-  setFrequency(_inputs[0].tick());
-  setHarmonics(_inputs[1].tick());
-  _generator->tick(_frames, 0);
-  for(size_t f = 0; f < _frames.size(); ++f)
-    _frames[f] *= _volume;
-  return _frames;
+  setFrequency(_inputs[0]->tick());
+  setHarmonics(_inputs[1]->tick());
+  
+  switch(_waveFormIdx) {
+    case BLIT:
+      return ((stk::Blit*)_generator)->tick();
+
+    case BLITSAW:
+      return ((stk::BlitSaw*)_generator)->tick();
+
+    case BLITSQUARE:
+      return ((stk::BlitSquare*)_generator)->tick();
+
+    case NOISE:
+      return ((stk::Noise*)_generator)->tick();
+
+    case SINEWAVE:
+      return ((stk::SineWave*)_generator)->tick();
+
+    case SINGWAVE:
+      return ((stk::SingWave*)_generator)->tick();
+  }
+  return 0.f;
+}
+
+stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
+{
+  if(!_generator || !_active || !_dirty) {
+    return frames;
+  }
+  //_dirty = false;
+  setFrequency(_inputs[0]->tick());
+  setHarmonics(_inputs[1]->tick());
+  _generator->tick(frames, 0);
+  for(size_t f = 0; f < frames.size(); ++f)
+    frames[f] *= _volume;
+  return frames;
 }
 
 void TxGenerator::setWaveForm(int8_t index)
@@ -51,16 +82,22 @@ void TxGenerator::setWaveForm(int8_t index)
     case BLIT:
       _generator = new stk::Blit();
       ((stk::Blit*)_generator)->setFrequency(_frequency);
+      ((stk::Blit*)_generator)->setHarmonics(_harmonics);
+      ((stk::Blit*)_generator)->reset();
       break;
 
     case BLITSAW:
       _generator = new stk::BlitSaw();
       ((stk::BlitSaw*)_generator)->setFrequency(_frequency);
+      ((stk::BlitSaw*)_generator)->setHarmonics(_harmonics);
+      ((stk::BlitSaw*)_generator)->reset();
       break;
 
     case BLITSQUARE:
       _generator = new stk::BlitSquare();
       ((stk::BlitSquare*)_generator)->setFrequency(_frequency);
+      ((stk::BlitSquare*)_generator)->setHarmonics(_harmonics);
+      ((stk::BlitSquare*)_generator)->reset();
       break;
 
     case NOISE:
@@ -70,19 +107,22 @@ void TxGenerator::setWaveForm(int8_t index)
     case SINEWAVE:
       _generator = new stk::SineWave();
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
+      ((stk::SineWave*)_generator)->reset();
       break;
 
     case SINGWAVE:
       _generator = new stk::SingWave( (stk::Stk::rawwavePath() + "impuls20.raw").c_str(), true );
       ((stk::SingWave*)_generator)->setFrequency(_frequency);
+      ((stk::SingWave*)_generator)->reset();
       break;
-
   }
+
   _waveFormIdx = index % 6;
 }
 
 void TxGenerator::setFrequency(const stk::StkFloat& frequency)
 {
+  if(_frequency == frequency) return;
   _frequency = frequency;
 
   switch(_waveFormIdx) {
@@ -113,6 +153,7 @@ void TxGenerator::setFrequency(const stk::StkFloat& frequency)
 
 void TxGenerator::setHarmonics(int harmonics)
 {
+  if(harmonics == _harmonics) return;
   _harmonics = harmonics;
 
   switch(_waveFormIdx) {
@@ -139,20 +180,23 @@ void TxGenerator::draw()
 {
   ImGui::Begin(_name.c_str(), NULL);
   
-  if (ImGuiKnobs::Knob("Frequency", &_frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    _inputs[0].set(_frequency);
-    setFrequency(_frequency);
+  float frequency = _frequency;  
+  if (ImGuiKnobs::Knob("Frequency", &frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
+    _inputs[0]->set(frequency);
+    //setFrequency(frequency);
   }
   ImGui::SameLine();
 
-  if (ImGuiKnobs::KnobInt("Harmonics", &_harmonics, 1, 9, 1, "%i", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    setHarmonics(_harmonics);
+  int harmonics = _harmonics;
+  if (ImGuiKnobs::KnobInt("Harmonics", &harmonics, 1, 9, 0.1, "%i", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
+    _inputs[1]->set(harmonics);
+    //setHarmonics(_harmonics);
   }
   ImGui::SameLine();    
   
   ImGui::BeginGroup();
   if(ImGui::Checkbox("Active", &_active)) {
-    if(!_active) clearSamples();
+    //if(!_active) clearSamples();
   }
   ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
   if (ImGui::BeginCombo("Signal", TX_WAVEFORM_NAME[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
@@ -172,7 +216,6 @@ void TxGenerator::draw()
   
   if (ImGui::SliderFloat("Stereo", &_stereo, -1.f, 1.f)) {
   }
-
 
   ImGui::EndGroup();
   ImGui::End();

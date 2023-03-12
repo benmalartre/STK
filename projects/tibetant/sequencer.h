@@ -7,7 +7,6 @@
 
 #include "common.h"
 #include "node.h"
-#include "generator.h"
 
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
@@ -22,25 +21,21 @@ public:
 
     Track(const std::string& name, uint64_t length=64) 
       : _times(Sequence(length))
-      , _generator(new TxGenerator(name))
+      , _node(NULL)
     {};
 
-    ~Track() {delete _generator;};
+    ~Track() {};
 
     void setLength(uint64_t length);
-    void setWaveForm(int index);
     void setTime(uint64_t time, const Time& value);
-    void setFrequency(float frequency);
-    stk::StkFloat channelWeight(uint32_t channelIdx);
+    void setNode(TxNode* node);
 
-    stk::StkFrames& tick(uint64_t timeIdx);
-    const stk::StkFrames& frames() const;
-    const stk::StkFloat* samples() const;
+    stk::StkFloat tick(uint64_t timeIdx);
     void draw();
 
   private:
     Sequence        _times;
-    TxGenerator*    _generator;
+    TxNode*         _node;
   };
 
 private:
@@ -63,12 +58,15 @@ public:
   std::vector<Track*>& getTracks(){return _tracks;};
   Track* getTrack(uint32_t trackIdx);
   void setTime(uint32_t trackIdx, uint64_t time, const Time& value);
-  stk::StkFrames& tick();
+  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(uint32_t trackIdx);
+  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
+  
   
   void start();
   void stop();
   uint64_t timeToIndex(double time);
-  void draw();
+  void draw() override;
 
   
 };

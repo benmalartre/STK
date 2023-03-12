@@ -30,8 +30,10 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
   stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
-
-  const stk::StkFrames& frames = sequencer.tick();
+  stk::StkFrames& frames = *(stk::StkFrames*)userData;
+  sequencer.tick(frames, 0);
+  std::cout << "sequencer tick!" << std::endl;
+  
   feedBuffers(frames);
   for ( unsigned int i=0; i < frames.size(); ++i) {
     *samples++ = frames[i];
@@ -242,14 +244,23 @@ int main()
   }
 
   sequencer.setLength(16);
-  Sequencer::Track* bass = sequencer.addTrack("Bass");
-  bass->setFrequency(60.f);
+  Sequencer::Track* track1 = sequencer.addTrack("Track1");
+  TxGenerator* bass = new TxGenerator("Bass");
+  bass->setFrequency(110.f);
+  bass->setHarmonics(7);
+  track1->setNode(bass);
+  //bass->setFrequency(60.f);
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(0, t, BASS[t]);
 
-  Sequencer::Track* drum = sequencer.addTrack("Drum");
-  drum->setWaveForm(4);
-  drum->setFrequency(88.f);
+  Sequencer::Track* track2 = sequencer.addTrack("Track2");
+  TxGenerator* drum = new TxGenerator("Drum");
+  drum->setFrequency(220.f);
+  drum->setWaveForm(BLITSQUARE);
+  drum->setHarmonics(5);
+  track2->setNode(drum);
+  //drum->setWaveForm(4);
+  //drum->setFrequency(88.f);
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(1, t, DRUM[t]);
 

@@ -5,11 +5,6 @@ void Sequencer::Track::setLength(uint64_t length)
   _times.resize(length);
 };
 
-void Sequencer::Track::setWaveForm(int index)
-{
-  _generator->setWaveForm(index);
-}
-
 void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
 {
   if(timeIdx >= _times.size()){
@@ -18,34 +13,22 @@ void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
   _times[timeIdx] = value;
 }
 
-void Sequencer::Track::setFrequency(float frequency)
+void Sequencer::Track::setNode(TxNode* node)
 {
-  _generator->setFrequency(frequency);
+  _node = node;
 }
 
-stk::StkFrames& Sequencer::Track::tick(uint64_t timeIdx)
-{
-  return _generator->tick();
-}
 
-stk::StkFloat Sequencer::Track::channelWeight(uint32_t channelIdx)
+stk::StkFloat Sequencer::Track::tick(uint64_t timeIdx)
 {
-  return _generator->stereoWeight(channelIdx);
-}
-
-const stk::StkFrames& Sequencer::Track::frames() const
-{
-  return _generator->frames();
-}
-
-const stk::StkFloat* Sequencer::Track::samples() const
-{
-  return (stk::StkFloat*)&_generator->frames();
+  std::cout << "track tick : " << _node << std::endl;
+  if(_node) return _node->tick();
+  return 0.f;
 }
 
 void Sequencer::Track::draw()
 {
-  _generator->draw();
+  
 }
 
 Sequencer::Sequencer()
@@ -150,23 +133,34 @@ uint64_t Sequencer::timeToIndex(double time)
   return index % _length;
 }
 
-stk::StkFrames& Sequencer::tick()
+stk::StkFloat Sequencer::tick(void)
 {
-  memset(&_frames[0], 0, _frames.size() * sizeof(stk::StkFloat));
-  if(!_active) return _frames;
+  return RANDOM_LO_HI(-1.f, 1.f);
+}
+
+stk::StkFloat Sequencer::tick(uint32_t trackIdx)
+{
+  return RANDOM_LO_HI(-1.f, 1.f);
+}
+
+stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
+{
+  std::cout << "sequencer tick..." << std::endl;
+  memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
+  if(!_active) return frames;
   
   uint64_t timeIdx = (uint64_t) _time;
 
   for(auto& track: _tracks) {
-    stk::StkFloat* samples = &_frames[0];
+    stk::StkFloat* samples = &frames[0];
     stk::StkFloat channelWeights[TX_NUM_CHANNELS];
     for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
-      channelWeights[n] = track->channelWeight(n);
+      channelWeights[n] = 1.f;//track->channelWeight(n);
     }
-    const stk::StkFrames& cFrames = track->tick(timeIdx % _length);
+    //const stk::StkFloat sample = track->tick(timeIdx % _length);
     for(size_t frameIdx = 0; frameIdx < stk::RT_BUFFER_SIZE;  ++frameIdx) {
       for(size_t channelIdx = 0; channelIdx < TX_NUM_CHANNELS; ++channelIdx) {
-        *samples++ += cFrames[frameIdx] * channelWeights[channelIdx];
+        *samples++ += track->tick(timeIdx % _length);
       }
     }
   }
@@ -174,7 +168,7 @@ stk::StkFrames& Sequencer::tick()
   const float sampleTime = computeSampleTime();
   _time += 60.f / _bpm * sampleTime;
 
-  return _frames;
+  return frames;
 }
 
 void Sequencer::draw()
@@ -189,7 +183,7 @@ void Sequencer::draw()
   
   ImGui::BeginGroup();
   if(ImGui::Checkbox("Active", &_active)) {
-    if(!_active) clearSamples();
+    //if(!_active) clearSamples();
   }
   ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
   

@@ -5,7 +5,7 @@
 TxLfo::TxLfo(const std::string& name) 
   : TxNode(name)
   , _frequency(0.2f)
-  , _amplitude(5.f)
+  , _amplitude(6.f)
   , _offset(6.f)
 {
   _sine.setFrequency(_frequency);
@@ -15,18 +15,23 @@ TxLfo::~TxLfo()
 {
 }
 
-stk::StkFrames& TxLfo::tick()
+stk::StkFloat TxLfo::tick(void)
+{
+  return _sine.tick();
+}
+
+stk::StkFrames& TxLfo::tick(stk::StkFrames& frames, unsigned int channel)
 {
   if(_dirty) {
-    _sine.tick(_frames, 0);
-    stk::StkFloat* samples = &_frames[0];
-    for(size_t f = 0; f < _frames.size(); ++f) {
+    _sine.tick(frames, 0);
+    stk::StkFloat* samples = &frames[0];
+    for(size_t f = 0; f < frames.size(); ++f) {
         *samples *= _amplitude;
         *samples++ += _offset;
     }
     //_dirty = false;
   }
-  return _frames;
+  return frames;
 }
 
 void TxLfo::setFrequency(const stk::StkFloat& frequency)
