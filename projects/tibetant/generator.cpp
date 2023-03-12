@@ -17,9 +17,9 @@ TxGenerator::TxGenerator(const std::string& name)
   , _harmonics(3)
 {
   _inputs.push_back(TxParameter("Frequency", 20.f, 3000.f, _frequency));
-  _inputs[0].connect(_lfo);
+  _inputs.push_back(TxParameter("Harmonics", 1, 9, _harmonics));
+  _inputs[1].connect(_lfo);
   setWaveForm(BLIT);
-  setHarmonics(_harmonics);
 }
 
 TxGenerator::~TxGenerator() 
@@ -35,6 +35,7 @@ stk::StkFrames& TxGenerator::tick()
   }
   //_dirty = false;
   setFrequency(_inputs[0].tick());
+  setHarmonics(_inputs[1].tick());
   _generator->tick(_frames, 0);
   for(size_t f = 0; f < _frames.size(); ++f)
     _frames[f] *= _volume;
@@ -139,6 +140,7 @@ void TxGenerator::draw()
   ImGui::Begin(_name.c_str(), NULL);
   
   if (ImGuiKnobs::Knob("Frequency", &_frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
+    _inputs[0].set(_frequency);
     setFrequency(_frequency);
   }
   ImGui::SameLine();

@@ -25,6 +25,11 @@ void TxParameter::disconnect()
   _input = NULL;
 }
 
+void TxParameter::set(const stk::StkFloat& value)
+{
+  _value = value;
+}
+
 stk::StkFloat TxParameter::tick()
 {
   if(_input) {
@@ -36,6 +41,7 @@ stk::StkFloat TxParameter::tick()
 
 TxNode::TxNode(const std::string& name, uint32_t numChannels)
   : _frames(stk::StkFrames(stk::RT_BUFFER_SIZE, numChannels))
+  , _nChannels(numChannels)
   , _name(name)
   , _active(true)
   , _dirty(true)
@@ -51,6 +57,11 @@ const stk::StkFrames& TxNode::frames() const
 {
   return _frames;
 };
+
+int TxNode::numChannels()
+{
+  return _nChannels;
+}
 
 void TxNode::setActive(bool state) 
 {

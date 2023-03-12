@@ -12,7 +12,7 @@
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
 
-class Sequencer : public TxNode{
+class Sequencer : public TxNode {
 public:
   using Time = uint8_t;
   using Sequence = std::vector<Time>;

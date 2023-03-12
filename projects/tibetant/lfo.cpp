@@ -4,9 +4,9 @@
 
 TxLfo::TxLfo(const std::string& name) 
   : TxNode(name)
-  , _frequency(2.f)
-  , _amplitude(2.f)
-  , _offset(60.f)
+  , _frequency(0.2f)
+  , _amplitude(5.f)
+  , _offset(6.f)
 {
   _sine.setFrequency(_frequency);
 }

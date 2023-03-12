@@ -14,6 +14,7 @@ public:
   const std::string& name();
   void connect(TxNode* node);
   void disconnect();
+  void set(const stk::StkFloat& value);
   stk::StkFloat tick();
 
 private:
@@ -31,6 +32,7 @@ public:
   virtual stk::StkFrames& tick() = 0;
   const stk::StkFrames& frames() const;
   stk::StkFloat lastSample();
+  int numChannels();
   void setActive(bool state);
   void setDirty(bool state);
   void clearSamples();
@@ -41,6 +43,7 @@ public:
 
 protected:
   std::string               _name;
+  int                       _nChannels;
   bool                      _active;
   bool                      _dirty;
   stk::StkFloat             _volume;

@@ -184,7 +184,6 @@ void Sequencer::draw()
   if (ImGuiKnobs::KnobInt("BPM", &_bpm, 1, 240, 1, "%ibpm", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
     setBPM(_bpm);
   }
-  std::cout << "bpm : " << _bpm << std::endl;
   ImGui::SameLine();
 
   
