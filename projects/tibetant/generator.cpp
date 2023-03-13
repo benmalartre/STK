@@ -7,7 +7,7 @@
 #include <SineWave.h>
 #include <SingWave.h>
 
-const char* TxGenerator::WaveFormName[6] = {
+const char* TxGenerator::WaveFormName[TxGenerator::NumWaveForm] = {
   "Blit",
   "BlitSaw",
   "BlitSquare",
@@ -19,20 +19,20 @@ const char* TxGenerator::WaveFormName[6] = {
 TxGenerator::TxGenerator(const std::string& name) 
   : TxNode(name)
   , _generator(NULL)
-  , _lfo(new TxLfo(name + "_lfo"))
   , _waveFormIdx(-1)
+  , _lastWaveFormIdx(-1)
   , _frequency(110.f)
   , _harmonics(3)
 {
-  _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, _frequency));
-  _params.push_back(new TxParameterFloat("Harmonics", 0, 16, _harmonics));
-  //_params[1]->connect(_lfo);
   setWaveForm(BLIT);
+  _params.push_back(new TxParameterEnum("WaveForm", &TxGenerator::WaveFormName[0], 
+    TxGenerator::NumWaveForm, &_waveFormIdx));
+  _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency));
+  _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics));
 }
 
 TxGenerator::~TxGenerator() 
 {
-  if(_lfo) delete _lfo;
   if(_generator) delete _generator;
 }
 
@@ -42,27 +42,27 @@ stk::StkFloat TxGenerator::tick(void)
     return 0.f;
   }
   //_dirty = false;
-  setFrequency(_params[0]->tick());
-  setHarmonics(_params[1]->tick());
+  setFrequency(_params[FREQUENCY]->tick());
+  setHarmonics(_params[HARMONICS]->tick());
   
   switch(_waveFormIdx) {
     case BLIT:
-      return ((stk::Blit*)_generator)->tick();
+      return ((stk::Blit*)_generator)->tick() * _volume;
 
     case BLITSAW:
-      return ((stk::BlitSaw*)_generator)->tick();
+      return ((stk::BlitSaw*)_generator)->tick() * _volume;
 
     case BLITSQUARE:
-      return ((stk::BlitSquare*)_generator)->tick();
+      return ((stk::BlitSquare*)_generator)->tick() * _volume;
 
     case NOISE:
-      return ((stk::Noise*)_generator)->tick();
+      return ((stk::Noise*)_generator)->tick() * _volume;
 
     case SINEWAVE:
-      return ((stk::SineWave*)_generator)->tick();
+      return ((stk::SineWave*)_generator)->tick() * _volume;
 
     case SINGWAVE:
-      return ((stk::SingWave*)_generator)->tick();
+      return ((stk::SingWave*)_generator)->tick() * _volume;
   }
   return 0.f;
 }
@@ -72,13 +72,13 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
   if(!_generator || !_active || !_dirty) {
     return frames;
   }
+
   //_dirty = false;
+  if(_lastWaveFormIdx != _waveFormIdx) setWaveForm(_waveFormIdx);
   
-  //_generator->tick(frames, 0);
   for(size_t f = 0; f < frames.size(); ++f) {
-    std::cout << "frequency : " << _params[0]->tick() << std::endl;
-    //setFrequency(_params[0]->tick());
-    //setHarmonics(_params[1]->tick());
+    setFrequency(_params[FREQUENCY]->tick());
+    setHarmonics(_params[HARMONICS]->tick());
     frames[f] = tick();
     frames[f] *= _volume;
   }
@@ -88,10 +88,10 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
 
 void TxGenerator::setWaveForm(int8_t index)
 {
-  if(index == _waveFormIdx)return;
+  _waveFormIdx = index % NumWaveForm;
   if(_generator) delete _generator;
 
-  switch(index % 6) {
+  switch(_waveFormIdx) {
     case BLIT:
       _generator = new stk::Blit();
       ((stk::Blit*)_generator)->setFrequency(_frequency);
@@ -129,13 +129,11 @@ void TxGenerator::setWaveForm(int8_t index)
       ((stk::SingWave*)_generator)->reset();
       break;
   }
-
-  _waveFormIdx = index % 6;
+  _lastWaveFormIdx = _waveFormIdx;
 }
 
 void TxGenerator::setFrequency(const stk::StkFloat& frequency)
 {
-  if(_frequency == frequency) return;
   _frequency = frequency;
 
   switch(_waveFormIdx) {
@@ -166,7 +164,6 @@ void TxGenerator::setFrequency(const stk::StkFloat& frequency)
 
 void TxGenerator::setHarmonics(int harmonics)
 {
-  if(harmonics == _harmonics) return;
   _harmonics = harmonics;
 
   switch(_waveFormIdx) {
@@ -189,6 +186,7 @@ void TxGenerator::setHarmonics(int harmonics)
   }
 }
 
+/*
 void TxGenerator::draw()
 {
   ImGui::Begin(_name.c_str(), NULL);
@@ -233,3 +231,4 @@ void TxGenerator::draw()
   ImGui::EndGroup();
   ImGui::End();
 }
+*/

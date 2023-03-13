@@ -1,5 +1,6 @@
 #include "common.h"
 #include "generator.h"
+#include "lfo.h"
 #include "sequencer.h"
 
 Sequencer sequencer;

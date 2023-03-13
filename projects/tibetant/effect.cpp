@@ -26,12 +26,3 @@ stk::StkFrames& TxEffect::tick(stk::StkFrames& frames, unsigned int channel)
 {
   return frames;
 }
-
-
-void TxEffect::draw()
-{
-  ImGui::Begin(_name.c_str(), NULL);
-  
-
-  ImGui::End();
-}

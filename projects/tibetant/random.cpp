@@ -43,8 +43,3 @@ stk::StkFrames& TxRandom::tick(stk::StkFrames& frames, unsigned int channel)
   }
   return frames;
 }
-
-void TxRandom::draw()
-{
-
-}

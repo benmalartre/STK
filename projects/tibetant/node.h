@@ -14,7 +14,7 @@ public:
     STEREO,
     LAST
   };
-  
+
   TxNode(const std::string& name, uint32_t numChannels=1);
   ~TxNode();
   virtual stk::StkFloat tick(void) = 0;
@@ -23,13 +23,15 @@ public:
   int numChannels();
   void setActive(bool state);
   void setDirty(bool state);
-  void setStereo(const stk::StkFloat& stereo);
+  void setStereo(stk::StkFloat stereo);
+  void setVolume(stk::StkFloat volume);
   stk::StkFloat stereoWeight(uint32_t channelIdx);
   bool connect(TxNode* node, const std::string& name);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
-  virtual void draw() = 0;
+  void draw();
 
+  
 protected:
   std::string               _name;
   int                       _nChannels;
@@ -40,5 +42,6 @@ protected:
   stk::StkFrames            _frames;
   std::vector<TxParameter*> _params;
 };
+
 
 #endif // TX_NODE_H

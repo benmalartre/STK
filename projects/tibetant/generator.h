@@ -1,7 +1,6 @@
 #include <Stk.h>
 #include <Generator.h>
 #include "node.h"
-#include "lfo.h"
 
 #ifndef TX_GENERATOR_H
 #define TX_GENERATOR_H
@@ -19,11 +18,13 @@ public:
     SINGWAVE
   };
 
-  static const char* WaveFormName[6];
+  static const int NumWaveForm = 6;
+  static const char* WaveFormName[NumWaveForm];
 
   enum Parameters {
-    FREQUENCY = TxNode::LAST,
-    HARMONICS = 3
+    WAVEFORM = TxNode::LAST,
+    FREQUENCY,
+    HARMONICS
   };
 
   TxGenerator(const std::string& name);
@@ -33,14 +34,14 @@ public:
   void setWaveForm(int8_t index);
   void setFrequency(const stk::StkFloat& frequency);
   void setHarmonics(int harmonics);
-  void draw() override;
 
 private:
   stk::Generator* _generator;
-  TxLfo*          _lfo;
   stk::StkFloat   _frequency;
-  int             _waveFormIdx;
   int             _harmonics;
+  int             _lastWaveFormIdx;
+  int             _waveFormIdx;
+  
 };
 
 #endif // TX_GENERATOR_H

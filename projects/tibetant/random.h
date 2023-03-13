@@ -12,7 +12,6 @@ public:
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);
   void setSeed(int seed);
-  void draw() override;
 
 private:
   stk::StkFloat  _value;

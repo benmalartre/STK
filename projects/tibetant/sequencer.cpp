@@ -27,7 +27,7 @@ stk::StkFloat Sequencer::Track::tick(uint64_t timeIdx)
 
 void Sequencer::Track::draw()
 {
-  
+  if(_node) _node->draw();
 }
 
 Sequencer::Sequencer()
@@ -167,28 +167,4 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
   _time += 60.f / _bpm * sampleTime;
 
   return frames;
-}
-
-void Sequencer::draw()
-{
-  ImGui::Begin("Sequencer", NULL);
-  
-  if (ImGuiKnobs::KnobInt("BPM", &_bpm, 1, 240, 1, "%ibpm", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    setBPM(_bpm);
-  }
-  ImGui::SameLine();
-
-  
-  ImGui::BeginGroup();
-  if(ImGui::Checkbox("Active", &_active)) {
-    //if(!_active) clearSamples();
-  }
-  ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
-  
-  if (ImGui::SliderFloat("Stereo", &_stereo, -1.f, 1.f)) {
-  }
-
-
-  ImGui::EndGroup();
-  ImGui::End();
 }

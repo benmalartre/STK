@@ -13,7 +13,6 @@ public:
   stk::StkFloat tick(void) override;
   stk::StkFloat tick(stk::StkFloat input);
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
-  void draw() override;
 
 private:
   stk::Effect* _effect;
