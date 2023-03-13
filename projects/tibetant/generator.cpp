@@ -7,6 +7,14 @@
 #include <SineWave.h>
 #include <SingWave.h>
 
+const char* TxGenerator::WaveFormName[6] = {
+  "Blit",
+  "BlitSaw",
+  "BlitSquare",
+  "Noise",
+  "SineWave",
+  "SingWave"
+};
 
 TxGenerator::TxGenerator(const std::string& name) 
   : TxNode(name)
@@ -16,9 +24,9 @@ TxGenerator::TxGenerator(const std::string& name)
   , _frequency(110.f)
   , _harmonics(3)
 {
-  _inputs.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, _frequency));
-  _inputs.push_back(new TxParameterFloat("Harmonics", 0, 16, _harmonics));
-  //_inputs[1]->connect(_lfo);
+  _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, _frequency));
+  _params.push_back(new TxParameterFloat("Harmonics", 0, 16, _harmonics));
+  //_params[1]->connect(_lfo);
   setWaveForm(BLIT);
 }
 
@@ -34,8 +42,8 @@ stk::StkFloat TxGenerator::tick(void)
     return 0.f;
   }
   //_dirty = false;
-  setFrequency(_inputs[0]->tick());
-  setHarmonics(_inputs[1]->tick());
+  setFrequency(_params[0]->tick());
+  setHarmonics(_params[1]->tick());
   
   switch(_waveFormIdx) {
     case BLIT:
@@ -65,11 +73,16 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
     return frames;
   }
   //_dirty = false;
-  setFrequency(_inputs[0]->tick());
-  setHarmonics(_inputs[1]->tick());
-  _generator->tick(frames, 0);
-  for(size_t f = 0; f < frames.size(); ++f)
+  
+  //_generator->tick(frames, 0);
+  for(size_t f = 0; f < frames.size(); ++f) {
+    std::cout << "frequency : " << _params[0]->tick() << std::endl;
+    //setFrequency(_params[0]->tick());
+    //setHarmonics(_params[1]->tick());
+    frames[f] = tick();
     frames[f] *= _volume;
+  }
+
   return frames;
 }
 
@@ -182,14 +195,14 @@ void TxGenerator::draw()
   
   float frequency = _frequency;  
   if (ImGuiKnobs::Knob("Frequency", &frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    _inputs[0]->set(frequency);
+    _params[0]->set(frequency);
     //setFrequency(frequency);
   }
   ImGui::SameLine();
 
   int harmonics = _harmonics;
   if (ImGuiKnobs::KnobInt("Harmonics", &harmonics, 1, 9, 0.1, "%i", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    _inputs[1]->set(harmonics);
+    _params[1]->set(harmonics);
     //setHarmonics(_harmonics);
   }
   ImGui::SameLine();    
@@ -199,12 +212,12 @@ void TxGenerator::draw()
     //if(!_active) clearSamples();
   }
   ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
-  if (ImGui::BeginCombo("Signal", TX_WAVEFORM_NAME[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
+  if (ImGui::BeginCombo("Signal", TxGenerator::WaveFormName[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
   {
     for (int n = 0; n < TX_NUM_SIGNAL; ++n)
     {
       const bool is_selected = (_waveFormIdx == n);
-      if (ImGui::Selectable(TX_WAVEFORM_NAME[n], is_selected)) {
+      if (ImGui::Selectable(TxGenerator::WaveFormName[n], is_selected)) {
         setWaveForm(n);
       }
       // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)

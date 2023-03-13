@@ -94,3 +94,20 @@ stk::StkFloat TxParameterFloat::tick()
   }
   return (stk::StkFloat)_value;
 }
+
+// TxParameterSamples
+// ---------------------------------------------------------------
+TxParameterSamples::TxParameterSamples(const std::string& name, TxNode* input)
+  : TxParameter(name, input)
+  , _frames(NULL)
+{
+}
+
+void TxParameterSamples::set(stk::StkFloat value)
+{
+}
+
+stk::StkFloat TxParameterSamples::tick()
+{
+  return 0.f;
+}

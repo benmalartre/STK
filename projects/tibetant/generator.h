@@ -8,30 +8,24 @@
 
 #define TX_NUM_SIGNAL 6
 
-enum TX_WAVEFORM_TYPE {
+class TxGenerator : public TxNode {
+public:
+  enum WaveFormType {
     BLIT,
     BLITSAW,
     BLITSQUARE,
     NOISE,
     SINEWAVE,
     SINGWAVE
-};
+  };
 
-static const char* TX_WAVEFORM_NAME[6] = {
-  "Blit",
-  "BlitSaw",
-  "BlitSquare",
-  "Noise",
-  "SineWave",
-  "SingWave"
-};
+  static const char* WaveFormName[6];
 
-class TxGenerator : public TxNode {
-enum Parameters {
-  FREQUENCY = 2,
-  HARMONICS = 3
-};
-public:
+  enum Parameters {
+    FREQUENCY = TxNode::LAST,
+    HARMONICS = 3
+  };
+
   TxGenerator(const std::string& name);
   ~TxGenerator();
   stk::StkFloat tick(void) override;

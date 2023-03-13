@@ -63,4 +63,15 @@ private:
   stk::StkFloat     _value;
 };
 
+class TxParameterSamples : public TxParameter {
+public:
+  TxParameterSamples(const std::string& name, TxNode* input=NULL);
+
+  void set(stk::StkFloat value) override;
+  stk::StkFloat tick() override;
+
+private:
+  stk::StkFrames*    _frames;;
+};
+
 #endif // TX_PARAMETER_H

@@ -7,6 +7,7 @@ TxNode::TxNode(const std::string& name, uint32_t numChannels)
   , _dirty(true)
   , _volume(1.f)
 {
+  _frames.resize(1, 1, 0.0);
 }
 
 TxNode::~TxNode()
@@ -30,7 +31,7 @@ void TxNode::setDirty(bool state)
 
 stk::StkFloat TxNode::lastSample(unsigned int channel)
 {
-  return _sample[channel];
+  return _frames[channel];
 }
 
 void TxNode::setStereo(const stk::StkFloat& stereo) 
@@ -50,12 +51,30 @@ stk::StkFloat TxNode::stereoWeight(uint32_t channelIdx)
   }
 }
 
-bool TxNode::connect(TxNode* node, const std::string& parameter) 
+bool TxNode::connect(TxNode* node, const std::string& name) 
 {
-  for(auto& input: _inputs) {
-    if(input->name() == parameter) {
-
-    }
+  TxParameter* parameter = getParameter(name);
+  if(parameter) {
+    parameter->connect(node);
+    return true;
   }
   return false;
+}
+
+void TxNode::disconnect(const std::string& name) 
+{
+  TxParameter* parameter = getParameter(name);
+  if(parameter) {
+    parameter->disconnect();
+  }
+}
+
+TxParameter* TxNode::getParameter(const std::string& name)
+{
+  for(auto& param: _params) {
+    if(param->name() == name) {
+      return param;
+    }
+  }
+  return NULL;
 }

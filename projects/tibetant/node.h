@@ -6,13 +6,15 @@
 #define TX_NODE_H
 
 class TxNode {
-enum Parameters {
-  ACTIVE = 0,
-  VOLUME = 1,
-  STEREO = 2
-};
-
 public:
+  enum Parameters {
+    SAMPLES,
+    ACTIVE,
+    VOLUME,
+    STEREO,
+    LAST
+  };
+  
   TxNode(const std::string& name, uint32_t numChannels=1);
   ~TxNode();
   virtual stk::StkFloat tick(void) = 0;
@@ -23,7 +25,9 @@ public:
   void setDirty(bool state);
   void setStereo(const stk::StkFloat& stereo);
   stk::StkFloat stereoWeight(uint32_t channelIdx);
-  bool connect(TxNode* node, const std::string& parameter);
+  bool connect(TxNode* node, const std::string& name);
+  void disconnect(const std::string& name);
+  TxParameter* getParameter(const std::string& name);
   virtual void draw() = 0;
 
 protected:
@@ -33,8 +37,8 @@ protected:
   bool                      _dirty;
   stk::StkFloat             _volume;
   stk::StkFloat             _stereo;
-  stk::StkFloat             _sample[2];
-  std::vector<TxParameter*> _inputs;
+  stk::StkFrames            _frames;
+  std::vector<TxParameter*> _params;
 };
 
 #endif // TX_NODE_H

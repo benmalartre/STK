@@ -21,7 +21,6 @@ void Sequencer::Track::setNode(TxNode* node)
 
 stk::StkFloat Sequencer::Track::tick(uint64_t timeIdx)
 {
-  std::cout << "track tick : " << _node << std::endl;
   if(_node) return _node->tick();
   return 0.f;
 }
@@ -145,7 +144,6 @@ stk::StkFloat Sequencer::tick(uint32_t trackIdx)
 
 stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
 {
-  std::cout << "sequencer tick..." << std::endl;
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   if(!_active) return frames;
   

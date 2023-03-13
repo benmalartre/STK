@@ -17,7 +17,7 @@ TxLfo::~TxLfo()
 
 stk::StkFloat TxLfo::tick(void)
 {
-  return _sine.tick();
+  return _sine.tick() * _amplitude +_offset;
 }
 
 stk::StkFrames& TxLfo::tick(stk::StkFrames& frames, unsigned int channel)
@@ -34,10 +34,20 @@ stk::StkFrames& TxLfo::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxLfo::setFrequency(const stk::StkFloat& frequency)
+void TxLfo::setFrequency(stk::StkFloat frequency)
 {
   _frequency = frequency;
   _sine.setFrequency(_frequency);
+}
+
+void TxLfo::setAmplitude(stk::StkFloat amplitude)
+{
+  _amplitude = amplitude;
+}
+
+void TxLfo::setOffset(stk::StkFloat offset)
+{
+  _offset = offset;
 }
 
 void TxLfo::draw()
