@@ -8,6 +8,17 @@
 
 class TxEffect : public TxNode {
 public:
+  enum Type {
+    CHORUS,
+    ECHO,
+    FREEVERB,
+    JCREV,
+    LENPITSHIFT,
+    NREV,
+    PITSHIFT,
+    PRCREV
+  };
+  
   TxEffect(const std::string& name);
   ~TxEffect();
   stk::StkFloat tick(void) override;

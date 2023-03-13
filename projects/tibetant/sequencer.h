@@ -8,10 +8,10 @@
 #include "common.h"
 #include "node.h"
 
-#ifndef TX_SEQUENCER_H
-#define TX_SEQUENCER_H
+#ifndef TX_TxSequencer_H
+#define TX_TxSequencer_H
 
-class Sequencer : public TxNode {
+class TxSequencer : public TxNode {
 public:
   using Time = uint8_t;
   using Sequence = std::vector<Time>;
@@ -24,13 +24,19 @@ public:
       , _node(NULL)
     {};
 
-    ~Track() {};
+    ~Track()
+    {
+      if(_node) {
+        delete _node;
+      }
+    };
 
     void setLength(uint64_t length);
     void setTime(uint64_t time, const Time& value);
     void setNode(TxNode* node);
 
     stk::StkFloat tick(uint64_t timeIdx);
+    TxNode* getNode();
     void draw();
 
   private:
@@ -47,9 +53,9 @@ private:
   bool                _running;
 
 public:
-  Sequencer();
-  Sequencer(uint32_t bpm, uint32_t n, uint64_t length);
-  ~Sequencer();
+  TxSequencer();
+  TxSequencer(uint32_t bpm, uint32_t n, uint64_t length);
+  ~TxSequencer();
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);
   uint32_t numTracks();
@@ -62,12 +68,13 @@ public:
   stk::StkFloat tick(uint32_t trackIdx);
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   
-  
   void start();
   void stop();
   uint64_t timeToIndex(double time);
 
+  void draw() override;
+
   
 };
 
-#endif // TX_SEQUENCER_H
+#endif // TX_TxSequencer_H

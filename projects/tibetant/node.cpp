@@ -12,12 +12,15 @@ TxNode::TxNode(const std::string& name, uint32_t numChannels)
 
   _params.push_back(new TxParameterSamples("Samples"));
   _params.push_back(new TxParameterBool("Active", &_active));
-  _params.push_back(new TxParameterFloat("Volume", 0.f, 2.f, &_volume));
-  _params.push_back(new TxParameterFloat("Stereo", -1.f, 1.f, &_stereo));
+  _params.push_back(new TxParameterFloat("Volume", 0.f, 2.f, &_volume, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Stereo", -1.f, 1.f, &_stereo, TxParameter::KNOB));
 }
 
 TxNode::~TxNode()
 {
+  for(auto& param: _params){
+    delete param;
+  }
 }
 
 int TxNode::numChannels()
@@ -90,52 +93,18 @@ TxParameter* TxNode::getParameter(const std::string& name)
   return NULL;
 }
 
-void TxNode::draw()
+void TxNode::commonControls()
 {
-  ImGui::Begin(_name.c_str(), NULL);
-  
-  for(auto& param: _params) {
-    param->draw();
-  }
-  /*
-  float frequency = _frequency;  
-  if (ImGuiKnobs::Knob("Frequency", &frequency, 20.f, 2000.f, 1.f, "%.1fHz", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    _params[]->set(frequency);
-    //setFrequency(frequency);
-  }
-  ImGui::SameLine();
-
-  int harmonics = _harmonics;
-  if (ImGuiKnobs::KnobInt("Harmonics", &harmonics, 1, 9, 0.1, "%i", ImGuiKnobVariant_Tick, 0.f, ImGuiKnobFlags_DragHorizontal)) {
-    _params[1]->set(harmonics);
-    //setHarmonics(_harmonics);
-  }
-  ImGui::SameLine();    
-  
   ImGui::BeginGroup();
-  if(ImGui::Checkbox("Active", &_active)) {
-    //if(!_active) clearSamples();
-  }
-  ImGui::SliderFloat("Volume", &_volume, 0.f, 2.f);
-  if (ImGui::BeginCombo("Signal", TxGenerator::WaveFormName[_waveFormIdx], ImGuiComboFlags_NoArrowButton))
-  {
-    for (int n = 0; n < TX_NUM_SIGNAL; ++n)
-    {
-      const bool is_selected = (_waveFormIdx == n);
-      if (ImGui::Selectable(TxGenerator::WaveFormName[n], is_selected)) {
-        setWaveForm(n);
-      }
-      // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-      if (is_selected)
-        ImGui::SetItemDefaultFocus();
-    }
-    ImGui::EndCombo();
-  }
-  
-  if (ImGui::SliderFloat("Stereo", &_stereo, -1.f, 1.f)) {
-  }
+  TxParameter* active = _params[ACTIVE];
+  active->draw();
 
+  TxParameter* volume = _params[VOLUME];
+  volume->draw();
+  
+  ImGui::SameLine();
+  TxParameter* stereo = _params[STEREO];
+  stereo->draw();
+  
   ImGui::EndGroup();
-  */
-  ImGui::End();
 }

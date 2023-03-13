@@ -28,8 +28,9 @@ TxGenerator::TxGenerator(const std::string& name)
   setWaveForm(BLIT);
   _params.push_back(new TxParameterEnum("WaveForm", &TxGenerator::WaveFormName[0], 
     TxGenerator::NumWaveForm, &_waveFormIdx));
-  _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency));
-  _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics));
+  _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
+  _params.back()->setCallback(new TxCallback((CALLBACK_FN)&setHarmonicsCallback, (void*)this));
 }
 
 TxGenerator::~TxGenerator() 
@@ -178,7 +179,7 @@ void TxGenerator::setHarmonics(int harmonics)
 
     case BLITSAW:
       ((stk::BlitSaw*)_generator)->setHarmonics(_harmonics);
-      ((stk::BlitSaw*)_generator)->reset();
+      //((stk::BlitSaw*)_generator)->reset();
       break;
 
     case BLITSQUARE:
@@ -190,6 +191,27 @@ void TxGenerator::setHarmonics(int harmonics)
     case SINGWAVE:
       break;
   }
+}
+
+void TxGenerator::draw()
+{
+  ImGui::Begin(_name.c_str(), NULL);
+
+  ImGui::BeginGroup();
+  ImGui::SetNextItemWidth(128);
+  TxParameter* waveform = _params[TxGenerator::WAVEFORM];
+  waveform->draw();
+  TxParameter* frequency = _params[TxGenerator::FREQUENCY];
+  frequency->draw();
+  ImGui::SameLine();
+  TxParameter* harmonics = _params[TxGenerator::HARMONICS];
+  harmonics->draw();
+  ImGui::EndGroup();
+
+  ImGui::SameLine();
+  ImGui::Dummy(ImVec2(20, 100));
+  ImGui::SameLine();
+  commonControls();
 }
 
 /*

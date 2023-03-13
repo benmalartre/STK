@@ -7,6 +7,7 @@
 
 class TxNode {
 public:
+
   enum Parameters {
     SAMPLES,
     ACTIVE,
@@ -16,7 +17,7 @@ public:
   };
 
   TxNode(const std::string& name, uint32_t numChannels=1);
-  ~TxNode();
+  virtual ~TxNode();
   virtual stk::StkFloat tick(void) = 0;
   virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
   stk::StkFloat lastSample(unsigned int channel);
@@ -29,9 +30,9 @@ public:
   bool connect(TxNode* node, const std::string& name);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
-  void draw();
+  void commonControls();
+  virtual void draw() = 0;
 
-  
 protected:
   std::string               _name;
   int                       _nChannels;

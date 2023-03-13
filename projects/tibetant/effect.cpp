@@ -13,7 +13,7 @@ TxEffect::~TxEffect()
 
 stk::StkFloat TxEffect::tick(void)
 {
-  return 0.f;
+  return 0.f;// _effect->tick();
 }
 
 stk::StkFloat TxEffect::tick(stk::StkFloat input)

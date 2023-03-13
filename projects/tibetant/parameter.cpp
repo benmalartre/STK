@@ -5,12 +5,21 @@
 
 // TxParameter (base class)
 // ---------------------------------------------------------------
-TxParameter::TxParameter(const std::string& name, void* data, short type)
+TxParameter::TxParameter(const std::string& name, void* data, short type, short display)
   : _name(name)
   , _input(NULL)
   , _type(type)
+  , _display(display)
   , _data(data)
+  , _callback(NULL)
 {
+}
+
+TxParameter::~TxParameter()
+{
+  if(_callback){
+    delete _callback;
+  }
 }
 
 const std::string& TxParameter::name()
@@ -26,6 +35,11 @@ void TxParameter::connect(TxNode* node)
 void TxParameter::disconnect()
 {
   _input = NULL;
+}
+
+void TxParameter::setCallback(TxCallback* callback)
+{
+  _callback = callback;
 }
 
 // TxParameterBool
@@ -48,15 +62,16 @@ stk::StkFloat TxParameterBool::tick()
   return *(stk::StkFloat*)_data;
 }
 
-void TxParameterBool::draw()
+bool TxParameterBool::draw()
 {
-  ImGui::Checkbox(_name.c_str(), (bool*)_data);
+  return ImGui::Checkbox(_name.c_str(), (bool*)_data);
 }
 
 // TxParameterInt
 // ---------------------------------------------------------------
-TxParameterInt::TxParameterInt(const std::string& name, int minimum, int maximum, int* data)
-  : TxParameter(name, (void*)data, TxParameter::INT)
+TxParameterInt::TxParameterInt(const std::string& name, int minimum, int maximum, 
+  int* data, short display)
+  : TxParameter(name, (void*)data, TxParameter::INT, display)
   , _minimum(minimum)
   , _maximum(maximum)
 {
@@ -76,9 +91,22 @@ stk::StkFloat TxParameterInt::tick()
   return (stk::StkFloat)*(int*)_data;
 }
 
-void TxParameterInt::draw()
+bool TxParameterInt::draw()
 {
-  ImGui::SliderInt(_name.c_str(), (int*)_data, _minimum, _maximum);
+  bool modified = false;
+  switch(_display) {
+    case TxParameter::HORIZONTAL:
+      modified = ImGui::SliderInt(_name.c_str(), (int*)_data, _minimum, _maximum);
+      break;
+    case TxParameter::VERTICAL:
+      modified = ImGui::VSliderInt(_name.c_str(),ImVec2(20, 100), (int*)_data, _minimum, _maximum);
+      break;
+    case TxParameter::KNOB:
+      modified = ImGuiKnobs::KnobInt(_name.c_str(), (int*)_data, _minimum, _maximum);
+      break;
+  }
+  if(modified && _callback) _callback->execute();
+  return modified;
 }
 
 // TxParameterEnum
@@ -104,9 +132,10 @@ stk::StkFloat TxParameterEnum::tick()
   return (stk::StkFloat)*(int*)_data;
 }
 
-void TxParameterEnum::draw()
+bool TxParameterEnum::draw()
 {
   int value = *(int*)_data;
+  bool modified = false;
   if (ImGui::BeginCombo(_name.c_str(), _names[value], ImGuiComboFlags_NoArrowButton))
   {
     for (int n = 0; n < _num; ++n)
@@ -114,6 +143,7 @@ void TxParameterEnum::draw()
       const bool is_selected = (value == n);
       if(ImGui::Selectable(_names[n], is_selected)) {
         *(int*)_data = n;
+        modified = true;
       }
       // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
       if (is_selected)
@@ -121,13 +151,15 @@ void TxParameterEnum::draw()
     }
     ImGui::EndCombo();
   }
+  if(modified && _callback) _callback->execute();
+  return modified;
 }
 
 // TxParameterFloat
 // ---------------------------------------------------------------
 TxParameterFloat::TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, 
-  stk::StkFloat* data)
-  : TxParameter(name, (void*)data, TxParameter::FLOAT)
+  stk::StkFloat* data, short display)
+  : TxParameter(name, (void*)data, TxParameter::FLOAT, display)
   , _minimum(minimum)
   , _maximum(maximum)
 {
@@ -147,9 +179,23 @@ stk::StkFloat TxParameterFloat::tick()
   return *(stk::StkFloat*)_data;
 }
 
-void TxParameterFloat::draw()
+bool TxParameterFloat::draw()
 {
-  ImGui::SliderFloat(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+  bool modified = false;
+  switch(_display) {
+    case TxParameter::HORIZONTAL:
+      modified = ImGui::SliderFloat(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+      break;
+    case TxParameter::VERTICAL:
+      modified = ImGui::VSliderFloat(_name.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
+      break;
+    case TxParameter::KNOB:
+      modified = ImGuiKnobs::Knob(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+      break;
+  }
+  if(modified && _callback) _callback->execute();
+
+  return modified;
 }
 
 // TxParameterSamples
@@ -169,7 +215,8 @@ stk::StkFloat TxParameterSamples::tick()
   return 0.f;
 }
 
-void TxParameterSamples::draw()
+bool TxParameterSamples::draw()
 {
   //ImGui::SliderInt(_name.c_str(), &_value, _minimum, _maximum);
+  return false;
 }

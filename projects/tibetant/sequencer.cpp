@@ -1,11 +1,11 @@
 #include "sequencer.h"
 
-void Sequencer::Track::setLength(uint64_t length)
+void TxSequencer::Track::setLength(uint64_t length)
 {
   _times.resize(length);
 };
 
-void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
+void TxSequencer::Track::setTime(uint64_t timeIdx, const Time& value)
 {
   if(timeIdx >= _times.size()){
     _times.resize(timeIdx+1);
@@ -13,24 +13,28 @@ void Sequencer::Track::setTime(uint64_t timeIdx, const Time& value)
   _times[timeIdx] = value;
 }
 
-void Sequencer::Track::setNode(TxNode* node)
+void TxSequencer::Track::setNode(TxNode* node)
 {
   _node = node;
 }
 
+TxNode* TxSequencer::Track::getNode()
+{
+  return _node;
+}
 
-stk::StkFloat Sequencer::Track::tick(uint64_t timeIdx)
+stk::StkFloat TxSequencer::Track::tick(uint64_t timeIdx)
 {
   if(_node) return _node->tick();
   return 0.f;
 }
 
-void Sequencer::Track::draw()
+void TxSequencer::Track::draw()
 {
   if(_node) _node->draw();
 }
 
-Sequencer::Sequencer()
+TxSequencer::TxSequencer()
   : TxNode("TxSequencer", TX_NUM_CHANNELS)
   , _bpm(60)
   , _n(4)
@@ -40,7 +44,7 @@ Sequencer::Sequencer()
 {
 }
 
-Sequencer::Sequencer(uint32_t bpm, uint32_t n, uint64_t length)
+TxSequencer::TxSequencer(uint32_t bpm, uint32_t n, uint64_t length)
   : TxNode("TxSequencer", TX_NUM_CHANNELS)
   , _bpm(bpm)
   , _n(n)
@@ -50,13 +54,13 @@ Sequencer::Sequencer(uint32_t bpm, uint32_t n, uint64_t length)
 {
 }
 
-Sequencer::~Sequencer()
+TxSequencer::~TxSequencer()
 {
   for(auto& track: _tracks)delete track;
   _tracks.clear();
 }
 
-void Sequencer::setLength(uint64_t length)
+void TxSequencer::setLength(uint64_t length)
 {
   _length = length;
   for(auto& track: _tracks) {
@@ -64,24 +68,24 @@ void Sequencer::setLength(uint64_t length)
   }
 }
 
-void Sequencer::setBPM(uint32_t bpm)
+void TxSequencer::setBPM(uint32_t bpm)
 {
   _bpm = bpm;
 }
 
-uint32_t Sequencer::numTracks()
+uint32_t TxSequencer::numTracks()
 {
   return _tracks.size();
 }
 
-Sequencer::Track* Sequencer::addTrack(const std::string& name)
+TxSequencer::Track* TxSequencer::addTrack(const std::string& name)
 {
   _tracks.push_back(new Track(name, _length));
   return _tracks.back();
 }
 
 
-void Sequencer::removeTrack(uint32_t trackIdx)
+void TxSequencer::removeTrack(uint32_t trackIdx)
 {
   if(_tracks.size() > trackIdx) {
     Track* track = _tracks[trackIdx];
@@ -90,7 +94,7 @@ void Sequencer::removeTrack(uint32_t trackIdx)
   }
 }
 
-Sequencer::Track* Sequencer::getTrack(uint32_t trackIdx)
+TxSequencer::Track* TxSequencer::getTrack(uint32_t trackIdx)
 {
   if(_tracks.size() <= trackIdx) {
     std::cerr << "invalid track index !" << std::endl;
@@ -99,7 +103,7 @@ Sequencer::Track* Sequencer::getTrack(uint32_t trackIdx)
   return _tracks[trackIdx];
 }
 
-void Sequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
+void TxSequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
 {
   if(_tracks.size() <= trackIdx) {
     std::cerr << "Invalid track index : " << trackIdx << 
@@ -115,34 +119,34 @@ void Sequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
   _tracks[trackIdx]->setTime(timeIdx, time);
 }
 
-void Sequencer::start()
+void TxSequencer::start()
 {
   _running = true;
   _time = 0;
 }
 
-void Sequencer::stop()
+void TxSequencer::stop()
 {
   _running = false;
 }
 
-uint64_t Sequencer::timeToIndex(double time)
+uint64_t TxSequencer::timeToIndex(double time)
 {
   uint64_t index = time * (60 / _bpm * _n);
   return index % _length;
 }
 
-stk::StkFloat Sequencer::tick(void)
+stk::StkFloat TxSequencer::tick(void)
 {
   return RANDOM_LO_HI(-1.f, 1.f);
 }
 
-stk::StkFloat Sequencer::tick(uint32_t trackIdx)
+stk::StkFloat TxSequencer::tick(uint32_t trackIdx)
 {
   return RANDOM_LO_HI(-1.f, 1.f);
 }
 
-stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
+stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
 {
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   if(!_active) return frames;
@@ -153,12 +157,12 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
     stk::StkFloat* samples = &frames[0];
     stk::StkFloat channelWeights[TX_NUM_CHANNELS];
     for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
-      channelWeights[n] = 1.f;//track->channelWeight(n);
+      channelWeights[n] = track->getNode()->stereoWeight(n);
     }
     //const stk::StkFloat sample = track->tick(timeIdx % _length);
     for(size_t frameIdx = 0; frameIdx < stk::RT_BUFFER_SIZE;  ++frameIdx) {
       for(size_t channelIdx = 0; channelIdx < TX_NUM_CHANNELS; ++channelIdx) {
-        *samples++ += track->tick(timeIdx % _length);
+        *samples++ += track->tick(timeIdx % _length) * channelWeights[channelIdx];
       }
     }
   }
@@ -167,4 +171,16 @@ stk::StkFrames& Sequencer::tick(stk::StkFrames& frames, unsigned int channel)
   _time += 60.f / _bpm * sampleTime;
 
   return frames;
+}
+
+void TxSequencer::draw()
+{
+  ImGui::Begin(_name.c_str(), NULL);
+  
+  commonControls();
+  for(auto& track: _tracks) {
+    //track->draw();
+  } 
+
+  ImGui::End();
 }

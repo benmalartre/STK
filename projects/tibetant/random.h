@@ -12,12 +12,17 @@ public:
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);
   void setSeed(int seed);
+  void setFrequency(stk::StkFloat frequency);
+  void draw() override;
 
 private:
   stk::StkFloat  _value;
+  stk::StkFloat  _frequency;
   stk::StkFloat  _minimum;
   stk::StkFloat  _maximum;
   int            _seed;
+  int            _cnt;
+  int            _rate;
 };
 
 #endif // TX_VALUE_H

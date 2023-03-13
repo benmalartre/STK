@@ -8,6 +8,12 @@
 
 class TxLfo : public TxNode {
 public:
+  enum Parameters {
+    FREQUENCY = TxNode::LAST,
+    AMPLITUDE,
+    OFFSET, 
+    LAST
+  };
   TxLfo(const std::string& name);
   ~TxLfo();
   stk::StkFloat tick(void) override;
@@ -15,6 +21,7 @@ public:
   void setFrequency(stk::StkFloat frequency);
   void setAmplitude(stk::StkFloat amplitude);
   void setOffset(stk::StkFloat offset);
+  void draw() override;
 
 private:
   stk::SineWave   _sine;

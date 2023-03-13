@@ -1,11 +1,13 @@
 #include <Stk.h>
 #include <vector>
-#include <functional>
+#include "callback.h"
 
 #ifndef TX_PARAMETER_H
 #define TX_PARAMETER_H
 
+
 class TxNode;
+
 
 class TxParameter {
 public:
@@ -17,20 +19,30 @@ public:
     FLOAT,
     SAMPLES
   };
-  TxParameter(const std::string& name, void* data, short type=NONE);
 
+  enum Display {
+    HORIZONTAL,
+    VERTICAL,
+    KNOB
+  };
+
+  TxParameter(const std::string& name, void* data, short type=NONE, short display=HORIZONTAL);
+  virtual ~TxParameter();
   const std::string& name();
   void connect(TxNode* node);
   void disconnect();
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;
-  virtual void draw() = 0;
+  virtual bool draw() = 0;
+  void setCallback(TxCallback* callback);
 
 protected:
   short             _type;
+  short             _display;
   std::string       _name;
   TxNode*           _input;
   void*             _data;
+  TxCallback*       _callback;
 };
 
 class TxParameterBool : public TxParameter {
@@ -39,16 +51,17 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  void draw() override;
+  bool draw() override;
 };
 
 class TxParameterInt : public TxParameter {
 public:
-  TxParameterInt(const std::string& name, int minimum, int maximum, int* data);
+  TxParameterInt(const std::string& name, int minimum, int maximum, int* data,
+    short display=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  void draw() override;
+  bool draw() override;
 
 private:
   int     _minimum;
@@ -61,7 +74,7 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  void draw() override;
+  bool draw() override;
 
 private:
   const char**  _names;
@@ -70,11 +83,12 @@ private:
 
 class TxParameterFloat : public TxParameter {
 public:
-  TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, stk::StkFloat* data);
+  TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, 
+    stk::StkFloat* data, short display=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  void draw() override;
+  bool draw() override;
 
 private:
   stk::StkFloat     _minimum;
@@ -87,7 +101,7 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  void draw() override;
+  bool draw() override;
 
 private:
   stk::StkFrames*    _frames;;

@@ -1,10 +1,12 @@
 #include "common.h"
 #include "generator.h"
 #include "lfo.h"
+#include "random.h"
 #include "sequencer.h"
 
-Sequencer sequencer;
+TxSequencer sequencer;
 stk::StkFrames frames;
+std::vector<TxNode*> nodes;
 
 constexpr size_t TX_BUFFER_SIZE = 64 * stk::RT_BUFFER_SIZE;
 constexpr size_t TX_BUFFER_OFFSET = stk::RT_BUFFER_SIZE;
@@ -192,8 +194,8 @@ void draw(GLFWwindow* window)
 
   //drawPlot(display_w, display_h);
   sequencer.draw();
-  for(auto& track: sequencer.getTracks()) {
-    track->draw();
+  for(auto& node: nodes) {
+    node->draw();
   }
   
   ImGui::Render();
@@ -244,8 +246,9 @@ int main()
   }
 
   sequencer.setLength(16);
-  Sequencer::Track* track1 = sequencer.addTrack("Track1");
+  TxSequencer::Track* track1 = sequencer.addTrack("Track1");
   TxGenerator* bass = new TxGenerator("Bass");
+  nodes.push_back(bass);
   bass->setFrequency(110.f);
   bass->setWaveForm(TxGenerator::BLITSQUARE);
   bass->setHarmonics(7);
@@ -255,12 +258,14 @@ int main()
   TxParameter* harmonics = bass->getParameter("Harmonics");
 
   TxLfo* fLfo = new TxLfo("BassFrequencyLfo");
+  nodes.push_back(fLfo);
   fLfo->setFrequency(1.f);
   fLfo->setAmplitude(10.f);
   fLfo->setOffset(60.f);
   frequency->connect(fLfo);
 
   TxLfo* hLfo = new TxLfo("BassHarmonicsLfo");
+  nodes.push_back(hLfo);
   hLfo->setFrequency(0.1f);
   hLfo->setAmplitude(5.f);
   hLfo->setOffset(7.f);
@@ -270,12 +275,20 @@ int main()
   for(size_t t = 0; t < 16; ++t)
     sequencer.setTime(0, t, BASS[t]);
 
-  Sequencer::Track* track2 = sequencer.addTrack("Track2");
+  TxSequencer::Track* track2 = sequencer.addTrack("Track2");
   TxGenerator* drum = new TxGenerator("Drum");
+  nodes.push_back(drum);
   drum->setFrequency(60.f);
   drum->setWaveForm(TxGenerator::BLITSAW);
   drum->setHarmonics(5);
   track2->setNode(drum);
+
+  TxRandom* random = new TxRandom("DrumRandomFrequency");
+  nodes.push_back(random);
+  random->setMinimum(20.f);
+  random->setMaximum(220.f);
+  random->setFrequency(1.f);
+  drum->connect(random, "Frequency");
   //drum->setWaveForm(4);
   //drum->setFrequency(88.f);
   for(size_t t = 0; t < 16; ++t)

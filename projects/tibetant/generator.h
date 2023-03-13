@@ -9,7 +9,7 @@
 
 class TxGenerator : public TxNode {
 public:
-  enum WaveFormType {
+  enum Type {
     BLIT,
     BLITSAW,
     BLITSQUARE,
@@ -24,7 +24,8 @@ public:
   enum Parameters {
     WAVEFORM = TxNode::LAST,
     FREQUENCY,
-    HARMONICS
+    HARMONICS, 
+    LAST
   };
 
   TxGenerator(const std::string& name);
@@ -34,6 +35,9 @@ public:
   void setWaveForm(int8_t index);
   void setFrequency(const stk::StkFloat& frequency);
   void setHarmonics(int harmonics);
+
+  void draw() override;
+  void hello(){std::cout << "hello ben :)" << std::endl;};
 
 private:
   stk::Generator* _generator;
@@ -45,5 +49,11 @@ private:
   int             _waveFormIdx;
   
 };
+
+// callbacks
+static void setHarmonicsCallback(void* ctxt) 
+{
+  static_cast<TxGenerator*>(ctxt)->hello();
+}
 
 #endif // TX_GENERATOR_H

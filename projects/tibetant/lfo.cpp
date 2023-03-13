@@ -9,6 +9,10 @@ TxLfo::TxLfo(const std::string& name)
   , _offset(6.f)
 {
   _sine.setFrequency(_frequency);
+  _params.push_back(new TxParameterFloat("Frequency", 0.01f, 12.f, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Amplitude", 0.01f, 10.f, &_amplitude, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Offset", -100.f, 100.f, &_offset, TxParameter::KNOB));
+
 }
 
 TxLfo::~TxLfo() 
@@ -17,6 +21,7 @@ TxLfo::~TxLfo()
 
 stk::StkFloat TxLfo::tick(void)
 {
+  _sine.setFrequency(_frequency);
   return _sine.tick() * _amplitude +_offset;
 }
 
@@ -48,4 +53,27 @@ void TxLfo::setAmplitude(stk::StkFloat amplitude)
 void TxLfo::setOffset(stk::StkFloat offset)
 {
   _offset = offset;
+}
+
+void TxLfo::draw()
+{
+  ImGui::Begin(_name.c_str(), NULL);
+
+  ImGui::BeginGroup();
+  ImGui::SetNextItemWidth(128);
+  TxParameter* frequency = _params[TxLfo::FREQUENCY];
+  frequency->draw();
+  ImGui::SameLine();
+  TxParameter* amplitude = _params[TxLfo::AMPLITUDE];
+  amplitude->draw();
+  ImGui::SameLine();
+  TxParameter* offset = _params[TxLfo::OFFSET];
+  offset->draw();
+  ImGui::EndGroup();
+
+  ImGui::SameLine();
+  ImGui::Dummy(ImVec2(20, 100));
+  ImGui::SameLine();
+  commonControls();
+  ImGui::End();
 }
