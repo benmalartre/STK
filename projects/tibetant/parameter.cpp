@@ -98,7 +98,7 @@ void TxParameterEnum::set(stk::StkFloat value)
 stk::StkFloat TxParameterEnum::tick()
 {
   if(_input) {
-    const int value = (int)_input->tick() % _num;
+    const int value = ((int)_input->tick()) % _num;
     return (stk::StkFloat)value;
   }
   return (stk::StkFloat)*(int*)_data;

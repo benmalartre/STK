@@ -38,6 +38,8 @@ public:
 private:
   stk::Generator* _generator;
   stk::StkFloat   _frequency;
+
+  int             _lastHarmonics;
   int             _harmonics;
   int             _lastWaveFormIdx;
   int             _waveFormIdx;

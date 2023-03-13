@@ -22,6 +22,7 @@ TxGenerator::TxGenerator(const std::string& name)
   , _waveFormIdx(-1)
   , _lastWaveFormIdx(-1)
   , _frequency(110.f)
+  , _lastHarmonics(3)
   , _harmonics(3)
 {
   setWaveForm(BLIT);
@@ -91,25 +92,27 @@ void TxGenerator::setWaveForm(int8_t index)
   _waveFormIdx = index % NumWaveForm;
   if(_generator) delete _generator;
 
+  std::cout << "set wave form : " << _waveFormIdx << std::endl;
+
   switch(_waveFormIdx) {
     case BLIT:
       _generator = new stk::Blit();
-      ((stk::Blit*)_generator)->setFrequency(_frequency);
       ((stk::Blit*)_generator)->setHarmonics(_harmonics);
+      ((stk::Blit*)_generator)->setFrequency(_frequency);
       ((stk::Blit*)_generator)->reset();
       break;
 
     case BLITSAW:
       _generator = new stk::BlitSaw();
-      ((stk::BlitSaw*)_generator)->setFrequency(_frequency);
       ((stk::BlitSaw*)_generator)->setHarmonics(_harmonics);
+      ((stk::BlitSaw*)_generator)->setFrequency(_frequency);
       ((stk::BlitSaw*)_generator)->reset();
       break;
 
     case BLITSQUARE:
       _generator = new stk::BlitSquare();
-      ((stk::BlitSquare*)_generator)->setFrequency(_frequency);
       ((stk::BlitSquare*)_generator)->setHarmonics(_harmonics);
+      ((stk::BlitSquare*)_generator)->setFrequency(_frequency);
       ((stk::BlitSquare*)_generator)->reset();
       break;
 
@@ -164,6 +167,8 @@ void TxGenerator::setFrequency(const stk::StkFloat& frequency)
 
 void TxGenerator::setHarmonics(int harmonics)
 {
+  if(harmonics == _lastHarmonics)return;
+  _lastHarmonics = harmonics;
   _harmonics = harmonics;
 
   switch(_waveFormIdx) {
@@ -173,6 +178,7 @@ void TxGenerator::setHarmonics(int harmonics)
 
     case BLITSAW:
       ((stk::BlitSaw*)_generator)->setHarmonics(_harmonics);
+      ((stk::BlitSaw*)_generator)->reset();
       break;
 
     case BLITSQUARE:
