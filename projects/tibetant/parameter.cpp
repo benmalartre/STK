@@ -82,6 +82,16 @@ void TxParameterInt::set(stk::StkFloat value)
   *(int*)_data = (int)value;
 }
 
+void TxParameterInt::setMinimum(int value)
+{
+  _minimum = value;
+}
+
+void TxParameterInt::setMaximum(int value)
+{
+  _maximum = value;
+}
+
 stk::StkFloat TxParameterInt::tick()
 {
   if(_input) {
@@ -170,6 +180,16 @@ void TxParameterFloat::set(stk::StkFloat value)
   *(stk::StkFloat*)_data = value;
 }
 
+void TxParameterFloat::setMinimum(stk::StkFloat value)
+{
+  _minimum = value;
+}
+
+void TxParameterFloat::setMaximum(stk::StkFloat value)
+{
+  _maximum = value;
+}
+
 stk::StkFloat TxParameterFloat::tick()
 {
   if(_input) {
@@ -190,7 +210,8 @@ bool TxParameterFloat::draw()
       modified = ImGui::VSliderFloat(_name.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
       break;
     case TxParameter::KNOB:
-      modified = ImGuiKnobs::Knob(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+      modified = ImGuiKnobs::Knob(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
+        0.f, "%.3f", ImGuiKnobVariant_Stepped);
       break;
   }
   if(modified && _callback) _callback->execute();
@@ -217,6 +238,5 @@ stk::StkFloat TxParameterSamples::tick()
 
 bool TxParameterSamples::draw()
 {
-  //ImGui::SliderInt(_name.c_str(), &_value, _minimum, _maximum);
   return false;
 }

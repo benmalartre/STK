@@ -60,6 +60,8 @@ public:
     short display=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
+  void setMinimum(int value);
+  void setMaximum(int value);
   stk::StkFloat tick() override;
   bool draw() override;
 
@@ -87,6 +89,8 @@ public:
     stk::StkFloat* data, short display=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
+  void setMinimum(stk::StkFloat value);
+  void setMaximum(stk::StkFloat value);
   stk::StkFloat tick() override;
   bool draw() override;
 

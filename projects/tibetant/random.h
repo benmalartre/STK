@@ -5,6 +5,12 @@
 
 class TxRandom : public TxNode {
 public:
+  enum Parameters {
+    FREQUENCY = TxNode::LAST,
+    MINIMUM,
+    MAXIMUM, 
+    SEED
+  };
   TxRandom(const std::string& name);
   ~TxRandom();
   stk::StkFloat tick(void) override;
@@ -14,6 +20,7 @@ public:
   void setSeed(int seed);
   void setFrequency(stk::StkFloat frequency);
   void draw() override;
+  void updateBounds();
 
 private:
   stk::StkFloat  _value;
@@ -24,5 +31,10 @@ private:
   int            _cnt;
   int            _rate;
 };
+
+static void updateRandomBounds(void* node)
+{
+  static_cast<TxRandom*>(node)->updateBounds();
+}
 
 #endif // TX_VALUE_H

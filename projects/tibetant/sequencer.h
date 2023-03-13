@@ -8,8 +8,8 @@
 #include "common.h"
 #include "node.h"
 
-#ifndef TX_TxSequencer_H
-#define TX_TxSequencer_H
+#ifndef TX_SEQUENCER_H
+#define TX_SEQUENCER_H
 
 class TxSequencer : public TxNode {
 public:
@@ -77,4 +77,4 @@ public:
   
 };
 
-#endif // TX_TxSequencer_H
+#endif // TX_SEQUENCER_H
