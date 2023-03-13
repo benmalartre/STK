@@ -211,7 +211,7 @@ bool TxParameterFloat::draw()
       break;
     case TxParameter::KNOB:
       modified = ImGuiKnobs::Knob(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
-        0.f, "%.3f", ImGuiKnobVariant_Stepped);
+        0.f, "%.3f", ImGuiKnobVariant_WiperDot);
       break;
   }
   if(modified && _callback) _callback->execute();

@@ -50,11 +50,13 @@ void TxRandom::setSeed(int seed)
 void TxRandom::setFrequency(stk::StkFloat frequency)
 {
   _frequency = frequency;
+  _lastFrequency = _frequency;
   _rate = stk::Stk::sampleRate()  / _frequency;
 }
 
 stk::StkFloat TxRandom::tick(void)
 {
+  if(_lastFrequency != _frequency)setFrequency(_frequency);
   if(_cnt++ > _rate) {
     _cnt = 0;
     _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
@@ -64,12 +66,18 @@ stk::StkFloat TxRandom::tick(void)
 
 stk::StkFrames& TxRandom::tick(stk::StkFrames& frames, unsigned int channel)
 {
-  for(size_t i = 0; i < frames.size(); ++i) {
-    if(_cnt++ > _rate) {
-      _cnt = 0;
-      _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
+  if(_active) {
+    for(size_t i = 0; i < frames.size(); ++i) {
+      if(_cnt++ > _rate) {
+        _cnt = 0;
+        _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
+      }
+      frames[i] = _frames[0];
     }
-    frames[i] = _frames[0];
+  } else {
+    for(size_t i = 0; i < frames.size(); ++i) {
+      frames[i] = _frames[0];
+    }
   }
   return frames;
 }

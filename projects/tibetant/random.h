@@ -24,6 +24,7 @@ public:
 
 private:
   stk::StkFloat  _value;
+  stk::StkFloat  _lastFrequency;
   stk::StkFloat  _frequency;
   stk::StkFloat  _minimum;
   stk::StkFloat  _maximum;
