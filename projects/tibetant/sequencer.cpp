@@ -144,6 +144,8 @@ void TxSequencer::draw()
   //ImGui::SameLine();
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
+  if(ImGui::Button("Reset Time")) _time = 0.f;
+  ImGui::SameLine();
   ImGui::SetNextItemWidth(100);
   ImGui::Text("Time : %fs", _time);
   ImGui::SameLine();
