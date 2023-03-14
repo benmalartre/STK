@@ -198,4 +198,4 @@ depend:
 	 makedepend $(INCLUDES) $(MDFLAGS) -f$(MAKEFILE) $(SOURCES)
 
 clean:
-	 rm -rf *.o *.gah *.so $(STK_PATH)/*.o $(EXE_NAME)
+	 rm -rf *.o *.gah *.so $(STK_PATH)/*.o $(IMGUI_DIR)/*.o $(EXE_NAME)
