@@ -1,6 +1,7 @@
 #include "common.h"
 #include "generator.h"
 #include "lfo.h"
+#include "adsr.h"
 #include "random.h"
 #include "sequencer.h"
 #include "graph.h"
@@ -309,10 +310,16 @@ int main()
 
   TxGraph* graph = new TxGraph("Graph");
   TxGenerator* generator = new TxGenerator("Wave");
-
   generator->setHarmonics(7);
 
-  generator->connect(&sequencer, "Frequency");
+  TxAdsr* adsr = new TxAdsr("Adsr");
+  graph->addNode(adsr);
+  adsr->connect(&sequencer, "Trigger");
+
+  generator->connect(&sequencer, "Frequency", 1);
+
+  generator->connect(adsr, "Volume");
+
 
   graph->addNode(generator);
   graphs.push_back(graph);

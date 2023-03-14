@@ -54,7 +54,7 @@ void TxRandom::setFrequency(stk::StkFloat frequency)
   _rate = stk::Stk::sampleRate()  / _frequency;
 }
 
-stk::StkFloat TxRandom::tick(void)
+stk::StkFloat TxRandom::tick(unsigned int)
 {
   if(_lastFrequency != _frequency)setFrequency(_frequency);
   if(_cnt++ > _rate) {

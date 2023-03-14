@@ -19,7 +19,7 @@ TxLfo::~TxLfo()
 {
 }
 
-stk::StkFloat TxLfo::tick(void)
+stk::StkFloat TxLfo::tick(unsigned int)
 {
   _sine.setFrequency(_frequency);
   return _sine.tick() * _amplitude +_offset;

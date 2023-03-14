@@ -8,6 +8,13 @@
 
 class TxNode;
 
+struct TxParameterPreset {
+  const char*   name;
+  stk::StkFloat value;
+  stk::StkFloat minimum;
+  stk::StkFloat maximum;
+  bool          visible;
+};
 
 class TxParameter {
 public:
@@ -26,10 +33,13 @@ public:
     KNOB
   };
 
-  TxParameter(const std::string& name, void* data, short type=NONE, short display=HORIZONTAL);
+  TxParameter(const std::string& name, void* data, 
+    short type=NONE, short display=HORIZONTAL);
   virtual ~TxParameter();
   const std::string& name();
-  void connect(TxNode* node);
+  const std::string& label();
+  void setLabel(const std::string& label);
+  void connect(TxNode* node, short channel=0);
   void disconnect();
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;
@@ -40,7 +50,9 @@ protected:
   short             _type;
   short             _display;
   std::string       _name;
+  std::string       _label;
   TxNode*           _input;
+  short             _channel;
   void*             _data;
   TxCallback*       _callback;
 };

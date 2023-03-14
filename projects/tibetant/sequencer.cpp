@@ -62,10 +62,11 @@ uint64_t TxSequencer::timeToIndex(float time)
   return index % _length;
 }
 
-stk::StkFloat TxSequencer::tick(void)
+stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
-  const float sampleRate = computeSampleRate() * ((float)_bpm / 60.f) * 16.f;
-  return _sequence[timeToIndex(_time+=sampleRate)].second;
+  const float sampleRate = computeSampleRate() * ((float)_bpm / 60.f);
+  const Time* time = &_sequence[timeToIndex(_time+=sampleRate)];
+  return channel ? (time->first ? time->second : 0.f) : time->first;
 }
 
 stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
@@ -108,8 +109,8 @@ void TxSequencer::drawTime(uint64_t timeIdx, bool current)
 
   const ImGuiStyle& style = ImGui::GetStyle();
   const ImVec4 btnColor = current ? 
-    (time->first ? ImVec4(1, 0, 0, 1): ImVec4(1, 0.25, 0.5, 1)) 
-    : (time->first ? ImVec4(1, 0.25, 0.5, 1) : style.Colors[ImGuiCol_FrameBg]);
+    (time->first ? ImVec4(1, 0, 0, 1): ImVec4(1, 0.75, 0, 1)) 
+    : (time->first ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
 
   ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
   if (ImGui::Button((hiddenPrefix + "Btn").c_str(), ImVec2(12, 12))) {

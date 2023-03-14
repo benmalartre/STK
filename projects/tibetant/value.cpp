@@ -16,7 +16,7 @@ void TxValue::setValue(const stk::StkFloat& value)
   _value = value;
 }
 
-stk::StkFloat TxValue::tick()
+stk::StkFloat TxValue::tick(unsigned int)
 {
   return _value;
 }

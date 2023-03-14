@@ -129,6 +129,7 @@ SOURCES += $(SRCDIR)/random.cpp
 SOURCES += $(SRCDIR)/generator.cpp
 SOURCES += $(SRCDIR)/effect.cpp
 SOURCES += $(SRCDIR)/lfo.cpp
+SOURCES += $(SRCDIR)/adsr.cpp
 SOURCES += $(SRCDIR)/sequencer.cpp
 SOURCES += $(SRCDIR)/graph.cpp
 SOURCES += $(SRCDIR)/main.cpp

@@ -39,16 +39,15 @@ TxGenerator::~TxGenerator()
   if(_generator) delete _generator;
 }
 
-stk::StkFloat TxGenerator::tick(void)
+stk::StkFloat TxGenerator::tick(unsigned int)
 {
   if(!_generator || !_active || !_dirty) {
     return 0.f;
   }
-  //_dirty = false;
   if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
     setWaveForm(_waveFormIdx);
   }
-  //_dirty = false;
+  _volume = _params[VOLUME]->tick();
   setFrequency(_params[FREQUENCY]->tick());
   setHarmonics(_params[HARMONICS]->tick());
   switch(_waveFormIdx) {
@@ -87,7 +86,7 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
   for(size_t f = 0; f < frames.size(); ++f) {
     setFrequency(_params[FREQUENCY]->tick());
     setHarmonics(_params[HARMONICS]->tick());
-    frames[f] = tick();
+    frames[f] = tick(channel);
     frames[f] *= _volume;
   }
 

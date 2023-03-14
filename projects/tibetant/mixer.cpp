@@ -79,7 +79,6 @@ void TxSequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
     " (max = " << (_length - 1) << ")" << std::endl;
     return;
   }
-  std::cout << "set time : " << timeIdx << ": " << (int)time << std::endl;
   _tracks[trackIdx]->setTime(timeIdx, time);
 }
 

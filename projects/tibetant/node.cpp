@@ -65,11 +65,12 @@ stk::StkFloat TxNode::stereoWeight(uint32_t channelIdx)
   }
 }
 
-TxConnexion* TxNode::connect(TxNode* node, const std::string& name) 
+TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
   TxParameter* parameter = getParameter(name);
   if(parameter) {
-    parameter->connect(node);
+    parameter->connect(node, channel);
+    std::cout << "connect parameter : " << name << std::endl;
     return new TxConnexion({node, this, parameter});
   }
   return NULL;

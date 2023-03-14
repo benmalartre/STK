@@ -16,7 +16,7 @@ public:
   };
   TxLfo(const std::string& name);
   ~TxLfo();
-  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setFrequency(stk::StkFloat frequency);
   void setAmplitude(stk::StkFloat amplitude);
@@ -30,4 +30,4 @@ private:
   stk::StkFloat   _offset;
 };
 
-#endif // TX_GENERATOR_H
+#endif // TX_LFO_H

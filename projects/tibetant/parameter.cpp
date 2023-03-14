@@ -7,11 +7,13 @@
 // ---------------------------------------------------------------
 TxParameter::TxParameter(const std::string& name, void* data, short type, short display)
   : _name(name)
+  , _label(name)
   , _input(NULL)
   , _type(type)
   , _display(display)
   , _data(data)
   , _callback(NULL)
+  , _channel(0)
 {
 }
 
@@ -27,9 +29,20 @@ const std::string& TxParameter::name()
   return _name;
 };
 
-void TxParameter::connect(TxNode* node)
+const std::string& TxParameter::label()
+{
+  return _label;
+};
+
+void TxParameter::setLabel(const std::string& label)
+{
+  _label = label;
+}
+
+void TxParameter::connect(TxNode* node, short channel)
 {
   _input = node;
+  _channel = channel;
 }
 
 void TxParameter::disconnect()
@@ -56,7 +69,7 @@ void TxParameterBool::set(stk::StkFloat value)
 stk::StkFloat TxParameterBool::tick()
 {
   if(_input) {
-    const bool value = (bool)_input->tick();
+    const bool value = (bool)_input->tick(_channel);
     return (stk::StkFloat)value;
   }
   return *(stk::StkFloat*)_data;
@@ -64,7 +77,7 @@ stk::StkFloat TxParameterBool::tick()
 
 bool TxParameterBool::draw()
 {
-  return ImGui::Checkbox(_name.c_str(), (bool*)_data);
+  return ImGui::Checkbox(_label.c_str(), (bool*)_data);
 }
 
 // TxParameterInt
@@ -95,7 +108,7 @@ void TxParameterInt::setMaximum(int value)
 stk::StkFloat TxParameterInt::tick()
 {
   if(_input) {
-    const int value = (int)_input->tick();
+    const int value = (int)_input->tick(_channel);
     return (stk::StkFloat)value;
   }
   return (stk::StkFloat)*(int*)_data;
@@ -106,13 +119,13 @@ bool TxParameterInt::draw()
   bool modified = false;
   switch(_display) {
     case TxParameter::HORIZONTAL:
-      modified = ImGui::SliderInt(_name.c_str(), (int*)_data, _minimum, _maximum);
+      modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
       break;
     case TxParameter::VERTICAL:
-      modified = ImGui::VSliderInt(_name.c_str(),ImVec2(20, 100), (int*)_data, _minimum, _maximum);
+      modified = ImGui::VSliderInt(_label.c_str(),ImVec2(20, 100), (int*)_data, _minimum, _maximum);
       break;
     case TxParameter::KNOB:
-      modified = ImGuiKnobs::KnobInt(_name.c_str(), (int*)_data, _minimum, _maximum);
+      modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum);
       break;
   }
   if(modified && _callback) _callback->execute();
@@ -136,7 +149,7 @@ void TxParameterEnum::set(stk::StkFloat value)
 stk::StkFloat TxParameterEnum::tick()
 {
   if(_input) {
-    const int value = ((int)_input->tick()) % _num;
+    const int value = ((int)_input->tick(_channel)) % _num;
     return (stk::StkFloat)value;
   }
   return (stk::StkFloat)*(int*)_data;
@@ -146,7 +159,7 @@ bool TxParameterEnum::draw()
 {
   int value = *(int*)_data;
   bool modified = false;
-  if (ImGui::BeginCombo(_name.c_str(), _names[value], ImGuiComboFlags_NoArrowButton))
+  if (ImGui::BeginCombo(_label.c_str(), _names[value], ImGuiComboFlags_NoArrowButton))
   {
     for (int n = 0; n < _num; ++n)
     {
@@ -194,7 +207,7 @@ stk::StkFloat TxParameterFloat::tick()
 {
   if(_input) {
     
-    return _input->tick();
+    return _input->tick(_channel);
   }
   return *(stk::StkFloat*)_data;
 }
@@ -204,13 +217,13 @@ bool TxParameterFloat::draw()
   bool modified = false;
   switch(_display) {
     case TxParameter::HORIZONTAL:
-      modified = ImGui::SliderFloat(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+      modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
       break;
     case TxParameter::VERTICAL:
-      modified = ImGui::VSliderFloat(_name.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
+      modified = ImGui::VSliderFloat(_label.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
       break;
     case TxParameter::KNOB:
-      modified = ImGuiKnobs::Knob(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
+      modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
         0.f, "%.3f", ImGuiKnobVariant_WiperDot);
       break;
   }

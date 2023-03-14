@@ -18,10 +18,20 @@ public:
     PITSHIFT,
     PRCREV
   };
+
+  enum Parameters {
+    MODDEPTH = TxNode::LAST,
+    MODFREQUENCY,
+    DELAY,
+    MAXIMUMDELAY,
+    FREQUENCY,
+    HARMONICS, 
+    LAST
+  };
   
   TxEffect(const std::string& name);
   ~TxEffect();
-  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(unsigned int) override;
   stk::StkFloat tick(stk::StkFloat input);
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 

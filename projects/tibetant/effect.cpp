@@ -11,7 +11,7 @@ TxEffect::~TxEffect()
 {
 }
 
-stk::StkFloat TxEffect::tick(void)
+stk::StkFloat TxEffect::tick(unsigned int)
 {
   return 0.f;// _effect->tick();
 }

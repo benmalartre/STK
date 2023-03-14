@@ -28,7 +28,7 @@ public:
 
   TxGenerator(const std::string& name);
   ~TxGenerator();
-  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setWaveForm(short index);
   void setFrequency(const stk::StkFloat& frequency);

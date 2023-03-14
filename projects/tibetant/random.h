@@ -13,7 +13,7 @@ public:
   };
   TxRandom(const std::string& name);
   ~TxRandom();
-  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);

@@ -24,7 +24,7 @@ public:
   void setBPM(uint32_t bpm);
   
   void setTime(uint64_t time, const Time& value);
-  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(unsigned int channel) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   
   void start();

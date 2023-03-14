@@ -7,7 +7,7 @@ class TxValue : public TxNode {
 public:
   TxValue(const std::string& name);
   ~TxValue();
-  stk::StkFloat tick(void) override;
+  stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
   void setValue(const stk::StkFloat& value);
 private:
