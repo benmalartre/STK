@@ -6,6 +6,8 @@
 #include <Noise.h>
 #include <SineWave.h>
 #include <SingWave.h>
+#include <Modulate.h>
+#include <Granulate.h>
 
 const char* TxGenerator::WaveFormName[TxGenerator::NumWaveForm] = {
   "Blit",
@@ -30,7 +32,6 @@ TxGenerator::TxGenerator(const std::string& name)
     TxGenerator::NumWaveForm, &_waveFormIdx));
   _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
-  _params.back()->setCallback(new TxCallback((CALLBACK_FN)&setHarmonicsCallback, (void*)this));
 }
 
 TxGenerator::~TxGenerator() 
@@ -44,9 +45,12 @@ stk::StkFloat TxGenerator::tick(void)
     return 0.f;
   }
   //_dirty = false;
+  if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
+    setWaveForm(_waveFormIdx);
+  }
+  //_dirty = false;
   setFrequency(_params[FREQUENCY]->tick());
   setHarmonics(_params[HARMONICS]->tick());
-  
   switch(_waveFormIdx) {
     case BLIT:
       return ((stk::Blit*)_generator)->tick() * _volume;
@@ -76,7 +80,9 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
   }
 
   //_dirty = false;
-  if(_lastWaveFormIdx != _waveFormIdx) setWaveForm(_waveFormIdx);
+  if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
+    setWaveForm(_waveFormIdx);
+  }
   
   for(size_t f = 0; f < frames.size(); ++f) {
     setFrequency(_params[FREQUENCY]->tick());
@@ -88,11 +94,11 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxGenerator::setWaveForm(int8_t index)
+void TxGenerator::setWaveForm(short index)
 {
+  std::cout << index << "," << NumWaveForm << std::endl;
   _waveFormIdx = index % NumWaveForm;
   if(_generator) delete _generator;
-
   std::cout << "set wave form : " << _waveFormIdx << std::endl;
 
   switch(_waveFormIdx) {

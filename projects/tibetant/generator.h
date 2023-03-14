@@ -5,10 +5,11 @@
 #ifndef TX_GENERATOR_H
 #define TX_GENERATOR_H
 
-#define TX_NUM_SIGNAL 6
-
 class TxGenerator : public TxNode {
 public:
+  static const int NumWaveForm = 6;
+  static const char* WaveFormName[NumWaveForm];
+
   enum Type {
     BLIT,
     BLITSAW,
@@ -17,9 +18,6 @@ public:
     SINEWAVE,
     SINGWAVE
   };
-
-  static const int NumWaveForm = 6;
-  static const char* WaveFormName[NumWaveForm];
 
   enum Parameters {
     WAVEFORM = TxNode::LAST,
@@ -32,12 +30,11 @@ public:
   ~TxGenerator();
   stk::StkFloat tick(void) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
-  void setWaveForm(int8_t index);
+  void setWaveForm(short index);
   void setFrequency(const stk::StkFloat& frequency);
   void setHarmonics(int harmonics);
 
   void draw() override;
-  void hello(){std::cout << "hello ben :)" << std::endl;};
 
 private:
   stk::Generator* _generator;
@@ -49,11 +46,5 @@ private:
   int             _waveFormIdx;
   
 };
-
-// callbacks
-static void setHarmonicsCallback(void* ctxt) 
-{
-  static_cast<TxGenerator*>(ctxt)->hello();
-}
 
 #endif // TX_GENERATOR_H

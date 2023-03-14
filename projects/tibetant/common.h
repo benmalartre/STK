@@ -2,12 +2,16 @@
 #include <GLFW/glfw3.h>
 
 // Dear ImGui
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui_internal.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_stdlib.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_plot.h>
 #include <imgui/imgui_knobs.h>
+#include <imgui/implot.h>
+
 
 // Standard Template Library
 #include <iostream>
@@ -32,9 +36,9 @@ static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
 };
 
-static std::string computeHiddenName(const char* prefix, void* ptr) 
-{
-  return std::string(prefix)+ std::string("##") + std::to_string((size_t)ptr);
-}
+static float computeSampleRate() {
+  return 1.f / stk::Stk::sampleRate();
+};
+
 
 #endif // TX_COMMON_H

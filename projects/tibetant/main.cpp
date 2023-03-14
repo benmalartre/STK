@@ -3,10 +3,11 @@
 #include "lfo.h"
 #include "random.h"
 #include "sequencer.h"
+#include "graph.h"
 
 TxSequencer sequencer;
 stk::StkFrames frames;
-std::vector<TxNode*> nodes;
+std::vector<TxGraph*> graphs;
 
 constexpr size_t TX_BUFFER_SIZE = 64 * stk::RT_BUFFER_SIZE;
 constexpr size_t TX_BUFFER_OFFSET = stk::RT_BUFFER_SIZE;
@@ -33,12 +34,15 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
   stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
-  stk::StkFrames& frames = *(stk::StkFrames*)userData;
-  sequencer.tick(frames, 0);
+  TxGraph* graph = graphs[0];
+  //stk::StkFrames& frames = *(stk::StkFrames*)userData;
+  //generator.tick(frames, 0);
   
-  feedBuffers(frames);
-  for ( unsigned int i=0; i < frames.size(); ++i) {
-    *samples++ = frames[i];
+  //feedBuffers(frames);
+  for ( unsigned int i=0; i < nBufferFrames; ++i) {
+    const float sample = graph->tick();
+    *samples++ = sample;
+    *samples++ = sample;
   }
   
 
@@ -64,8 +68,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 static uint8_t BASS[16] = {
-  110, 0, 0, 0, 110, 0, 0, 0,
-  110, 0, 0, 0, 110, 0, 55, 0
+  110, 20, 20, 10, 110, 20, 20, 10,
+  110, 30, 110, 20, 110, 55, 55, 33
 };
 
 static uint8_t DRUM[16] = {
@@ -155,9 +159,11 @@ void drawPlot(int width, int height) {
   ImGui::End();
 }
 
-void setupStyle( bool bStyleDark_, float alpha_  )
+void setupStyle()
 {
-  ImGuiStyle& style = ImGui::GetStyle();
+  ImGuiStyle* style = &ImGui::GetStyle();
+  ImGui::StyleColorsLight(style);
+  /*
 
 	style.GrabRounding = 0.f;
 	style.WindowRounding = 0.f;
@@ -201,6 +207,7 @@ void setupStyle( bool bStyleDark_, float alpha_  )
 	style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 	style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.32f, 0.52f, 0.65f, 1.00f);
 	style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
+  */
 }
 
 
@@ -243,9 +250,8 @@ void draw(GLFWwindow* window)
 
   //drawPlot(display_w, display_h);
   sequencer.draw();
-  for(auto& node: nodes) {
-    node->draw();
-  }
+  for(auto& graph: graphs)graph->draw();
+
   
   ImGui::Render();
 
@@ -269,7 +275,7 @@ int main()
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330 ");
 
-  setupStyle(false, 0.5f);
+  setupStyle();
   
 
   // Set the global sample rate and rawwave path before creating class instances.
@@ -297,55 +303,66 @@ int main()
   }
 
   sequencer.setLength(16);
-  TxSequencer::Track* track1 = sequencer.addTrack("Track1");
+  for(size_t t = 0; t < 16; ++t)
+    sequencer.setTime(t, {true, BASS[t]});
+  sequencer.start();
+
+  TxGraph* graph = new TxGraph("Graph");
+  TxGenerator* generator = new TxGenerator("Wave");
+
+  generator->setHarmonics(7);
+
+  generator->connect(&sequencer, "Frequency");
+
+  graph->addNode(generator);
+  graphs.push_back(graph);
+  /*
+  TxGraph* graph1 = new TxGraph("Graph1");
+  graphs.push_back(graph1);
   TxGenerator* bass = new TxGenerator("Bass");
-  nodes.push_back(bass);
   bass->setFrequency(110.f);
   bass->setWaveForm(TxGenerator::BLITSQUARE);
   bass->setHarmonics(7);
-  track1->setNode(bass);
   
   TxParameter* frequency = bass->getParameter("Frequency");
   TxParameter* harmonics = bass->getParameter("Harmonics");
 
   TxLfo* fLfo = new TxLfo("BassFrequencyLfo");
-  nodes.push_back(fLfo);
   fLfo->setFrequency(1.f);
   fLfo->setAmplitude(10.f);
   fLfo->setOffset(60.f);
   frequency->connect(fLfo);
 
   TxLfo* hLfo = new TxLfo("BassHarmonicsLfo");
-  nodes.push_back(hLfo);
   hLfo->setFrequency(0.1f);
   hLfo->setAmplitude(5.f);
   hLfo->setOffset(7.f);
   harmonics->connect(hLfo);
-  
-  //bass->setFrequency(60.f);
-  for(size_t t = 0; t < 16; ++t)
-    sequencer.setTime(0, t, BASS[t]);
 
-  TxSequencer::Track* track2 = sequencer.addTrack("Track2");
+  graph1->addNode(fLfo);
+  graph1->addNode(hLfo);
+  graph1->addNode(bass);  
+
+  TxGraph* graph2 = new TxGraph("Graph2");
+  graphs.push_back(graph2);
   TxGenerator* drum = new TxGenerator("Drum");
-  nodes.push_back(drum);
   drum->setFrequency(60.f);
   drum->setWaveForm(TxGenerator::BLITSAW);
   drum->setHarmonics(5);
-  track2->setNode(drum);
 
   TxRandom* random = new TxRandom("DrumRandomFrequency");
-  nodes.push_back(random);
   random->setMinimum(20.f);
   random->setMaximum(220.f);
   random->setFrequency(1.f);
   drum->connect(random, "Frequency");
+
+  graph2->addNode(random);
+  graph2->addNode(drum);
+  */
   //drum->setWaveForm(4);
   //drum->setFrequency(88.f);
-  for(size_t t = 0; t < 16; ++t)
-    sequencer.setTime(1, t, DRUM[t]);
-
-  sequencer.start();
+  //for(size_t t = 0; t < 16; ++t)
+  //  track2->setTime(1, t, DRUM[t]);
 
   try {
     dac.startStream();

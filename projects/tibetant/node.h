@@ -5,6 +5,15 @@
 #ifndef TX_NODE_H
 #define TX_NODE_H
 
+
+class TxNode;
+
+struct TxConnexion {
+  TxNode*       start;
+  TxNode*       end;
+  TxParameter*  target;
+};
+
 class TxNode {
 public:
 
@@ -27,7 +36,7 @@ public:
   void setStereo(stk::StkFloat stereo);
   void setVolume(stk::StkFloat volume);
   stk::StkFloat stereoWeight(uint32_t channelIdx);
-  bool connect(TxNode* node, const std::string& name);
+  TxConnexion* connect(TxNode* node, const std::string& name);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
   void commonControls();
