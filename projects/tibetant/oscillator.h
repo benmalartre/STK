@@ -5,7 +5,7 @@
 #ifndef TX_GENERATOR_H
 #define TX_GENERATOR_H
 
-class TxGenerator : public TxNode {
+class TxOscillator : public TxNode {
 public:
   static const int NumWaveForm = 6;
   static const char* WaveFormName[NumWaveForm];
@@ -26,8 +26,8 @@ public:
     LAST
   };
 
-  TxGenerator(const std::string& name);
-  ~TxGenerator();
+  TxOscillator(const std::string& name);
+  ~TxOscillator();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setWaveForm(short index);

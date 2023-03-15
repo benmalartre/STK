@@ -1,5 +1,5 @@
 #include "common.h"
-#include "generator.h"
+#include "oscillator.h"
 #include <Blit.h>
 #include <BlitSaw.h>
 #include <BlitSquare.h>
@@ -9,7 +9,7 @@
 #include <Modulate.h>
 #include <Granulate.h>
 
-const char* TxGenerator::WaveFormName[TxGenerator::NumWaveForm] = {
+const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "Blit",
   "BlitSaw",
   "BlitSquare",
@@ -18,7 +18,7 @@ const char* TxGenerator::WaveFormName[TxGenerator::NumWaveForm] = {
   "SingWave"
 };
 
-TxGenerator::TxGenerator(const std::string& name) 
+TxOscillator::TxOscillator(const std::string& name) 
   : TxNode(name)
   , _generator(NULL)
   , _waveFormIdx(-1)
@@ -28,18 +28,18 @@ TxGenerator::TxGenerator(const std::string& name)
   , _harmonics(3)
 {
   setWaveForm(BLIT);
-  _params.push_back(new TxParameterEnum("WaveForm", &TxGenerator::WaveFormName[0], 
-    TxGenerator::NumWaveForm, &_waveFormIdx));
+  _params.push_back(new TxParameterEnum("WaveForm", &TxOscillator::WaveFormName[0], 
+    TxOscillator::NumWaveForm, &_waveFormIdx));
   _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
 }
 
-TxGenerator::~TxGenerator() 
+TxOscillator::~TxOscillator() 
 {
   if(_generator) delete _generator;
 }
 
-stk::StkFloat TxGenerator::tick(unsigned int)
+stk::StkFloat TxOscillator::tick(unsigned int)
 {
   if(!_generator || !_active || !_dirty) {
     return 0.f;
@@ -72,7 +72,7 @@ stk::StkFloat TxGenerator::tick(unsigned int)
   return 0.f;
 }
 
-stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
+stk::StkFrames& TxOscillator::tick(stk::StkFrames& frames, unsigned int channel)
 {
   if(!_generator || !_active || !_dirty) {
     return frames;
@@ -93,7 +93,7 @@ stk::StkFrames& TxGenerator::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxGenerator::setWaveForm(short index)
+void TxOscillator::setWaveForm(short index)
 {
   std::cout << index << "," << NumWaveForm << std::endl;
   _waveFormIdx = index % NumWaveForm;
@@ -141,7 +141,7 @@ void TxGenerator::setWaveForm(short index)
   _lastWaveFormIdx = _waveFormIdx;
 }
 
-void TxGenerator::setFrequency(const stk::StkFloat& frequency)
+void TxOscillator::setFrequency(const stk::StkFloat& frequency)
 {
   _frequency = frequency;
 
@@ -171,7 +171,7 @@ void TxGenerator::setFrequency(const stk::StkFloat& frequency)
   }
 }
 
-void TxGenerator::setHarmonics(int harmonics)
+void TxOscillator::setHarmonics(int harmonics)
 {
   if(harmonics == _lastHarmonics)return;
   _lastHarmonics = harmonics;
@@ -198,18 +198,18 @@ void TxGenerator::setHarmonics(int harmonics)
   }
 }
 
-void TxGenerator::draw()
+void TxOscillator::draw()
 {
   ImGui::Begin(_name.c_str(), NULL);
 
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
-  TxParameter* waveform = _params[TxGenerator::WAVEFORM];
+  TxParameter* waveform = _params[TxOscillator::WAVEFORM];
   waveform->draw();
-  TxParameter* frequency = _params[TxGenerator::FREQUENCY];
+  TxParameter* frequency = _params[TxOscillator::FREQUENCY];
   frequency->draw();
   ImGui::SameLine();
-  TxParameter* harmonics = _params[TxGenerator::HARMONICS];
+  TxParameter* harmonics = _params[TxOscillator::HARMONICS];
   harmonics->draw();
   ImGui::EndGroup();
 

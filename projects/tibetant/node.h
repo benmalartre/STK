@@ -21,7 +21,6 @@ public:
     SAMPLES,
     ACTIVE,
     VOLUME,
-    STEREO,
     LAST
   };
 
@@ -33,9 +32,7 @@ public:
   int numChannels();
   void setActive(bool state);
   void setDirty(bool state);
-  void setStereo(stk::StkFloat stereo);
   void setVolume(stk::StkFloat volume);
-  stk::StkFloat stereoWeight(uint32_t channelIdx);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
@@ -48,7 +45,6 @@ protected:
   bool                      _active;
   bool                      _dirty;
   stk::StkFloat             _volume;
-  stk::StkFloat             _stereo;
   stk::StkFrames            _frames;
   std::vector<TxParameter*> _params;
 };

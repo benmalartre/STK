@@ -1,12 +1,12 @@
 #include "common.h"
-#include "generator.h"
+#include "oscillator.h"
 #include "lfo.h"
 #include "adsr.h"
 #include "random.h"
 #include "sequencer.h"
 #include "graph.h"
 
-TxSequencer sequencer;
+TxSequencer* sequencer;
 stk::StkFrames frames;
 std::vector<TxGraph*> graphs;
 
@@ -45,8 +45,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
     const float sample = graph->tick();
     *samples++ = sample;
     *samples++ = sample;
-    time.increment();
   }
+  time.increment();
   
 
   /*
@@ -252,7 +252,7 @@ void draw(GLFWwindow* window)
   */
 
   //drawPlot(display_w, display_h);
-  sequencer.draw();
+  sequencer->draw();
   for(auto& graph: graphs)graph->draw();
 
   ImGui::ShowDemoWindow();
@@ -305,22 +305,29 @@ int main()
     return 0;
   }
 
-  sequencer.setLength(16);
+  sequencer = new TxSequencer("Sequencer");
+  sequencer->setLength(16);
   for(size_t t = 0; t < 16; ++t)
-    sequencer.setBeat(t, {!(t%2), BASS[t]});
-  sequencer.start();
+    sequencer->setBeat(t, {!(t%2), BASS[t]});
+  sequencer->start();
 
   TxGraph* graph = new TxGraph("Graph");
-  TxGenerator* generator = new TxGenerator("Wave");
+  TxOscillator* generator = new TxOscillator("Wave");
   generator->setHarmonics(7);
 
   TxAdsr* adsr = new TxAdsr("Adsr");
   graph->addNode(adsr);
-  adsr->connect(&sequencer, "Trigger");
-
-  generator->connect(&sequencer, "Frequency", 1);
+  adsr->connect(sequencer, "Trigger");
+  generator->connect(sequencer, "Frequency", 1);
 
   generator->connect(adsr, "Volume");
+
+  TxLfo* lfo = new TxLfo("Lfo");
+  graph->addNode(lfo);
+  lfo->setFrequency(0.01f);
+  lfo->setAmplitude(5.f);
+  lfo->setOffset(6.f);
+  generator->connect(lfo, "Harmonics");
 
 
   graph->addNode(generator);
@@ -328,9 +335,9 @@ int main()
   /*
   TxGraph* graph1 = new TxGraph("Graph1");
   graphs.push_back(graph1);
-  TxGenerator* bass = new TxGenerator("Bass");
+  TxOscillator* bass = new TxOscillator("Bass");
   bass->setFrequency(110.f);
-  bass->setWaveForm(TxGenerator::BLITSQUARE);
+  bass->setWaveForm(TxOscillator::BLITSQUARE);
   bass->setHarmonics(7);
   
   TxParameter* frequency = bass->getParameter("Frequency");
@@ -354,9 +361,9 @@ int main()
 
   TxGraph* graph2 = new TxGraph("Graph2");
   graphs.push_back(graph2);
-  TxGenerator* drum = new TxGenerator("Drum");
+  TxOscillator* drum = new TxOscillator("Drum");
   drum->setFrequency(60.f);
-  drum->setWaveForm(TxGenerator::BLITSAW);
+  drum->setWaveForm(TxOscillator::BLITSAW);
   drum->setHarmonics(5);
 
   TxRandom* random = new TxRandom("DrumRandomFrequency");

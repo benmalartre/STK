@@ -9,10 +9,10 @@ TxAdsr::TxAdsr(const std::string& name)
   , _release(0.25f)
   , _trigger(false)
 {
-  _params.push_back(new TxParameterFloat("Attack", 0.f, 1.f, &_attack, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Decay", 0.f, 1.f, &_decay, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Sustain", 0.f, 1.f, &_sustain, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Release", 0.f, 1.f, &_release, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Attack", 0.01f, 1.f, &_attack, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Decay", 0.01f, 1.f, &_decay, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Sustain", 0.01f, 1.f, &_sustain, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Release", 0.01f, 1.f, &_release, TxParameter::KNOB));
   _params.push_back(new TxParameterBool("Trigger", &_trigger));
 
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
@@ -25,6 +25,8 @@ TxAdsr::~TxAdsr()
 stk::StkFloat TxAdsr::tick(unsigned int)
 {
   _trigger = _params[TxAdsr::TRIGGER]->tick();
+  _adsr.setAllTimes(_attack, _decay, _sustain, _release);
+
   if(_trigger) _adsr.keyOn();
   else _adsr.keyOff();
   
@@ -33,6 +35,11 @@ stk::StkFloat TxAdsr::tick(unsigned int)
 
 stk::StkFrames& TxAdsr::tick(stk::StkFrames& frames, unsigned int channel)
 {
+  _params[TxAdsr::ATTACK]->tick();
+  _params[TxAdsr::DECAY]->tick();
+  _params[TxAdsr::SUSTAIN]->tick();
+  _params[TxAdsr::RELEASE]->tick();
+
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
 
   stk::StkFloat* samples = &frames[0];
@@ -70,22 +77,25 @@ void TxAdsr::draw()
 
   ImGui::BeginGroup();
   ImGui::Checkbox("Trigger", &_trigger);
-  /*
-  ImGui::SetNextItemWidth(128);
-  TxParameter* frequency = _params[TxAdsr::FREQUENCY];
-  frequency->draw();
+  
+  TxParameter* attack = _params[TxAdsr::ATTACK];
+  attack->draw();
   ImGui::SameLine();
-  TxParameter* amplitude = _params[TxAdsr::AMPLITUDE];
-  amplitude->draw();
+  TxParameter* decay = _params[TxAdsr::DECAY];
+  decay->draw();
   ImGui::SameLine();
-  TxParameter* offset = _params[TxAdsr::OFFSET];
-  offset->draw();
-  */
+  TxParameter* sustain = _params[TxAdsr::SUSTAIN];
+  sustain->draw();
+  ImGui::SameLine();
+  TxParameter* release = _params[TxAdsr::RELEASE];
+  release->draw();
+  
   ImGui::EndGroup();
-
+/*
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
   commonControls();
+*/
   ImGui::End();
 }

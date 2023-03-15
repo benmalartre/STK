@@ -17,8 +17,8 @@ public:
   using Sequence = std::vector<Beat>;
 
 public:
-  TxSequencer();
-  TxSequencer(uint32_t bpm, uint64_t length);
+  TxSequencer(const std::string& name);
+  TxSequencer(const std::string& name, uint32_t bpm, uint64_t length);
   ~TxSequencer();
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);
@@ -29,7 +29,7 @@ public:
   
   void start();
   void stop();
-  uint64_t timeToIndex(float time);
+  uint32_t timeToIndex(float time);
 
   void drawBeat(uint64_t timeIdx, bool active);
   void draw() override;

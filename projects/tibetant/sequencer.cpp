@@ -1,16 +1,16 @@
 #include "sequencer.h"
 
 
-TxSequencer::TxSequencer()
-  : TxNode("TxSequencer", TX_NUM_CHANNELS)
-  , _bpm(120)
+TxSequencer::TxSequencer(const std::string& name)
+  : TxNode(name, TX_NUM_CHANNELS)
+  , _bpm(60)
   , _length(8)
   , _running(false)
 {
 }
 
-TxSequencer::TxSequencer(uint32_t bpm, uint64_t length)
-  : TxNode("TxSequencer", TX_NUM_CHANNELS)
+TxSequencer::TxSequencer(const std::string& name, uint32_t bpm, uint64_t length)
+  : TxNode(name, TX_NUM_CHANNELS)
   , _bpm(bpm)
   , _length(length)
   , _running(false)
@@ -53,13 +53,9 @@ void TxSequencer::stop()
   _running = false;
 }
 
-uint64_t TxSequencer::timeToIndex(float time)
+uint32_t TxSequencer::timeToIndex(float time)
 {
-  const float rTime = time * (_bpm / 60.f);
-  const unsigned int iTime = (unsigned int) rTime;
-  //const float aTime = time - iTime;
-
-  return iTime % _length;
+  return (int)(time / 60.f * (float)_bpm * 16) % _length;
 }
 
 stk::StkFloat TxSequencer::tick(unsigned int channel)
@@ -138,14 +134,19 @@ void TxSequencer::draw()
   
   TxTime& time = TxTime::instance();
   float t = time.get();
+
   //commonControls();
   uint64_t tid = timeToIndex(t);
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
   if(ImGui::Button("Reset Time")) time.reset();
   ImGui::SameLine();
+  if(ImGui::Button("Incr Time")) time.incr100();
+  ImGui::SameLine();
   ImGui::SetNextItemWidth(100);
   ImGui::Text("Time : %fs", t);
+  ImGui::SameLine();
+  ImGui::Text("Rate : %fs", time.rate());
   ImGui::SameLine();
   ImGui::Text("Index : %llu", tid);
   ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm", 

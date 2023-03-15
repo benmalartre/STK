@@ -126,7 +126,7 @@ SOURCES += $(SRCDIR)/parameter.cpp
 SOURCES += $(SRCDIR)/node.cpp
 SOURCES += $(SRCDIR)/value.cpp
 SOURCES += $(SRCDIR)/random.cpp
-SOURCES += $(SRCDIR)/generator.cpp
+SOURCES += $(SRCDIR)/oscillator.cpp
 SOURCES += $(SRCDIR)/effect.cpp
 SOURCES += $(SRCDIR)/lfo.cpp
 SOURCES += $(SRCDIR)/adsr.cpp
@@ -150,7 +150,7 @@ DEPENDS:     INCLUDES := $(INCLUDES)
 
 # rules definitions
 #
-.PHONY:	all depend clean print test deploy
+.PHONY:	all depend clean cleanall print test deploy
 
 all:
 	 +@make -f $(MAKEFILE) print
@@ -171,7 +171,7 @@ test:
 	 @cp Tibetant $(DEST)
 
 deploy:
-	 +@make -f $(SRCDIR)/MakefileMacOS clean
+	 +@make -f $(SRCDIR)/MakefileMacOS cleanall
 	 +@make -f $(SRCDIR)/MakefileMacOS
 	 #
 	 @echo "_______________________________________________________________"
@@ -198,4 +198,7 @@ depend:
 	 makedepend $(INCLUDES) $(MDFLAGS) -f$(MAKEFILE) $(SOURCES)
 
 clean:
+	 rm -rf *.o *.gah *.so $(EXE_NAME)
+
+cleanall:
 	 rm -rf *.o *.gah *.so $(STK_PATH)/*.o $(IMGUI_DIR)/*.o $(EXE_NAME)

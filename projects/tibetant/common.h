@@ -42,16 +42,21 @@ static float computeSampleRate() {
 
 class TxTime {
 public:
-  TxTime() : _time(0.f), _rate(1.f / stk::Stk::sampleRate()) {};
+  TxTime() : _time(0.f), _rate((1.f / stk::Stk::sampleRate() * TX_NUM_CHANNELS)) {};
   ~TxTime() {};
 
   TxTime(TxTime &other) = delete;
   void operator=(const TxTime &) = delete;
 
-  void reset() {_time = 0.f; _rate = 1.f / stk::Stk::sampleRate();};
-  void increment() {_time += _rate;};
+  void reset() {
+    _time = 0.f; 
+    _rate = (1.f / stk::Stk::sampleRate() * TX_NUM_CHANNELS);
+  };
+  void increment() {_time += _rate * stk::RT_BUFFER_SIZE;};
+  void incr100() {_time += 100.f;};
   float get() {return _time;};
   void set(float t) {_time = t;};
+  float rate() {return _rate;};
   static TxTime& instance() {
     static TxTime instance;
     return instance;

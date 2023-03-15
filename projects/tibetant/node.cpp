@@ -8,12 +8,11 @@ TxNode::TxNode(const std::string& name, uint32_t numChannels)
   , _dirty(true)
   , _volume(1.f)
 {
-  _frames.resize(1, 1, 0.0);
+  _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
 
   _params.push_back(new TxParameterSamples("Samples"));
   _params.push_back(new TxParameterBool("Active", &_active));
   _params.push_back(new TxParameterFloat("Volume", 0.f, 2.f, &_volume, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Stereo", -1.f, 1.f, &_stereo, TxParameter::KNOB));
 }
 
 TxNode::~TxNode()
@@ -43,27 +42,10 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
   return _frames[channel];
 }
 
-void TxNode::setStereo(stk::StkFloat stereo) 
-{
-  _stereo = stereo;
-};
-
 void TxNode::setVolume(stk::StkFloat volume) 
 {
   _volume = volume;
 };
-
-stk::StkFloat TxNode::stereoWeight(uint32_t channelIdx)
-{
-  if(_stereo == 0.f) return 1.f;
-
-  const stk::StkFloat nrm = _stereo * 0.5f + 0.5f;
-  if(channelIdx == 0) {
-    return 2.f * (1.f - nrm);
-  } else {
-    return 2.f * nrm;
-  }
-}
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
@@ -102,10 +84,6 @@ void TxNode::commonControls()
 
   TxParameter* volume = _params[VOLUME];
   volume->draw();
-  
-  ImGui::SameLine();
-  TxParameter* stereo = _params[STEREO];
-  stereo->draw();
   
   ImGui::EndGroup();
 }

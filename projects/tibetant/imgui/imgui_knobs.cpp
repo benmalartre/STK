@@ -79,7 +79,10 @@ namespace ImGuiKnobs {
                     drag_flags |= ImGuiSliderFlags_Vertical;
                 }
                 value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
-
+                if(value_changed) {
+                  if(*p_value < v_min) *p_value = v_min;
+                  else if(*p_value > v_max) *p_value = v_max;
+                }
                 angle_min = IMGUIKNOBS_PI * 0.75f;
                 angle_max = IMGUIKNOBS_PI * 2.25f;
                 center = {screen_pos[0] + radius, screen_pos[1] + radius};
@@ -181,6 +184,8 @@ namespace ImGuiKnobs {
                 auto changed = ImGui::DragScalar("###knob_drag", data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
                 if (changed) {
                     k.value_changed = true;
+                    if(*p_value < v_min) *p_value = v_min;
+                    else if(*p_value > v_max) *p_value = v_max;
                 }
             }
 
