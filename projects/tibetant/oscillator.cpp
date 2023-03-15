@@ -50,26 +50,34 @@ stk::StkFloat TxOscillator::tick(unsigned int)
   _volume = _params[VOLUME]->tick();
   setFrequency(_params[FREQUENCY]->tick());
   setHarmonics(_params[HARMONICS]->tick());
+  float sample = 0.f;
   switch(_waveFormIdx) {
     case BLIT:
-      return ((stk::Blit*)_generator)->tick() * _volume;
+      sample = ((stk::Blit*)_generator)->tick() * _volume;
+      break;
 
     case BLITSAW:
-      return ((stk::BlitSaw*)_generator)->tick() * _volume;
+      sample = ((stk::BlitSaw*)_generator)->tick() * _volume;
+      break;
 
     case BLITSQUARE:
-      return ((stk::BlitSquare*)_generator)->tick() * _volume;
+      sample = ((stk::BlitSquare*)_generator)->tick() * _volume;
+      break;
 
     case NOISE:
-      return ((stk::Noise*)_generator)->tick() * _volume;
+      sample = ((stk::Noise*)_generator)->tick() * _volume;
+      break;
 
     case SINEWAVE:
-      return ((stk::SineWave*)_generator)->tick() * _volume;
+      sample = ((stk::SineWave*)_generator)->tick() * _volume;
+      break;
 
     case SINGWAVE:
-      return ((stk::SingWave*)_generator)->tick() * _volume;
-  }
-  return 0.f;
+      sample = ((stk::SingWave*)_generator)->tick() * _volume;
+      break;
+  }   
+  _buffer.write(sample);
+  return sample;
 }
 
 stk::StkFrames& TxOscillator::tick(stk::StkFrames& frames, unsigned int channel)
@@ -217,6 +225,8 @@ void TxOscillator::draw()
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
   commonControls();
+
+  ImGui::End();
 }
 
 void TxOscillator::reset()

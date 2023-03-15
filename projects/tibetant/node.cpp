@@ -78,6 +78,7 @@ TxParameter* TxNode::getParameter(const std::string& name)
 
 void TxNode::commonControls()
 {
+  _buffer.draw();
   ImGui::BeginGroup();
   TxParameter* active = _params[ACTIVE];
   active->draw();

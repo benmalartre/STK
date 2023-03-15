@@ -395,7 +395,7 @@ int main()
   }
   
   while (!glfwWindowShouldClose(window)) {
-    stk::Stk::sleep( 100 );
+    stk::Stk::sleep( 10 );
     draw(window);
   }
     

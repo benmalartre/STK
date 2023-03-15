@@ -1,5 +1,6 @@
 #include <Stk.h>
 #include <vector>
+#include "buffer.h"
 #include "parameter.h"
 
 #ifndef TX_NODE_H
@@ -47,6 +48,7 @@ protected:
   bool                      _dirty;
   stk::StkFloat             _volume;
   stk::StkFrames            _frames;
+  TxBuffer                  _buffer;
   std::vector<TxParameter*> _params;
 };
 

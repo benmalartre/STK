@@ -126,6 +126,7 @@ SOURCES += $(STK_PATH)/Plucked.cpp
 SOURCES += $(STK_PATH)/RtAudio.cpp
 SOURCES += $(STK_PATH)/FM.cpp
 SOURCES += $(SRCDIR)/parameter.cpp
+SOURCES += $(SRCDIR)/buffer.cpp
 SOURCES += $(SRCDIR)/node.cpp
 SOURCES += $(SRCDIR)/value.cpp
 SOURCES += $(SRCDIR)/random.cpp
