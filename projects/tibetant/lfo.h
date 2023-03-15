@@ -22,6 +22,7 @@ public:
   void setAmplitude(stk::StkFloat amplitude);
   void setOffset(stk::StkFloat offset);
   void draw() override;
+  void reset() override;
 
 private:
   stk::SineWave   _sine;

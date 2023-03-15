@@ -218,3 +218,32 @@ void TxOscillator::draw()
   ImGui::SameLine();
   commonControls();
 }
+
+void TxOscillator::reset()
+{
+  if(!_generator)return;
+  switch(_waveFormIdx) {
+    case BLIT:
+      ((stk::Blit*)_generator)->reset();
+      break;
+
+    case BLITSAW:
+      ((stk::BlitSaw*)_generator)->reset();
+      break;
+
+    case BLITSQUARE:
+      ((stk::BlitSquare*)_generator)->reset();
+      break;
+
+    case NOISE:
+      break;
+
+    case SINEWAVE:
+      ((stk::SineWave*)_generator)->reset();
+      break;
+      
+    case SINGWAVE:
+      ((stk::SingWave*)_generator)->reset();
+      break;
+  }
+}

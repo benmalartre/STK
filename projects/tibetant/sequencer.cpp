@@ -159,3 +159,8 @@ void TxSequencer::draw()
 
   ImGui::End();
 }
+
+void TxSequencer::reset()
+{
+  
+}

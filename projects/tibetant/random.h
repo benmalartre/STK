@@ -20,6 +20,7 @@ public:
   void setSeed(int seed);
   void setFrequency(stk::StkFloat frequency);
   void draw() override;
+  void reset() override;
   void updateBounds();
 
 private:

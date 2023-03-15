@@ -24,19 +24,24 @@ public:
     MODFREQUENCY,
     DELAY,
     MAXIMUMDELAY,
-    FREQUENCY,
-    HARMONICS, 
     LAST
   };
   
   TxEffect(const std::string& name);
   ~TxEffect();
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFloat tick(stk::StkFloat input);
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
+  void draw() override;
+  void reset() override;
+
 private:
-  stk::Effect* _effect;
+  stk::Effect*  _effect;
+  short         _effectIdx;
+  stk::StkFloat _modDepth;
+  stk::StkFloat _modFrequency;
+  int           _delay;
+  int           _maximumDelay;
 };
 
 #endif // TX_GENERATOR_H

@@ -99,3 +99,7 @@ void TxAdsr::draw()
 */
   ImGui::End();
 }
+
+void TxAdsr::reset()
+{
+}

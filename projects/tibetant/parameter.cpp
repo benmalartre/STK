@@ -246,6 +246,10 @@ void TxParameterSamples::set(stk::StkFloat value)
 
 stk::StkFloat TxParameterSamples::tick()
 {
+  if(_input) {
+    
+    return _input->tick(_channel);
+  }
   return 0.f;
 }
 

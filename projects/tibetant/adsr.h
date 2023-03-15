@@ -26,6 +26,7 @@ public:
   void setSustain(stk::StkFloat sustain);
   void setRelease(stk::StkFloat release);
   void draw() override;
+  void reset() override;
 
 private:
   stk::ADSR     _adsr;

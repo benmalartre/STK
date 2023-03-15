@@ -33,6 +33,7 @@ public:
 
   void drawBeat(uint64_t timeIdx, bool active);
   void draw() override;
+  void reset() override;
 
 private:
   Sequence            _sequence;

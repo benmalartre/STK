@@ -1,8 +1,8 @@
-#include "sequencer.h"
+#include "mixer.h"
 
 
-TxSequencer::TxSequencer()
-  : TxNode("TxSequencer", TX_NUM_CHANNELS)
+TxMixer::TxMixer()
+  : TxNode("TxMixer", TX_NUM_CHANNELS)
   , _bpm(60)
   , _n(4)
   , _length(8)
@@ -11,8 +11,8 @@ TxSequencer::TxSequencer()
 {
 }
 
-TxSequencer::TxSequencer(uint32_t bpm, uint32_t n, uint64_t length)
-  : TxNode("TxSequencer", TX_NUM_CHANNELS)
+TxMixer::TxMixer(uint32_t bpm, uint32_t n, uint64_t length)
+  : TxNode("TxMixer", TX_NUM_CHANNELS)
   , _bpm(bpm)
   , _n(n)
   , _length(length)
@@ -21,35 +21,35 @@ TxSequencer::TxSequencer(uint32_t bpm, uint32_t n, uint64_t length)
 {
 }
 
-TxSequencer::~TxSequencer()
+TxMixer::~TxMixer()
 {
 
 }
 
-void TxSequencer::setLength(uint64_t length)
+void TxMixer::setLength(uint64_t length)
 {
   _length = length;
   _sequence.resize(_length + _n);
 }
 
-void TxSequencer::setBPM(uint32_t bpm)
+void TxMixer::setBPM(uint32_t bpm)
 {
   _bpm = bpm;
 }
 
-uint32_t TxSequencer::numTracks()
+uint32_t TxMixer::numTracks()
 {
   return _tracks.size();
 }
 
-TxSequencer::Track* TxSequencer::addTrack(const std::string& name)
+TxMixer::Track* TxMixer::addTrack(const std::string& name)
 {
   _tracks.push_back(new Track(name, _length));
   return _tracks.back();
 }
 
 
-void TxSequencer::removeTrack(uint32_t trackIdx)
+void TxMixer::removeTrack(uint32_t trackIdx)
 {
   if(_tracks.size() > trackIdx) {
     Track* track = _tracks[trackIdx];
@@ -58,7 +58,7 @@ void TxSequencer::removeTrack(uint32_t trackIdx)
   }
 }
 
-TxSequencer::Track* TxSequencer::getTrack(uint32_t trackIdx)
+TxMixer::Track* TxMixer::getTrack(uint32_t trackIdx)
 {
   if(_tracks.size() <= trackIdx) {
     std::cerr << "invalid track index !" << std::endl;
@@ -67,7 +67,7 @@ TxSequencer::Track* TxSequencer::getTrack(uint32_t trackIdx)
   return _tracks[trackIdx];
 }
 
-void TxSequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
+void TxMixer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
 {
   if(_tracks.size() <= trackIdx) {
     std::cerr << "Invalid track index : " << trackIdx << 
@@ -82,34 +82,34 @@ void TxSequencer::setTime(uint32_t trackIdx, uint64_t timeIdx, const Time& time)
   _tracks[trackIdx]->setTime(timeIdx, time);
 }
 
-void TxSequencer::start()
+void TxMixer::start()
 {
   _running = true;
   _time = 0;
 }
 
-void TxSequencer::stop()
+void TxMixer::stop()
 {
   _running = false;
 }
 
-uint64_t TxSequencer::timeToIndex(double time)
+uint64_t TxMixer::timeToIndex(double time)
 {
   uint64_t index = time * (60 / _bpm * _n);
   return index % _length;
 }
 
-stk::StkFloat TxSequencer::tick(void)
+stk::StkFloat TxMixer::tick(void)
 {
   return RANDOM_LO_HI(-1.f, 1.f);
 }
 
-stk::StkFloat TxSequencer::tick(uint32_t trackIdx)
+stk::StkFloat TxMixer::tick(uint32_t trackIdx)
 {
   return RANDOM_LO_HI(-1.f, 1.f);
 }
 
-stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
+stk::StkFrames& TxMixer::tick(stk::StkFrames& frames, unsigned int channel)
 {
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   if(!_active) return frames;
@@ -136,7 +136,7 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxSequencer::draw()
+void TxMixer::draw()
 {
   ImGui::Begin(_name.c_str(), NULL);
   
@@ -147,3 +147,4 @@ void TxSequencer::draw()
 
   ImGui::End();
 }
+

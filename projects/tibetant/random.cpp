@@ -107,3 +107,8 @@ void TxRandom::draw()
   commonControls();
   ImGui::End();
 }
+
+void TxRandom::reset()
+{
+  srand(_seed);
+}

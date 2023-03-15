@@ -38,6 +38,7 @@ public:
   TxParameter* getParameter(const std::string& name);
   void commonControls();
   virtual void draw() = 0;
+  virtual void reset() = 0;
 
 protected:
   std::string               _name;

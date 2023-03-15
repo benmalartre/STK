@@ -3,6 +3,7 @@
 #include "lfo.h"
 #include "adsr.h"
 #include "random.h"
+#include "effect.h"
 #include "sequencer.h"
 #include "graph.h"
 
@@ -329,8 +330,13 @@ int main()
   lfo->setOffset(6.f);
   generator->connect(lfo, "Harmonics");
 
-
   graph->addNode(generator);
+
+  TxEffect* chorus = new TxEffect("Chorus");
+  chorus->connect(generator, "Samples");
+
+  graph->addNode(chorus);
+
   graphs.push_back(graph);
   /*
   TxGraph* graph1 = new TxGraph("Graph1");

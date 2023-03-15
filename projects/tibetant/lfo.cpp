@@ -77,3 +77,8 @@ void TxLfo::draw()
   commonControls();
   ImGui::End();
 }
+
+void TxLfo::reset()
+{
+  _sine.reset();
+}

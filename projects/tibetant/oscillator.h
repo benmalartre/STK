@@ -35,6 +35,7 @@ public:
   void setHarmonics(int harmonics);
 
   void draw() override;
+  void reset() override;
 
 private:
   stk::Generator* _generator;
