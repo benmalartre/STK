@@ -40,10 +40,12 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   //generator.tick(frames, 0);
   
   //feedBuffers(frames);
+  TxTime& time = TxTime::instance();
   for ( unsigned int i=0; i < nBufferFrames; ++i) {
     const float sample = graph->tick();
     *samples++ = sample;
     *samples++ = sample;
+    time.increment();
   }
   
 
@@ -253,7 +255,7 @@ void draw(GLFWwindow* window)
   sequencer.draw();
   for(auto& graph: graphs)graph->draw();
 
-  
+  ImGui::ShowDemoWindow();
   ImGui::Render();
 
   glViewport(0, 0, display_w, display_h);
@@ -305,7 +307,7 @@ int main()
 
   sequencer.setLength(16);
   for(size_t t = 0; t < 16; ++t)
-    sequencer.setTime(t, {true, BASS[t]});
+    sequencer.setBeat(t, {!(t%2), BASS[t]});
   sequencer.start();
 
   TxGraph* graph = new TxGraph("Graph");

@@ -13,8 +13,8 @@
 
 class TxSequencer : public TxNode {
 public:
-  using Time = std::pair<bool, float>;
-  using Sequence = std::vector<Time>;
+  using Beat = std::pair<bool, float>;
+  using Sequence = std::vector<Beat>;
 
 public:
   TxSequencer();
@@ -23,7 +23,7 @@ public:
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);
   
-  void setTime(uint64_t time, const Time& value);
+  void setBeat(uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   
@@ -31,13 +31,12 @@ public:
   void stop();
   uint64_t timeToIndex(float time);
 
-  void drawTime(uint64_t timeIdx, bool active);
+  void drawBeat(uint64_t timeIdx, bool active);
   void draw() override;
 
 private:
   Sequence            _sequence;
   int                 _bpm;
-  float               _time;
   int                 _length;
   bool                _running;
 

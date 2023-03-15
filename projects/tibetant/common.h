@@ -40,5 +40,26 @@ static float computeSampleRate() {
   return 1.f / stk::Stk::sampleRate();
 };
 
+class TxTime {
+public:
+  TxTime() : _time(0.f), _rate(1.f / stk::Stk::sampleRate()) {};
+  ~TxTime() {};
+
+  TxTime(TxTime &other) = delete;
+  void operator=(const TxTime &) = delete;
+
+  void reset() {_time = 0.f; _rate = 1.f / stk::Stk::sampleRate();};
+  void increment() {_time += _rate;};
+  float get() {return _time;};
+  void set(float t) {_time = t;};
+  static TxTime& instance() {
+    static TxTime instance;
+    return instance;
+  }
+
+protected:
+  float _time;
+  float _rate;
+};
 
 #endif // TX_COMMON_H
