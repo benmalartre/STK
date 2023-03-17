@@ -31,6 +31,7 @@ public:
   virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
+  const std::string& name();
   void setActive(bool state);
   void setDirty(bool state);
   void setVolume(stk::StkFloat volume);

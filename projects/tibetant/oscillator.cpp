@@ -200,7 +200,11 @@ void TxOscillator::setHarmonics(int harmonics)
       break;
 
     case NOISE:
+      break;
+
     case SINEWAVE:
+      break;
+
     case SINGWAVE:
       break;
   }

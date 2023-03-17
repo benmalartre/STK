@@ -62,6 +62,7 @@ void TxEffect::draw()
     {
       TxParameter* modDepth = _params[TxEffect::MODDEPTH];
       modDepth->draw();
+      ImGui::SameLine();
       TxParameter* modFreq = _params[TxEffect::MODFREQUENCY];
       modFreq->draw();
       break;
@@ -71,6 +72,7 @@ void TxEffect::draw()
     {
       TxParameter* delay = _params[TxEffect::DELAY];
       delay->draw();
+      ImGui::SameLine();
       TxParameter* maxDelay = _params[TxEffect::MAXIMUMDELAY];
       maxDelay->draw();
       break;

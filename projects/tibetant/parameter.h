@@ -10,10 +10,8 @@ class TxNode;
 
 struct TxParameterPreset {
   const char*   name;
-  stk::StkFloat value;
   stk::StkFloat minimum;
   stk::StkFloat maximum;
-  bool          visible;
 };
 
 class TxParameter {

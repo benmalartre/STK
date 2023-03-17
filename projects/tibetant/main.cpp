@@ -3,7 +3,9 @@
 #include "lfo.h"
 #include "adsr.h"
 #include "random.h"
+#include "filter.h"
 #include "effect.h"
+#include "arythmetic.h"
 #include "sequencer.h"
 #include "graph.h"
 
@@ -11,43 +13,20 @@ TxSequencer* sequencer;
 stk::StkFrames frames;
 std::vector<TxGraph*> graphs;
 
-constexpr size_t TX_BUFFER_SIZE = 64 * stk::RT_BUFFER_SIZE;
-constexpr size_t TX_BUFFER_OFFSET = stk::RT_BUFFER_SIZE;
-stk::StkFloat buffer[TX_NUM_CHANNELS][TX_BUFFER_SIZE];
-
-static void shiftBuffers() {
-  for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
-    for(size_t i = 0; i < TX_BUFFER_SIZE - TX_BUFFER_OFFSET; ++i) {
-      buffer[n][i] = buffer[n][i + TX_BUFFER_OFFSET];
-    }
-  }
-}
-
-static void feedBuffers(const stk::StkFrames& frames) {
-  shiftBuffers();
-  for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
-    for(size_t i = 0; i < TX_BUFFER_OFFSET; ++i) {
-      buffer[n][TX_BUFFER_SIZE - i - 1] = frames[i + n];
-    }
-  }
-}
-
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
   stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
   TxGraph* graph = graphs[0];
-  //stk::StkFrames& frames = *(stk::StkFrames*)userData;
-  //generator.tick(frames, 0);
-  
-  //feedBuffers(frames);
+
   TxTime& time = TxTime::instance();
   for ( unsigned int i=0; i < nBufferFrames; ++i) {
     const float sample = graph->tick();
     *samples++ = sample;
     *samples++ = sample;
+    time.increment();
   }
-  time.increment();
+  
   
 
   /*
@@ -140,27 +119,6 @@ GLFWwindow* openWindow(size_t width, size_t height)
   //SetupImgui();
   //glfwMakeContextCurrent(NULL);
   return window;
-}
-
-void drawPlot(int width, int height) {
-  ImGui::Begin("Plot Window", NULL);
-  ImGui::PlotConfig conf;
-  //conf.values.xs = x_data; // this line is optional
-  conf.values.ys = &buffer[0][0];
-  conf.values.count = TX_BUFFER_SIZE;
-  conf.scale.min = -3;
-  conf.scale.max = 1;
-  conf.tooltip.show = true;
-  conf.tooltip.format = "x=%.2f, y=%.2f";
-  conf.grid_x.show = false;
-  conf.grid_y.show = false;
-  conf.grid_x.size = 128;
-  conf.grid_y.size = 0.5;
-  conf.frame_size = ImVec2(width, height);
-  conf.line_thickness = 4.f;
-
-  ImGui::Plot("plot", conf);
-  ImGui::End();
 }
 
 void setupStyle()
@@ -309,33 +267,42 @@ int main()
   sequencer = new TxSequencer("Sequencer");
   sequencer->setLength(16);
   for(size_t t = 0; t < 16; ++t)
-    sequencer->setBeat(t, {!(t%2), BASS[t]});
+    sequencer->setBeat(t, {1, BASS[t]});
   sequencer->start();
 
   TxGraph* graph = new TxGraph("Graph");
-  TxOscillator* generator = new TxOscillator("Wave");
-  generator->setHarmonics(7);
+  TxOscillator* oscillator = new TxOscillator("Oscillator");
+  graph->addNode(oscillator);
+  oscillator->setHarmonics(7);
 
   TxAdsr* adsr = new TxAdsr("Adsr");
   graph->addNode(adsr);
   adsr->connect(sequencer, "Trigger");
-  generator->connect(sequencer, "Frequency", 1);
+  oscillator->connect(sequencer, "Frequency", 1);
 
-  generator->connect(adsr, "Volume");
+  oscillator->connect(adsr, "Volume");
 
   TxLfo* lfo = new TxLfo("Lfo");
   graph->addNode(lfo);
   lfo->setFrequency(0.01f);
   lfo->setAmplitude(5.f);
   lfo->setOffset(6.f);
-  generator->connect(lfo, "Harmonics");
 
-  graph->addNode(generator);
+  TxArythmetic* arythmetic = new TxArythmetic("Arythmetic");
+  graph->addNode(arythmetic);
+  arythmetic->connect(sequencer, "Input1", 1);
+  arythmetic->connect(lfo, "Input2");
 
-  TxEffect* chorus = new TxEffect("Chorus");
-  chorus->connect(generator, "Samples");
+  oscillator->connect(arythmetic, "Frequency");
 
+  TxFilter* filter = new TxFilter("Filter");
+  filter->connect(oscillator, "Samples");
+  graph->addNode(filter);
+  /*
+  TxEffect* chorus = new TxEffect("Effect");
+  chorus->connect(oscillator, "Samples");
   graph->addNode(chorus);
+  */
 
   graphs.push_back(graph);
   /*

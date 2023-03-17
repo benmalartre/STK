@@ -1,6 +1,5 @@
 #include "sequencer.h"
 
-
 TxSequencer::TxSequencer(const std::string& name)
   : TxNode(name, TX_NUM_CHANNELS)
   , _bpm(60)
@@ -53,15 +52,19 @@ void TxSequencer::stop()
   _running = false;
 }
 
-uint32_t TxSequencer::timeToIndex(float time)
+TxSequencer::Index TxSequencer::timeToIndex(float time)
 {
-  return (int)(time / 60.f * (float)_bpm * 16) % _length;
+  const float relativeTime = time / 60.f * (float)_bpm * TxSequencer::NumBits;
+  const int beatTime = (int)relativeTime;
+  const int bitTime = (int)((float)(relativeTime - beatTime) * TxSequencer::NumBits);
+  return {beatTime % _length, bitTime};
 }
 
 stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
-  const Beat* beat = &_sequence[timeToIndex(TxTime::instance().get())];
-  return channel ? beat->second : beat->first;
+  const TxSequencer::Index index = timeToIndex(TxTime::instance().get());
+  const Beat* beat = &_sequence[index.first];
+  return channel ? beat->second : BIT_CHECK(beat->first, index.second);
 }
 
 stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
@@ -69,7 +72,7 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   if(!_active) return frames;
   
-  uint64_t timeIdx = (uint64_t) timeToIndex(TxTime::instance().get());
+  TxSequencer::Index index = timeToIndex(TxTime::instance().get());
 
 /*
   for(auto& track: _tracks) {
@@ -90,7 +93,7 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxSequencer::drawBeat(uint64_t beatIdx, bool current)
+void TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
 {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   const std::string hiddenPrefix = "##" + std::to_string(beatIdx);
@@ -100,30 +103,27 @@ void TxSequencer::drawBeat(uint64_t beatIdx, bool current)
   ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(20, 120),
     &beat->second, 0, 255);
 
+  ImGui::BeginGroup();
+  
   const ImGuiStyle& style = ImGui::GetStyle();
-  const ImVec4 btnColor = current ? 
-    (beat->first ? ImVec4(1, 0, 0, 1): ImVec4(1, 0.75, 0, 1)) 
-    : (beat->first ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1, 1));
+  for(size_t i = 0; i < 4; ++i) {
+    bool bit = BIT_CHECK(beat->first, i);
+    const ImVec4 btnColor = (current && (i == bitIdx))? 
+      (bit ? ImVec4(1, 0, 0, 1): ImVec4(1, 0.75, 0, 1)) 
+      : (bit ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
 
-  ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-  if (ImGui::Button((hiddenPrefix + "Btn").c_str(), ImVec2(12, 12))) {
-    beat->first = 1 - beat->first;
+    ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
+    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(4, 12))) {
+      BIT_FLIP(beat->first, i);
+    }
+    ImGui::PopStyleColor();
+    if(i < 3)ImGui::SameLine();
   }
-  ImGui::PopStyleColor();
+  ImGui::PopStyleVar();
 
-  /*
-  const ImVec2 ledSize(12, 12);
-  const ImVec2 ledPos(ImGui::GetCursorPos() + ImGui::GetStyle().ItemSpacing + ImVec2(2, 80));
-  if(active) {
-    drawList->AddRectFilled(
-      ledPos, ledPos + ledSize, 
-      ImColor(ImGui::GetStyle().Colors[ImGuiCol_FrameBgActive]), 4.f);
-  } else {
-    drawList->AddRectFilled(
-      ledPos, ledPos + ledSize, 
-      ImColor(ImGui::GetStyle().Colors[ImGuiCol_FrameBg]), 4.f);
-  }
-  */
+  ImGui::EndGroup();
+
   ImGui::EndGroup();
   ImGui::SameLine();
 }
@@ -136,7 +136,7 @@ void TxSequencer::draw()
   float t = time.get();
 
   //commonControls();
-  uint64_t tid = timeToIndex(t);
+  TxSequencer::Index index = timeToIndex(t);
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
   if(ImGui::Button("Reset Time")) time.reset();
@@ -148,13 +148,13 @@ void TxSequencer::draw()
   ImGui::SameLine();
   ImGui::Text("Rate : %fs", time.rate());
   ImGui::SameLine();
-  ImGui::Text("Index : %llu", tid);
+  ImGui::Text("Index : %i", index.first);
   ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm", 
     ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal);
   ImGui::SameLine();
 
   for(size_t i = 0; i < _sequence.size(); ++i) {
-    drawBeat(i, (i == tid));
+    drawBeat(i, index.second, (i == index.first));
   }
 
   ImGui::End();

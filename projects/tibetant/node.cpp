@@ -27,6 +27,11 @@ int TxNode::numChannels()
   return _nChannels;
 }
 
+const std::string& TxNode::name()
+{
+  return _name;
+}
+
 void TxNode::setActive(bool state) 
 {
     _active = state;
@@ -52,7 +57,8 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
   TxParameter* parameter = getParameter(name);
   if(parameter) {
     parameter->connect(node, channel);
-    std::cout << "connect parameter : " << name << std::endl;
+    std::cout << "connect : " << node->name() << " -> " << 
+      _name << ":" << name << "(channel=" << channel << ")" << std::endl;
     return new TxConnexion({node, this, parameter});
   }
   return NULL;
@@ -78,7 +84,12 @@ TxParameter* TxNode::getParameter(const std::string& name)
 
 void TxNode::commonControls()
 {
+
+  ImGui::BeginGroup();
   _buffer.draw();
+  ImGui::EndGroup();
+  
+  ImGui::SameLine();
   ImGui::BeginGroup();
   TxParameter* active = _params[ACTIVE];
   active->draw();
@@ -87,4 +98,5 @@ void TxNode::commonControls()
   volume->draw();
   
   ImGui::EndGroup();
+  
 }

@@ -13,8 +13,11 @@
 
 class TxSequencer : public TxNode {
 public:
-  using Beat = std::pair<bool, float>;
+  using Beat = std::pair<short, float>;
   using Sequence = std::vector<Beat>;
+  using Index = std::pair<uint32_t, uint32_t>;
+
+  static const uint32_t NumBits = 4;
 
 public:
   TxSequencer(const std::string& name);
@@ -29,9 +32,9 @@ public:
   
   void start();
   void stop();
-  uint32_t timeToIndex(float time);
+  Index timeToIndex(float time);
 
-  void drawBeat(uint64_t timeIdx, bool active);
+  void drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool active);
   void draw() override;
   void reset() override;
 

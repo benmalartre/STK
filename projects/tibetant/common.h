@@ -31,6 +31,18 @@
 
 #define RANDOM_LO_HI(LO, HI) ((LO) + (float)rand() / \
   (float)(RAND_MAX / ((HI) - (LO))))
+
+// a=target variable, b=bit number to act upon 0-n 
+#define BIT_SET(a,b) ((a) |= (1<<(b)))
+#define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
+#define BIT_FLIP(a,b) ((a) ^= (1<<(b)))
+#define BIT_CHECK(a,b) ((a) & (1<<(b)))
+
+// x=target variable, y=mask
+#define BITMASK_SET(x,y) ((x) |= (y))
+#define BITMASK_CLEAR(x,y) ((x) &= (~(y)))
+#define BITMASK_FLIP(x,y) ((x) ^= (y))
+#define BITMASK_CHECK(x,y) (((x) & (y)) == (y))
  
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
@@ -42,7 +54,7 @@ static float computeSampleRate() {
 
 class TxTime {
 public:
-  TxTime() : _time(0.f), _rate((1.f / stk::Stk::sampleRate())) {};
+  TxTime() : _time(0.f), _rate(computeSampleRate()) {};
   ~TxTime() {};
 
   TxTime(TxTime &other) = delete;
@@ -50,21 +62,21 @@ public:
 
   void reset() {
     _time = 0.f; 
-    _rate = (1.f / stk::Stk::sampleRate());
+    _rate = computeSampleRate();
   };
-  void increment() {_time += _rate * stk::RT_BUFFER_SIZE;};
+  void increment() {_time += _rate/* * stk::RT_BUFFER_SIZE*/;};
   void incr100() {_time += 100.f;};
-  float get() {return _time;};
+  double get() const {return _time;};
   void set(float t) {_time = t;};
-  float rate() {return _rate;};
+  double rate() const {return _rate;};
   static TxTime& instance() {
     static TxTime instance;
     return instance;
   }
 
 protected:
-  float _time;
-  float _rate;
+  double _time;
+  double _rate;
 };
 
 #endif // TX_COMMON_H
