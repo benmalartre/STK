@@ -68,3 +68,6 @@
 *.pdb
 *.filters
 *.vcxproj*
+
+# build folders
+*/build/*
