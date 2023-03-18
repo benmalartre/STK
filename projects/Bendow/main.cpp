@@ -76,7 +76,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_STENCIL_BITS, 8);
   glfwWindowHint(GLFW_SAMPLES, 4);
   
-  GLFWwindow* window = glfwCreateWindow(width,height,"7ound",NULL,NULL);
+  GLFWwindow* window = glfwCreateWindow(width,height,"BendoW",NULL,NULL);
 
    // window datas
   //glfwSetWindowUserPointer(window, this);
