@@ -5,7 +5,7 @@
 
 class TxArythmetic : public TxNode {
 public:
-  static const int NumMode = 4;
+  static const int NumMode = 5;
   static const char* ModeName[NumMode];
 
   enum Mode {
@@ -20,6 +20,7 @@ public:
     MODE = TxNode::LAST,
     INPUT1,
     INPUT2, 
+    FLOAT1,
     LAST
   };
 
@@ -32,7 +33,8 @@ public:
   void reset() override;
 
 private:
-  int _mode;
+  int     _mode;
+  float   _float1;
 };
 
 #endif // TX_ARYTHMETIC_H
