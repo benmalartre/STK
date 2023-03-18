@@ -34,7 +34,6 @@ public:
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
   const std::string& name();
-  void setActive(bool state);
   void setDirty(bool state);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);

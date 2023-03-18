@@ -196,11 +196,13 @@ void TxParameterFloat::set(stk::StkFloat value)
 void TxParameterFloat::setMinimum(stk::StkFloat value)
 {
   _minimum = value;
+  std::cout << "tx float set min : " << _minimum << std::endl;
 }
 
 void TxParameterFloat::setMaximum(stk::StkFloat value)
 {
   _maximum = value;
+  std::cout << "tx float set max : " << _maximum << std::endl;
 }
 
 stk::StkFloat TxParameterFloat::tick()

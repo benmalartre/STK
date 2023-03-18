@@ -33,6 +33,10 @@ public:
     FLOAT1,
     FLOAT2,
     FLOAT3,
+    INT1,
+    INT2,
+    INT3,
+    BOOL1,
     LAST
   };
   
@@ -53,6 +57,10 @@ private:
   stk::StkFloat _float1;
   stk::StkFloat _float2;
   stk::StkFloat _float3;
+  int           _int1;
+  int           _int2;
+  int           _int3;
+  bool          _bool1;
 
 };
 
