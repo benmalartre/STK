@@ -99,8 +99,9 @@ void TxFilter::setFilter(int filterIdx)
 stk::StkFloat TxFilter::tick(unsigned int)
 {
   if (!_filter)return 0.f;
-  stk::StkFloat sample = _params[TxNode::SAMPLES]->tick();
+  stk::StkFloat input = _params[TxNode::SAMPLES]->tick();
   stk::StkFloat gain = _params[TxFilter::GAIN]->tick();
+  stk::StkFloat sample = 0.f;
   _filter->setGain(gain);
   switch(_filterIdx) {
     case BIQUAD:
@@ -110,13 +111,12 @@ stk::StkFloat TxFilter::tick(unsigned int)
     {
       stk::StkFloat pole = _params[TxFilter::FLOAT1]->tick();
       ((stk::OnePole*)_filter)->setPole(pole);
-      return ((stk::OnePole*)_filter)->tick(sample);
+      sample = ((stk::OnePole*)_filter)->tick(input);
     }
-    
-    default:
-      return 0.f;
   }
-  
+
+  _buffer.write(sample);
+  return sample;
 }
 
 stk::StkFrames& TxFilter::tick(stk::StkFrames& frames, unsigned int channel)
@@ -141,7 +141,6 @@ void TxFilter::draw()
   TxParameter* float1 = _params[TxFilter::FLOAT1];
   float1->setLabel("Pole");
   float1->draw();
-  ImGui::SameLine();
 
   switch(_filterIdx) {
     /*
