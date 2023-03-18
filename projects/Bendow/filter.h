@@ -28,7 +28,8 @@ public:
   };
 
   enum Parameters {
-    GAIN = TxNode::LAST,
+    FILTER = TxNode::LAST,
+    GAIN,
     FLOAT1,
     FLOAT2,
     FLOAT3,
@@ -49,7 +50,9 @@ private:
   int           _lastFilterIdx;
   int           _filterIdx;
   stk::StkFloat _gain;
-  stk::StkFloat _pole;
+  stk::StkFloat _float1;
+  stk::StkFloat _float2;
+  stk::StkFloat _float3;
 
 };
 

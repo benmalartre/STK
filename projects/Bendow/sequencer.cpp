@@ -70,7 +70,6 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
 stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
 {
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
-  if(!_active) return frames;
   
   TxSequencer::Index index = timeToIndex(TxTime::instance().get());
 

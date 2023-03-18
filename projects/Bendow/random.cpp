@@ -66,18 +66,12 @@ stk::StkFloat TxRandom::tick(unsigned int)
 
 stk::StkFrames& TxRandom::tick(stk::StkFrames& frames, unsigned int channel)
 {
-  if(_active) {
-    for(size_t i = 0; i < frames.size(); ++i) {
-      if(_cnt++ > _rate) {
-        _cnt = 0;
-        _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
-      }
-      frames[i] = _frames[0];
+  for(size_t i = 0; i < frames.size(); ++i) {
+    if(_cnt++ > _rate) {
+      _cnt = 0;
+      _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
     }
-  } else {
-    for(size_t i = 0; i < frames.size(); ++i) {
-      frames[i] = _frames[0];
-    }
+    frames[i] = _frames[0];
   }
   return frames;
 }

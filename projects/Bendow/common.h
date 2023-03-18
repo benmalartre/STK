@@ -6,7 +6,6 @@
 #include <imgui_stdlib.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <imgui_plot.h>
 #include <imgui_knobs.h>
 #include <implot.h>
 

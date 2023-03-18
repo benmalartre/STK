@@ -32,6 +32,7 @@ TxOscillator::TxOscillator(const std::string& name)
     TxOscillator::NumWaveForm, &_waveFormIdx));
   _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat("Envelope", 0.f, 2.f, &_envelope, TxParameter::KNOB));
 }
 
 TxOscillator::~TxOscillator() 
@@ -41,39 +42,39 @@ TxOscillator::~TxOscillator()
 
 stk::StkFloat TxOscillator::tick(unsigned int)
 {
-  if(!_generator || !_active || !_dirty) {
+  if(!_generator || !_dirty) {
     return 0.f;
   }
   if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
     setWaveForm(_waveFormIdx);
   }
-  _volume = _params[VOLUME]->tick();
+  _envelope = _params[ENVELOPE]->tick();
   setFrequency(_params[FREQUENCY]->tick());
   setHarmonics(_params[HARMONICS]->tick());
   float sample = 0.f;
   switch(_waveFormIdx) {
     case BLIT:
-      sample = ((stk::Blit*)_generator)->tick() * _volume;
+      sample = ((stk::Blit*)_generator)->tick() * _envelope;
       break;
 
     case BLITSAW:
-      sample = ((stk::BlitSaw*)_generator)->tick() * _volume;
+      sample = ((stk::BlitSaw*)_generator)->tick() * _envelope;
       break;
 
     case BLITSQUARE:
-      sample = ((stk::BlitSquare*)_generator)->tick() * _volume;
+      sample = ((stk::BlitSquare*)_generator)->tick() * _envelope;
       break;
 
     case NOISE:
-      sample = ((stk::Noise*)_generator)->tick() * _volume;
+      sample = ((stk::Noise*)_generator)->tick() * _envelope;
       break;
 
     case SINEWAVE:
-      sample = ((stk::SineWave*)_generator)->tick() * _volume;
+      sample = ((stk::SineWave*)_generator)->tick() * _envelope;
       break;
 
     case SINGWAVE:
-      sample = ((stk::SingWave*)_generator)->tick() * _volume;
+      sample = ((stk::SingWave*)_generator)->tick() * _envelope;
       break;
   }   
   _buffer.write(sample);
@@ -82,7 +83,7 @@ stk::StkFloat TxOscillator::tick(unsigned int)
 
 stk::StkFrames& TxOscillator::tick(stk::StkFrames& frames, unsigned int channel)
 {
-  if(!_generator || !_active || !_dirty) {
+  if(!_generator || !_dirty) {
     return frames;
   }
 
@@ -95,7 +96,7 @@ stk::StkFrames& TxOscillator::tick(stk::StkFrames& frames, unsigned int channel)
     setFrequency(_params[FREQUENCY]->tick());
     setHarmonics(_params[HARMONICS]->tick());
     frames[f] = tick(channel);
-    frames[f] *= _volume;
+    frames[f] *= _envelope;
   }
 
   return frames;
@@ -106,7 +107,6 @@ void TxOscillator::setWaveForm(short index)
   std::cout << index << "," << NumWaveForm << std::endl;
   _waveFormIdx = index % NumWaveForm;
   if(_generator) delete _generator;
-  std::cout << "set wave form : " << _waveFormIdx << std::endl;
 
   switch(_waveFormIdx) {
     case BLIT:
@@ -192,7 +192,6 @@ void TxOscillator::setHarmonics(int harmonics)
 
     case BLITSAW:
       ((stk::BlitSaw*)_generator)->setHarmonics(_harmonics);
-      //((stk::BlitSaw*)_generator)->reset();
       break;
 
     case BLITSQUARE:
@@ -223,6 +222,9 @@ void TxOscillator::draw()
   ImGui::SameLine();
   TxParameter* harmonics = _params[TxOscillator::HARMONICS];
   harmonics->draw();
+  ImGui::SameLine();
+  TxParameter* envelope = _params[TxOscillator::ENVELOPE];
+  envelope->draw();
   ImGui::EndGroup();
 
   ImGui::SameLine();

@@ -22,7 +22,8 @@ public:
   enum Parameters {
     WAVEFORM = TxNode::LAST,
     FREQUENCY,
-    HARMONICS, 
+    HARMONICS,
+    ENVELOPE,
     LAST
   };
 
@@ -33,6 +34,7 @@ public:
   void setWaveForm(short index);
   void setFrequency(const stk::StkFloat& frequency);
   void setHarmonics(int harmonics);
+  void setEnvelope(stk::StkFloat envelope);
 
   void draw() override;
   void reset() override;
@@ -40,6 +42,7 @@ public:
 private:
   stk::Generator* _generator;
   stk::StkFloat   _frequency;
+  stk::StkFloat   _envelope;
 
   int             _lastHarmonics;
   int             _harmonics;

@@ -48,13 +48,13 @@ ENDIF(APPLE)
 IF(APPLE)
   ADD_COMPILE_DEFINITIONS(
     __MACOSX_CORE__
-	D__LITTLE_ENDIAN__
+	  __LITTLE_ENDIAN__
   )
 ELSEIF(WIN32)
   ADD_COMPILE_DEFINITIONS(
     __WINDOWS_DS__ 
-	__LITTLE_ENDIAN__ 
-	WIN32_LEAN_AND_MEAN
+	  __LITTLE_ENDIAN__ 
+	  WIN32_LEAN_AND_MEAN
   )
   ADD_DEFINITIONS("/wd4244")
   ADD_DEFINITIONS("/wd4305")
@@ -72,7 +72,6 @@ SET(SOURCES
 	${IMGUI_DIR}/imgui_tables.cpp
 	${IMGUI_DIR}/imgui_demo.cpp
 	${IMGUI_DIR}/imgui_knobs.cpp
-	${IMGUI_DIR}/imgui_plot.cpp
 	${IMGUI_DIR}/implot.cpp
 	${IMGUI_DIR}/implot_items.cpp
 	${IMGUI_DIR}/implot_demo.cpp
@@ -96,6 +95,7 @@ SET(SOURCES
 	${STK_DIR}/src/DelayL.cpp
 	${STK_DIR}/src/SineWave.cpp
 	${STK_DIR}/src/SingWave.cpp
+	${STK_DIR}/src/BiQuad.cpp
 	${STK_DIR}/src/TwoZero.cpp
 	${STK_DIR}/src/OneZero.cpp
 	${STK_DIR}/src/OnePole.cpp
@@ -134,5 +134,3 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 	${GLFW}
 	${ADDITIONAL_LIBRARIES}
 )
-
-ADD_COMPILE_OPTIONS(/C4244)

@@ -1,5 +1,16 @@
 #include "graph.h"
 
+TxGraph::TxGraph(const std::string& name) 
+  : _name(name)
+  , _current(NULL)
+  , _active(true)
+{};
+
+TxGraph::~TxGraph()
+{
+  for(auto& node: _nodes)delete node;
+};
+
 bool TxGraph::contains(const TxNode* node)
 {
   for(auto& n: _nodes) {

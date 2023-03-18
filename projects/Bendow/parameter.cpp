@@ -232,6 +232,44 @@ bool TxParameterFloat::draw()
   return modified;
 }
 
+// TxParameterString
+// ---------------------------------------------------------------
+TxParameterString::TxParameterString(const std::string& name, std::string* data, short display)
+  : TxParameter(name, (void*)data, TxParameter::STRING, display)
+{
+}
+
+void TxParameterString::set(stk::StkFloat value)
+{
+}
+
+stk::StkFloat TxParameterString::tick()
+{
+  return 0.f;
+}
+
+bool TxParameterString::draw()
+{
+  bool modified = false;
+  /*
+  switch(_display) {
+    case TxParameter::HORIZONTAL:
+      modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+      break;
+    case TxParameter::VERTICAL:
+      modified = ImGui::VSliderFloat(_label.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
+      break;
+    case TxParameter::KNOB:
+      modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
+        0.f, "%.3f", ImGuiKnobVariant_WiperDot);
+      break;
+  }
+  if(modified && _callback) _callback->execute();
+  */
+
+  return modified;
+}
+
 // TxParameterSamples
 // ---------------------------------------------------------------
 TxParameterSamples::TxParameterSamples(const std::string& name)

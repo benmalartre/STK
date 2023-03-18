@@ -7,17 +7,8 @@
 
 class TxGraph {
   public:
-
-    TxGraph(const std::string& name) 
-      : _name(name)
-      , _current(NULL)
-      , _active(true)
-    {};
-
-    ~TxGraph()
-    {
-      for(auto& node: _nodes)delete node;
-    };
+    TxGraph(const std::string& name);
+    ~TxGraph();
 
     void setActive(bool state);
     void setCurrent(TxNode* node);

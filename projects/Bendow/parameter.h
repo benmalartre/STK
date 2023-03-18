@@ -22,6 +22,7 @@ public:
     INT,
     ENUM,
     FLOAT,
+    STRING,
     SAMPLES
   };
 
@@ -107,6 +108,19 @@ public:
 private:
   stk::StkFloat     _minimum;
   stk::StkFloat     _maximum;
+};
+
+class TxParameterString : public TxParameter {
+public:
+  TxParameterString(const std::string& name, std::string* data, short display=HORIZONTAL);
+
+  void set(stk::StkFloat value) override;
+  const std::string& get();
+  stk::StkFloat tick() override;
+  bool draw() override;
+
+private:
+  std::string       _value;
 };
 
 class TxParameterSamples : public TxParameter {

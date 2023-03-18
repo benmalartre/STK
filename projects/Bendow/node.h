@@ -17,11 +17,13 @@ struct TxConnexion {
 
 class TxNode {
 public:
+  enum State {
+    ON,
+    OFF
+  };
 
   enum Parameters {
     SAMPLES,
-    ACTIVE,
-    VOLUME,
     LAST
   };
 
@@ -34,7 +36,6 @@ public:
   const std::string& name();
   void setActive(bool state);
   void setDirty(bool state);
-  void setVolume(stk::StkFloat volume);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
@@ -45,9 +46,8 @@ public:
 protected:
   std::string               _name;
   int                       _nChannels;
-  bool                      _active;
+  int                       _state;
   bool                      _dirty;
-  stk::StkFloat             _volume;
   stk::StkFrames            _frames;
   TxBuffer                  _buffer;
   std::vector<TxParameter*> _params;

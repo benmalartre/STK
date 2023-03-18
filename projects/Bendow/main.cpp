@@ -216,6 +216,7 @@ void draw(GLFWwindow* window)
   for(auto& graph: graphs)graph->draw();
 
   ImGui::ShowDemoWindow();
+  ImPlot::ShowDemoWindow();
   ImGui::Render();
 
   glViewport(0, 0, display_w, display_h);
@@ -234,7 +235,8 @@ int main()
   // Setup ImGui binding
   IMGUI_CHECKVERSION();
   ImGuiContext* context = ImGui::CreateContext();
-  ImGui::SetCurrentContext(context);
+  ImPlotContext* plotContext = ImPlot::CreateContext();
+  
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330 ");
 
@@ -281,7 +283,7 @@ int main()
   adsr->connect(sequencer, "Trigger");
   oscillator->connect(sequencer, "Frequency", 1);
 
-  oscillator->connect(adsr, "Volume");
+  oscillator->connect(adsr, "Envelope");
 
   TxLfo* lfo = new TxLfo("Lfo");
   graph->addNode(lfo);
@@ -374,6 +376,12 @@ int main()
   catch ( RtAudioError &error ) {
     error.printMessage();
   }
+  
+  ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
+
+  ImPlot::DestroyContext(plotContext);
+  ImGui::DestroyContext(context);
+  
   glfwTerminate();
 }

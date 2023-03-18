@@ -4,15 +4,11 @@
 TxNode::TxNode(const std::string& name, uint32_t numChannels)
   : _nChannels(numChannels)
   , _name(name)
-  , _active(true)
   , _dirty(true)
-  , _volume(1.f)
 {
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
 
   _params.push_back(new TxParameterSamples("Samples"));
-  _params.push_back(new TxParameterBool("Active", &_active));
-  _params.push_back(new TxParameterFloat("Volume", 0.f, 2.f, &_volume, TxParameter::KNOB));
 }
 
 TxNode::~TxNode()
@@ -32,11 +28,6 @@ const std::string& TxNode::name()
   return _name;
 }
 
-void TxNode::setActive(bool state) 
-{
-    _active = state;
-};
-
 void TxNode::setDirty(bool state) 
 {
     _dirty = state;
@@ -46,11 +37,6 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
 {
   return _frames[channel];
 }
-
-void TxNode::setVolume(stk::StkFloat volume) 
-{
-  _volume = volume;
-};
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
@@ -84,19 +70,7 @@ TxParameter* TxNode::getParameter(const std::string& name)
 
 void TxNode::commonControls()
 {
-
   ImGui::BeginGroup();
   _buffer.draw();
   ImGui::EndGroup();
-  
-  ImGui::SameLine();
-  ImGui::BeginGroup();
-  TxParameter* active = _params[ACTIVE];
-  active->draw();
-
-  TxParameter* volume = _params[VOLUME];
-  volume->draw();
-  
-  ImGui::EndGroup();
-  
 }

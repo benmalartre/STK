@@ -56,20 +56,11 @@ void TxBuffer::swap()
 
 void TxBuffer::draw()
 {
-  ImGui::PlotConfig conf;
-  //conf.values.xs = x_data; // this line is optional
-  conf.values.ys = read();
-  conf.values.count = _n;
-  conf.scale.min = _smin;
-  conf.scale.max = _smax;
-  conf.tooltip.show = true;
-  conf.tooltip.format = "x=%.2f, y=%.2f";
-  conf.grid_x.show = false;
-  conf.grid_y.show = false;
-  conf.grid_x.size = 1;
-  conf.grid_y.size = 1;
-  conf.frame_size = ImVec2(256, 128);
-  conf.line_thickness = 0.1f;
-
-  ImGui::Plot("Buffer", conf);
+  ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
+  if (ImPlot::BeginPlot("##buffer", ImVec2(256,128), ImPlotFlags_CanvasOnly| ImPlotFlags_NoInputs)) {
+    ImPlot::SetupAxes(0,0,ax_flags,ax_flags);
+    ImPlot::SetupAxesLimits(0, _n, -1.2f, 1.2f);
+    ImPlot::PlotLine("samples", read(), _n, 2.f, 2.f);
+    ImPlot::EndPlot();
+  }
 }
