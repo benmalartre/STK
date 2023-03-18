@@ -9,6 +9,8 @@
 #include "sequencer.h"
 #include "graph.h"
 
+#include <GLFW/glfw3.h>
+
 TxSequencer* sequencer;
 stk::StkFrames frames;
 std::vector<TxGraph*> graphs;
@@ -26,8 +28,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
     *samples++ = sample;
     time.increment();
   }
-  
-  
+
 
   /*
   for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {

@@ -1,16 +1,14 @@
-// GLFW
-#include <GLFW/glfw3.h>
 
 // Dear ImGui
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui_internal.h"
-#include <imgui/imgui.h>
-#include <imgui/imgui_stdlib.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-#include <imgui/imgui_plot.h>
-#include <imgui/imgui_knobs.h>
-#include <imgui/implot.h>
+#include <imgui_internal.h>
+#include <imgui.h>
+#include <imgui_stdlib.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_plot.h>
+#include <imgui_knobs.h>
+#include <implot.h>
 
 
 // Standard Template Library

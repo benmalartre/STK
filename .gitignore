@@ -55,7 +55,7 @@
 .group
 
 # windows
-*/x64/*
+x64/
 *.obj
 *.sdf
 *.log
@@ -70,4 +70,4 @@
 *.vcxproj*
 
 # build folders
-*/build/*
+build/
