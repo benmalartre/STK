@@ -1,6 +1,8 @@
 #include "common.h"
 #include "arythmetic.h"
 
+ImVec2 TxArythmetic::Size(256, 64);
+
 const char* TxArythmetic::ModeName[TxArythmetic::NumMode] = {
   "Add",
   "Subtract",
@@ -23,6 +25,11 @@ TxArythmetic::TxArythmetic(const std::string& name)
 
 TxArythmetic::~TxArythmetic() 
 {
+}
+
+const ImVec2& TxArythmetic::size()
+{
+  return TxArythmetic::Size;
 }
 
 stk::StkFloat TxArythmetic::tick(unsigned int)
@@ -74,10 +81,9 @@ void TxArythmetic::setMode(int mode)
   _mode = mode;
 }
 
-void TxArythmetic::draw()
+void TxArythmetic::_drawImpl()
 {
-  ImGui::Begin(_name.c_str(), NULL);
-
+  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* mode = _params[TxArythmetic::MODE];
@@ -94,7 +100,6 @@ void TxArythmetic::draw()
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
   commonControls();
-  ImGui::End();
 }
 
 void TxArythmetic::reset()

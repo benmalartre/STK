@@ -1,6 +1,7 @@
 #include "common.h"
 #include "lfo.h"
 
+ImVec2 TxLfo::Size(400, 200);
 
 TxLfo::TxLfo(const std::string& name) 
   : TxNode(name)
@@ -17,6 +18,11 @@ TxLfo::TxLfo(const std::string& name)
 
 TxLfo::~TxLfo() 
 {
+}
+
+const ImVec2& TxLfo::size()
+{
+  return TxLfo::Size;
 }
 
 stk::StkFloat TxLfo::tick(unsigned int)
@@ -57,27 +63,25 @@ void TxLfo::setOffset(stk::StkFloat offset)
   _offset = offset;
 }
 
-void TxLfo::draw()
+void TxLfo::_drawImpl(bool* modified)
 {
-  ImGui::Begin(_name.c_str(), NULL);
-
+  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* frequency = _params[TxLfo::FREQUENCY];
-  frequency->draw();
+  if(frequency->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* amplitude = _params[TxLfo::AMPLITUDE];
-  amplitude->draw();
+  if(amplitude->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* offset = _params[TxLfo::OFFSET];
-  offset->draw();
+  if(offset->draw() && modified)*modified = true;
   ImGui::EndGroup();
 
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
   commonControls();
-  ImGui::End();
 }
 
 void TxLfo::reset()

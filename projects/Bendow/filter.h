@@ -46,10 +46,14 @@ public:
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
-  void draw() override;
+  const ImVec2& size() override;
   void reset() override;
 
+protected:
+  void _drawImpl(bool*) override;
+
 private:
+  static ImVec2 Size;
   stk::Filter*  _filter;
   int           _lastFilterIdx;
   int           _filterIdx;

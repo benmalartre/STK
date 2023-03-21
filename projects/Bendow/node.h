@@ -16,11 +16,10 @@ struct TxConnexion {
 };
 
 class TxNode {
+
 public:
-  enum State {
-    ON,
-    OFF
-  };
+  static const int Flags;
+  static const int PortSize;
 
   enum Parameters {
     SAMPLES,
@@ -35,17 +34,22 @@ public:
   int numChannels();
   const std::string& name();
   const ImVec2& position();
-  const ImVec2& size();
+  virtual const ImVec2& size() = 0;
   const ImVec4& color();
   void setDirty(bool state);
+  void setPosition(const ImVec2& pos);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
   void commonControls();
-  virtual void draw() = 0;
+  void drawInput();
+  int pick(const ImVec2& pos);
+  
+  void draw(const ImVec2& offset, const float& scale, bool* modified);
   virtual void reset() = 0;
 
 protected:
+  virtual void              _drawImpl(bool* modified) {};
   ImVec2                    _position;
   ImVec2                    _size;
   ImVec4                    _color;

@@ -76,22 +76,20 @@ stk::StkFrames& TxRandom::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxRandom::draw()
+void TxRandom::_drawImpl(bool* modified)
 {
-  ImGui::Begin(_name.c_str(), NULL);
-
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* seed = _params[TxRandom::SEED];
-  seed->draw();
+  if(seed->draw() && modified)*modified = true;
   TxParameter* frequency = _params[TxRandom::FREQUENCY];
-  frequency->draw();
+  if(frequency->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* minimum = _params[TxRandom::MINIMUM];
-  minimum->draw();
+  if(minimum->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* maximum = _params[TxRandom::MAXIMUM];
-  maximum->draw();
+  if(maximum->draw() && modified)*modified = true;
   
   ImGui::EndGroup();
 
@@ -99,7 +97,6 @@ void TxRandom::draw()
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
   commonControls();
-  ImGui::End();
 }
 
 void TxRandom::reset()

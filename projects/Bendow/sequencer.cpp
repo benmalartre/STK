@@ -1,5 +1,7 @@
 #include "sequencer.h"
 
+ImVec2 TxSequencer::Size(512, 256);
+
 TxSequencer::TxSequencer(const std::string& name)
   : TxNode(name, TX_NUM_CHANNELS)
   , _bpm(60)
@@ -52,6 +54,11 @@ void TxSequencer::stop()
   _running = false;
 }
 
+const ImVec2& TxSequencer::size()
+{
+  return TxSequencer::Size;
+}
+
 TxSequencer::Index TxSequencer::timeToIndex(float time)
 {
   const float relativeTime = time / 60.f * (float)_bpm * TxSequencer::NumBits;
@@ -92,15 +99,16 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
+bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
 {
+  bool modified = false;
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   const std::string hiddenPrefix = "##" + std::to_string(beatIdx);
 
   Beat* beat = &_sequence[beatIdx];
   ImGui::BeginGroup();
-  ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(20, 120),
-    &beat->second, 0, 255);
+  if (ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(20, 120),
+    &beat->second, 0, 255))modified = true;
 
   ImGui::BeginGroup();
   
@@ -115,6 +123,7 @@ void TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
     ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
     if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(4, 12))) {
       BIT_FLIP(beat->first, i);
+      modified = true;
     }
     ImGui::PopStyleColor();
     if(i < 3)ImGui::SameLine();
@@ -124,13 +133,11 @@ void TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
   ImGui::EndGroup();
 
   ImGui::EndGroup();
-  ImGui::SameLine();
+  return modified;
 }
 
-void TxSequencer::draw()
-{
-  ImGui::Begin(_name.c_str(), NULL);
-  
+void TxSequencer::_drawImpl(bool* modified)
+{  
   TxTime& time = TxTime::instance();
   float t = time.get();
 
@@ -140,23 +147,25 @@ void TxSequencer::draw()
   ImGui::SameLine();
   if(ImGui::Button("Reset Time")) time.reset();
   ImGui::SameLine();
-  if(ImGui::Button("Incr Time")) time.incr100();
-  ImGui::SameLine();
+  //if(ImGui::Button("Incr Time")) time.incr100();
+  //ImGui::SameLine();
   ImGui::SetNextItemWidth(100);
   ImGui::Text("Time : %fs", t);
+  /*
   ImGui::SameLine();
   ImGui::Text("Rate : %fs", time.rate());
   ImGui::SameLine();
   ImGui::Text("Index : %i", index.first);
-  ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm", 
-    ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal);
+  */
+  if (ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm",
+    ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal) && modified)* modified = true;
+  
   ImGui::SameLine();
 
   for(size_t i = 0; i < _sequence.size(); ++i) {
-    drawBeat(i, index.second, (i == index.first));
+    if (drawBeat(i, index.second, (i == index.first)))*modified = true;
+    if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
-
-  ImGui::End();
 }
 
 void TxSequencer::reset()

@@ -18,6 +18,7 @@
 #include <TwoZero.h>
 #include <TapDelay.h>
 
+ImVec2 TxFilter::Size(512, 256);
 
 const char* TxFilter::FilterName[TxFilter::NumFilter] = {
   "Biquad",
@@ -82,6 +83,10 @@ TxFilter::~TxFilter()
 {
 }
 
+const ImVec2& TxFilter::size()
+{
+  return TxFilter::Size;
+}
 /*
 * This function calculates the zeroth order Bessel function
 */
@@ -117,7 +122,7 @@ std::vector<float> computeFirCoefficients(int Fs, float Fa, float Fb, int Att, i
 
   float alpha, inoAlpha;
   std::vector<float> A(Np+1);
-  std::vector<float> coeffs(Np*2);
+  std::vector<float> coeffs(Np*2+1);
 
   // Calculate the impulse response of the ideal filter
   A[0] = 2*(Fb-Fa)/Fs;
@@ -325,7 +330,8 @@ stk::StkFloat TxFilter::tick(unsigned int)
       
       ((stk::Fir*)_filter)->setCoefficients(
         computeFirCoefficients(stk::Stk::sampleRate(),
-          _params[FLOAT1]->tick(), _params[FLOAT2]->tick(), _params[INT2]->tick(), _params[INT1]->tick()), true);
+          _params[FLOAT1]->tick(), _params[FLOAT2]->tick(), 
+          _params[INT2]->tick(), _params[INT1]->tick()), false);
       
       sample = ((stk::Fir*)_filter)->tick(input);
       break;
@@ -341,48 +347,47 @@ stk::StkFrames& TxFilter::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxFilter::draw()
+void TxFilter::_drawImpl(bool* modified)
 {
-  ImGui::Begin(_name.c_str(), NULL);
-
+  TxNode::drawInput();
   ImGui::BeginGroup();
 
   ImGui::SetNextItemWidth(128);
   TxParameter* filter = _params[TxFilter::FILTER];
-  filter->draw();
+  if(filter->draw()&&modified)*modified=true;
 
   TxParameter* gain = _params[TxFilter::GAIN];
-  gain->draw();
+  if (gain->draw() && modified)*modified = true;
   ImGui::SameLine();
 
   switch(_filterIdx) {
     case BIQUAD:
-      _params[TxFilter::FLOAT1]->draw();
+      if(_params[TxFilter::FLOAT1]->draw() && modified)*modified=true;
       ImGui::SameLine();
-      _params[TxFilter::FLOAT2]->draw();
-      _params[TxFilter::BOOL1]->draw();
+      if(_params[TxFilter::FLOAT2]->draw() && modified)* modified = true;
+      if(_params[TxFilter::BOOL1]->draw() && modified)* modified = true;
       break;
 
     case ONEPOLE:
-      _params[TxFilter::FLOAT1]->draw();
+      if(_params[TxFilter::FLOAT1]->draw() && modified)*modified = true;
       break;
   
     case DELAY:
     case DELAYA:
     case DELAYL:
-      _params[TxFilter::INT1]->draw();
+      if(_params[TxFilter::INT1]->draw() && modified)*modified = true;
       ImGui::SameLine();
-      _params[TxFilter::INT2]->draw();
+      if(_params[TxFilter::INT2]->draw() && modified)*modified = true;
       break;
 
     case FIR:
-      _params[TxFilter::INT1]->draw();
+      if(_params[TxFilter::INT1]->draw() && modified)*modified = true;
       ImGui::SameLine();
-      _params[TxFilter::FLOAT1]->draw();
+      if(_params[TxFilter::FLOAT1]->draw() && modified)*modified = true;
       ImGui::SameLine();
-      _params[TxFilter::FLOAT2]->draw();
+      if(_params[TxFilter::FLOAT2]->draw() && modified)*modified = true;
       ImGui::SameLine();
-      _params[TxFilter::INT2]->draw();
+      if(_params[TxFilter::INT2]->draw() && modified)*modified = true;
       break;
       
     default:
@@ -395,8 +400,6 @@ void TxFilter::draw()
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
   commonControls();
-
-  ImGui::End();
 }
 
 void TxFilter::reset()

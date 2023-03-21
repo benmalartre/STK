@@ -19,9 +19,11 @@ public:
   void setMaximum(stk::StkFloat value);
   void setSeed(int seed);
   void setFrequency(stk::StkFloat frequency);
-  void draw() override;
   void reset() override;
   void updateBounds();
+
+protected:
+  void _drawImpl(bool*) override;
 
 private:
   stk::StkFloat  _value;

@@ -52,29 +52,28 @@ stk::StkFrames& TxEffect::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxEffect::draw()
+void TxEffect::_drawImpl(bool* modified)
 {
-  ImGui::Begin(_name.c_str(), NULL);
 
   ImGui::BeginGroup();
   switch(_effectIdx) {
     case CHORUS:
     {
       TxParameter* modDepth = _params[TxEffect::MODDEPTH];
-      modDepth->draw();
+      if (modDepth->draw() && modified)*modified = true;
       ImGui::SameLine();
       TxParameter* modFreq = _params[TxEffect::MODFREQUENCY];
-      modFreq->draw();
+      if (modFreq->draw() && modified)*modified = true;
       break;
     }
 
     case ECHO:
     {
       TxParameter* delay = _params[TxEffect::DELAY];
-      delay->draw();
+      if (delay->draw() && modified)*modified = true;
       ImGui::SameLine();
       TxParameter* maxDelay = _params[TxEffect::MAXIMUMDELAY];
-      maxDelay->draw();
+      if (maxDelay->draw() && modified)*modified = true;
       break;
     }
 
@@ -89,7 +88,6 @@ void TxEffect::draw()
   ImGui::SameLine();
   commonControls();
 
-  ImGui::End();
 }
 
 void TxEffect::reset()

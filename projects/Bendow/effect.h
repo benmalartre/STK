@@ -32,8 +32,10 @@ public:
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
-  void draw() override;
   void reset() override;
+
+protected:
+  void _drawImpl(bool*) override;
 
 private:
   stk::Effect*  _effect;

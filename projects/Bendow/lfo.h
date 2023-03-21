@@ -21,10 +21,14 @@ public:
   void setFrequency(stk::StkFloat frequency);
   void setAmplitude(stk::StkFloat amplitude);
   void setOffset(stk::StkFloat offset);
-  void draw() override;
+  const ImVec2& size() override;
   void reset() override;
 
+protected:
+  void _drawImpl(bool*) override;
+
 private:
+  static ImVec2       Size;
   stk::SineWave   _sine;
   stk::StkFloat   _frequency;
   stk::StkFloat   _amplitude;

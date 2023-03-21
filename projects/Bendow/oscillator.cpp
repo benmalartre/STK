@@ -9,6 +9,8 @@
 #include <Modulate.h>
 #include <Granulate.h>
 
+ImVec2 TxOscillator::Size(512, 120);
+
 const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "Blit",
   "BlitSaw",
@@ -38,6 +40,11 @@ TxOscillator::TxOscillator(const std::string& name)
 TxOscillator::~TxOscillator() 
 {
   if(_generator) delete _generator;
+}
+
+const ImVec2& TxOscillator::size()
+{
+  return TxOscillator::Size;
 }
 
 stk::StkFloat TxOscillator::tick(unsigned int)
@@ -209,22 +216,21 @@ void TxOscillator::setHarmonics(int harmonics)
   }
 }
 
-void TxOscillator::draw()
+void TxOscillator::_drawImpl(bool* modified)
 {
-  ImGui::Begin(_name.c_str(), NULL);
-
+  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* waveform = _params[TxOscillator::WAVEFORM];
-  waveform->draw();
+  if(waveform->draw() && modified)*modified = true;
   TxParameter* frequency = _params[TxOscillator::FREQUENCY];
-  frequency->draw();
+  if(frequency->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* harmonics = _params[TxOscillator::HARMONICS];
-  harmonics->draw();
+  if(harmonics->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* envelope = _params[TxOscillator::ENVELOPE];
-  envelope->draw();
+  if(envelope->draw() && modified)*modified = true;
   ImGui::EndGroup();
 
   ImGui::SameLine();
@@ -232,7 +238,6 @@ void TxOscillator::draw()
   ImGui::SameLine();
   commonControls();
 
-  ImGui::End();
 }
 
 void TxOscillator::reset()

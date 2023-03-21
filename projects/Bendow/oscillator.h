@@ -36,10 +36,14 @@ public:
   void setHarmonics(int harmonics);
   void setEnvelope(stk::StkFloat envelope);
 
-  void draw() override;
+  const ImVec2& size() override;
   void reset() override;
 
+protected:
+  void _drawImpl(bool*) override;
+
 private:
+  static ImVec2   Size;
   stk::Generator* _generator;
   stk::StkFloat   _frequency;
   stk::StkFloat   _envelope;

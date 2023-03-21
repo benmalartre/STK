@@ -29,10 +29,14 @@ public:
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setMode(int mode);
-  void draw() override;
+  const ImVec2& size();
   void reset() override;
 
+protected:
+  void _drawImpl();
+
 private:
+  static ImVec2  Size;
   int     _mode;
   float   _float1;
 };

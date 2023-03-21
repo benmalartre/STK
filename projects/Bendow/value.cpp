@@ -29,7 +29,7 @@ stk::StkFrames& TxValue::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxValue::draw()
+void TxValue::_drawImpl(bool*)
 {
 
 }

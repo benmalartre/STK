@@ -25,10 +25,14 @@ public:
   void setDecay(stk::StkFloat decay);
   void setSustain(stk::StkFloat sustain);
   void setRelease(stk::StkFloat release);
-  void draw() override;
+  const ImVec2& size() override;
   void reset() override;
 
+protected:
+  void _drawImpl(bool*) override;
+
 private:
+  static ImVec2 Size;
   stk::ADSR     _adsr;
   stk::StkFloat _attack;
   stk::StkFloat _decay;

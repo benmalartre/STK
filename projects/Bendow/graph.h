@@ -7,6 +7,12 @@
 
 class TxGraph {
   public:
+    enum Pick {
+      NONE,
+      NODE,
+      INPUT,
+      OUTPUT
+   };
     TxGraph(const std::string& name);
     ~TxGraph();
 
@@ -16,21 +22,25 @@ class TxGraph {
     void removeNode(TxNode* node);
 
     stk::StkFloat          tick();
-    TxNode*                getCurrent();
-    std::vector<TxNode*>&  getNodes();
+    TxNode*                current();
+    TxNode*                selected();
+    std::vector<TxNode*>&  nodes();
     void                   draw();
 
   private:
-    void                   pick(const ImVec2& position);
+    static const int       Flags;
+    int                    pick(const ImVec2& position);
     bool                   contains(const TxNode* node);
     int                    index(const TxNode* node);
     std::string          _name;
     std::vector<TxNode*> _nodes;
     TxNode*              _current;
+    TxNode*              _selected;
     bool                 _active;
 
+    bool                 _drag;
     ImVec2               _offset;
-    ImVec2               _scale;
+    float                _scale;
 };
 
 #endif // TX_GRAPH_H

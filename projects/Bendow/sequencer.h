@@ -30,15 +30,18 @@ public:
   stk::StkFloat tick(unsigned int channel) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   
+  const ImVec2& size() override;
   void start();
   void stop();
   Index timeToIndex(float time);
 
-  void drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool active);
-  void draw() override;
+  bool drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool active);
   void reset() override;
 
+protected: 
+  void _drawImpl(bool*) override;
 private:
+  static ImVec2       Size;
   Sequence            _sequence;
   int                 _bpm;
   int                 _length;

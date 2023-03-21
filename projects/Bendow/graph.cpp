@@ -1,11 +1,21 @@
 #include "graph.h"
 
+const int TxGraph::Flags = 
+  ImGuiWindowFlags_NoResize | 
+  ImGuiWindowFlags_NoCollapse |
+  ImGuiWindowFlags_NoMove |
+  ImGuiWindowFlags_NoNav |
+  //ImGuiWindowFlags_NoBackground |
+  ImGuiWindowFlags_NoTitleBar |
+  ImGuiWindowFlags_NoInputs;
+
 TxGraph::TxGraph(const std::string& name) 
   : _name(name)
   , _current(NULL)
+  , _selected(NULL)
   , _active(true)
   , _offset(ImVec2(100,100))
-  , _scale(ImVec2(1,1))
+  , _scale(1.f)
 {};
 
 TxGraph::~TxGraph()
@@ -39,12 +49,18 @@ void TxGraph::setCurrent(TxNode* node)
   _current = node;
 }
 
-TxNode* TxGraph::getCurrent()
+TxNode* TxGraph::current()
 {
   return _current;
 }
 
-std::vector<TxNode*>& TxGraph::getNodes()
+TxNode* TxGraph::selected()
+{
+  return _selected;
+}
+
+
+std::vector<TxNode*>& TxGraph::nodes()
 {
     return _nodes;
 }
@@ -74,30 +90,74 @@ stk::StkFloat TxGraph::tick()
 
 static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
 {
+  std::cout << "check inside: (" << point[0] << "," << point[1] << ") : (" << bmin[0] << "," << bmin[1] << "),(" << bmax[0] << ", " << bmax[1] << ")" << std::endl;
   return point[0] >= bmin[0] && point[0] <= bmax[0] &&
     point[1] >= bmin[1] && point[1] <= bmax[1];
 }
 
-
-void TxGraph::pick(const ImVec2& pos)
+int TxGraph::pick(const ImVec2& pos)
 {
-  std::cout << "pick position : " << pos[0] << "," << pos[1] << std::endl;
+  _selected = NULL;
   for(auto& node: _nodes) {
+    std::cout << "check inside node : " << node->name() << std::endl;
     if(inside(pos, node->position() * _scale + _offset, 
       (node->position() + node->size()) * _scale + _offset))
       {
-        _current = node;
+        _selected = node;
+        
+        int portIdx = node->pick(pos);
+        if(portIdx > -1) {
+
+        }
         break;
       }
   }
+  return TxGraph::NONE;
 }
-
 
 void TxGraph::draw()
 {
+  static int counter = 0;
   static ImU32 whiteColor = ImColor({ 255,255,255,255 });
   static ImU32 blackColor = ImColor({ 0,0,0,255 });
-  ImGui::Begin(_name.c_str(), NULL);
+  static ImVec2 offset;
+  ImGuiIO& io = ImGui::GetIO();
+  const ImVec2 pos(0, 100);
+  const ImVec2 size = io.DisplaySize - pos;
+  ImGui::SetNextWindowPos(pos);
+  ImGui::SetNextWindowSize(size);
+  ImGui::Begin(_name.c_str(), NULL, TxGraph::Flags);
+  ImGui::SetWindowFontScale(_scale);
+ 
+  if(io.MouseWheel) {
+    _scale += io.MouseWheel * 0.1f;
+  }
+  if (io.MouseClicked[0]) {
+    pick(ImGui::GetMousePos());
+    if (_selected) {
+      offset = ImGui::GetMousePos() - _selected->position();
+    }
+  }
+
+  bool modified = false;
+  for (auto& node : _nodes) {
+    node->draw(_offset, _scale, &modified);
+  }
+
+  if (!modified) {
+    if (io.MouseDown[0] && _selected) {
+      if (_selected) {
+        _selected->setPosition(ImGui::GetMousePos() - offset);
+      }
+    }
+    else if (io.MouseDown[2]) {
+      _offset += io.MouseDelta;
+      std::cout << "offset : " << _offset[0] << "," << _offset[1] << std::endl;
+    }
+  }
+  
+  //ImGui::PopClipRect();
+  /*
   ImDrawList* drawList = ImGui::GetWindowDrawList();
 
   ImGuiIO& io = ImGui::GetIO();
@@ -106,7 +166,7 @@ void TxGraph::draw()
   }
 
   for (auto& node : _nodes) {
-    if (node == _current) {
+    if (node == _selected) {
       drawList->AddRectFilled(
         node->position() * _scale + _offset + ImGui::GetWindowPos(),
         (node->position() + node->size()) * _scale + _offset + ImGui::GetWindowPos(),
@@ -122,7 +182,8 @@ void TxGraph::draw()
       drawList->AddText(node->position() * _scale + _offset + ImGui::GetWindowPos() + ImVec2(20, 8), 
         whiteColor, node->name().c_str());
     }
-    
   }
+  */
   ImGui::End();
+  //if (_selected)_selected->draw();
 }

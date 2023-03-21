@@ -10,8 +10,11 @@ public:
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
   void setValue(const stk::StkFloat& value);
-  void draw() override;
   void reset() override;
+
+protected:
+  void _drawImpl(bool*) override;
+
 private:
   stk::StkFloat  _value;
 };

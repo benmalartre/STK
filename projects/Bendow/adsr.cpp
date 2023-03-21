@@ -1,6 +1,8 @@
 #include "common.h"
 #include "adsr.h"
 
+ImVec2 TxAdsr::Size(240, 120);
+
 TxAdsr::TxAdsr(const std::string& name) 
   : TxNode(name)
   , _attack(0.05f)
@@ -20,6 +22,10 @@ TxAdsr::TxAdsr(const std::string& name)
 
 TxAdsr::~TxAdsr() 
 {
+}
+const ImVec2& TxAdsr::size()
+{
+  return TxAdsr::Size;
 }
 
 stk::StkFloat TxAdsr::tick(unsigned int)
@@ -71,33 +77,25 @@ void TxAdsr::setSustain(stk::StkFloat sustain)
   _adsr.setSustainLevel(_sustain);
 }
 
-void TxAdsr::draw()
+void TxAdsr::_drawImpl(bool* modified)
 {
-  ImGui::Begin(_name.c_str(), NULL);
-
+  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::Checkbox("Trigger", &_trigger);
   
   TxParameter* attack = _params[TxAdsr::ATTACK];
-  attack->draw();
+  if (attack->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* decay = _params[TxAdsr::DECAY];
-  decay->draw();
+  if (decay->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* sustain = _params[TxAdsr::SUSTAIN];
-  sustain->draw();
+  if (sustain->draw() && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* release = _params[TxAdsr::RELEASE];
-  release->draw();
+  if (release->draw() && modified)*modified = true;
   
   ImGui::EndGroup();
-/*
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
-  commonControls();
-*/
-  ImGui::End();
 }
 
 void TxAdsr::reset()
