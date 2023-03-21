@@ -5,9 +5,11 @@ TxNode::TxNode(const std::string& name, uint32_t numChannels)
   : _nChannels(numChannels)
   , _name(name)
   , _dirty(true)
+  , _position(RANDOM_LO_HI(0,200), RANDOM_LO_HI(0,200))
+  , _size(100,25)
+  , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, RANDOM_0_1)
 {
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
-
   _params.push_back(new TxParameterSamples("Samples"));
 }
 
@@ -26,6 +28,21 @@ int TxNode::numChannels()
 const std::string& TxNode::name()
 {
   return _name;
+}
+
+const ImVec2& TxNode::position()
+{
+  return _position;
+}
+
+const ImVec2& TxNode::size()
+{
+  return _size;
+}
+
+const ImVec4& TxNode::color()
+{
+  return _color;
 }
 
 void TxNode::setDirty(bool state) 

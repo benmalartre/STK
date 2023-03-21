@@ -4,6 +4,8 @@ TxGraph::TxGraph(const std::string& name)
   : _name(name)
   , _current(NULL)
   , _active(true)
+  , _offset(ImVec2(100,100))
+  , _scale(ImVec2(1,1))
 {};
 
 TxGraph::~TxGraph()
@@ -70,7 +72,57 @@ stk::StkFloat TxGraph::tick()
   return 0.f;
 }
 
+static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
+{
+  return point[0] >= bmin[0] && point[0] <= bmax[0] &&
+    point[1] >= bmin[1] && point[1] <= bmax[1];
+}
+
+
+void TxGraph::pick(const ImVec2& pos)
+{
+  std::cout << "pick position : " << pos[0] << "," << pos[1] << std::endl;
+  for(auto& node: _nodes) {
+    if(inside(pos, node->position() * _scale + _offset, 
+      (node->position() + node->size()) * _scale + _offset))
+      {
+        _current = node;
+        break;
+      }
+  }
+}
+
+
 void TxGraph::draw()
 {
-  for(auto& node: _nodes)node->draw();
+  static ImU32 whiteColor = ImColor({ 255,255,255,255 });
+  static ImU32 blackColor = ImColor({ 0,0,0,255 });
+  ImGui::Begin(_name.c_str(), NULL);
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  ImGuiIO& io = ImGui::GetIO();
+  if (io.MouseClicked[0] && inside(ImGui::GetMousePos(), ImGui::GetWindowPos(), ImGui::GetWindowPos() + ImVec2(1024,1024))) {
+    pick(io.MouseClickedPos[0] - ImGui::GetWindowPos());
+  }
+
+  for (auto& node : _nodes) {
+    if (node == _current) {
+      drawList->AddRectFilled(
+        node->position() * _scale + _offset + ImGui::GetWindowPos(),
+        (node->position() + node->size()) * _scale + _offset + ImGui::GetWindowPos(),
+        whiteColor, 2.f);
+      drawList->AddText(node->position() * _scale + _offset + ImGui::GetWindowPos() + ImVec2(20, 8),
+        blackColor, node->name().c_str());
+    }
+    else {
+      drawList->AddRectFilled(
+        node->position() * _scale + _offset + ImGui::GetWindowPos(),
+        (node->position() + node->size()) * _scale + _offset + ImGui::GetWindowPos(),
+        ImColor(node->color()), 2.f);
+      drawList->AddText(node->position() * _scale + _offset + ImGui::GetWindowPos() + ImVec2(20, 8), 
+        whiteColor, node->name().c_str());
+    }
+    
+  }
+  ImGui::End();
 }

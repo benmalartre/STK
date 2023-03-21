@@ -26,14 +26,16 @@ public:
     SAMPLES
   };
 
-  enum Display {
-    HORIZONTAL,
-    VERTICAL,
-    KNOB
+  enum Flag {
+    HORIZONTAL  = 1,
+    VERTICAL    = 2,
+    KNOB        = 4,
+    EVEN        = 8,
+    ODD         = 16
   };
 
   TxParameter(const std::string& name, void* data, 
-    short type=NONE, short display=HORIZONTAL);
+    short type=NONE, int flags=HORIZONTAL);
   virtual ~TxParameter();
   const std::string& name();
   const std::string& label();
@@ -47,7 +49,7 @@ public:
 
 protected:
   short             _type;
-  short             _display;
+  int               _flags;
   std::string       _name;
   std::string       _label;
   TxNode*           _input;
@@ -68,7 +70,7 @@ public:
 class TxParameterInt : public TxParameter {
 public:
   TxParameterInt(const std::string& name, int minimum, int maximum, int* data,
-    short display=HORIZONTAL);
+    int flags=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
   void setMinimum(int value);
@@ -97,7 +99,7 @@ private:
 class TxParameterFloat : public TxParameter {
 public:
   TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, 
-    stk::StkFloat* data, short display=HORIZONTAL);
+    stk::StkFloat* data, int flags=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
   void setMinimum(stk::StkFloat value);
@@ -112,7 +114,7 @@ private:
 
 class TxParameterString : public TxParameter {
 public:
-  TxParameterString(const std::string& name, std::string* data, short display=HORIZONTAL);
+  TxParameterString(const std::string& name, std::string* data, int flags=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
   const std::string& get();

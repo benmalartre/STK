@@ -34,6 +34,9 @@ public:
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
   const std::string& name();
+  const ImVec2& position();
+  const ImVec2& size();
+  const ImVec4& color();
   void setDirty(bool state);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
@@ -43,9 +46,13 @@ public:
   virtual void reset() = 0;
 
 protected:
+  ImVec2                    _position;
+  ImVec2                    _size;
+  ImVec4                    _color;
+  int                       _expended;
+
   std::string               _name;
   int                       _nChannels;
-  int                       _state;
   bool                      _dirty;
   stk::StkFrames            _frames;
   TxBuffer                  _buffer;

@@ -5,12 +5,12 @@
 
 // TxParameter (base class)
 // ---------------------------------------------------------------
-TxParameter::TxParameter(const std::string& name, void* data, short type, short display)
+TxParameter::TxParameter(const std::string& name, void* data, short type, int flags)
   : _name(name)
   , _label(name)
   , _input(NULL)
   , _type(type)
-  , _display(display)
+  , _flags(flags)
   , _data(data)
   , _callback(NULL)
   , _channel(0)
@@ -83,8 +83,8 @@ bool TxParameterBool::draw()
 // TxParameterInt
 // ---------------------------------------------------------------
 TxParameterInt::TxParameterInt(const std::string& name, int minimum, int maximum, 
-  int* data, short display)
-  : TxParameter(name, (void*)data, TxParameter::INT, display)
+  int* data, int flags)
+  : TxParameter(name, (void*)data, TxParameter::INT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
 {
@@ -117,16 +117,13 @@ stk::StkFloat TxParameterInt::tick()
 bool TxParameterInt::draw()
 {
   bool modified = false;
-  switch(_display) {
-    case TxParameter::HORIZONTAL:
-      modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
-      break;
-    case TxParameter::VERTICAL:
-      modified = ImGui::VSliderInt(_label.c_str(),ImVec2(20, 100), (int*)_data, _minimum, _maximum);
-      break;
-    case TxParameter::KNOB:
-      modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum);
-      break;
+  if (_flags & TxParameter::HORIZONTAL) {
+    modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
+  }
+  else if (_flags & TxParameter::VERTICAL) {
+    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100), (int*)_data, _minimum, _maximum);
+  } else if (_flags & TxParameter::KNOB) {
+    modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
   if(modified && _callback) _callback->execute();
   return modified;
@@ -181,8 +178,8 @@ bool TxParameterEnum::draw()
 // TxParameterFloat
 // ---------------------------------------------------------------
 TxParameterFloat::TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, 
-  stk::StkFloat* data, short display)
-  : TxParameter(name, (void*)data, TxParameter::FLOAT, display)
+  stk::StkFloat* data, int flags)
+  : TxParameter(name, (void*)data, TxParameter::FLOAT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
 {
@@ -217,17 +214,14 @@ stk::StkFloat TxParameterFloat::tick()
 bool TxParameterFloat::draw()
 {
   bool modified = false;
-  switch(_display) {
-    case TxParameter::HORIZONTAL:
-      modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
-      break;
-    case TxParameter::VERTICAL:
-      modified = ImGui::VSliderFloat(_label.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
-      break;
-    case TxParameter::KNOB:
-      modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
-        0.f, "%.3f", ImGuiKnobVariant_WiperDot);
-      break;
+  if (_flags & TxParameter::HORIZONTAL) {
+    modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+  }
+  else if (_flags & TxParameter::VERTICAL) {
+    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
+  } else if (_flags & TxParameter::KNOB) {
+    modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
+      0.f, "%.3f", ImGuiKnobVariant_WiperDot);
   }
   if(modified && _callback) _callback->execute();
 
@@ -236,8 +230,8 @@ bool TxParameterFloat::draw()
 
 // TxParameterString
 // ---------------------------------------------------------------
-TxParameterString::TxParameterString(const std::string& name, std::string* data, short display)
-  : TxParameter(name, (void*)data, TxParameter::STRING, display)
+TxParameterString::TxParameterString(const std::string& name, std::string* data, int flags)
+  : TxParameter(name, (void*)data, TxParameter::STRING, flags)
 {
 }
 

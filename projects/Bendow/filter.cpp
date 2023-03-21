@@ -1,6 +1,9 @@
 #include "common.h"
 #include "filter.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <BiQuad.h>
 #include <Delay.h>
 #include <DelayA.h>
@@ -54,9 +57,9 @@ TxFilter::TxFilter(const std::string& name)
   , _filter(NULL)
   , _filterIdx(-1)
   , _gain(0.9f)
-  , _float1(0.5f)
-  , _float2(1.f)
-  , _float3(0.f)
+  , _float1(1.f)
+  , _float2(0.6f)
+  , _float3(0.3f)
   , _int1(0)
   , _int2(0)
   , _int3(0)
@@ -72,17 +75,82 @@ TxFilter::TxFilter(const std::string& name)
   _params.push_back(new TxParameterInt("Int3", 0, 12, &_int3, TxParameter::KNOB));
   _params.push_back(new TxParameterBool("Bool1", &_bool1));
   setFilter(ONEPOLE);
-  /*
-  _params.push_back(new TxParameterFloat("ModDepth", 0.f, 1.f, &_modDepth, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("ModFrequency", 1.f, 220.f, &_modFrequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("Delay", 0, 1000, &_delay, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("MaximumDelay", 0, 1000, &_maximumDelay, TxParameter::KNOB));
-  */
+
 }
 
 TxFilter::~TxFilter() 
 {
 }
+
+/*
+* This function calculates the zeroth order Bessel function
+*/
+static double Ino(double x)
+{
+  double d = 0, ds = 1, s = 1;
+  do
+  {
+    d += 2;
+    ds *= x*x/(d*d);
+    s += ds;
+  }
+  while (ds > s*1e-6);
+  return s;
+}
+
+std::vector<float> computeFirCoefficients(int Fs, float Fa, float Fb, int Att, int M)
+{
+  /*
+    * This function calculates Kaiser windowed
+    * FIR filter coefficients for a single passband
+    * based on
+    * "DIGITAL SIGNAL PROCESSING, II" IEEE Press pp 123-126.
+    *
+    * Fs=Sampling frequency
+    * Fa=Low freq ideal cut off (0=low pass)
+    * Fb=High freq ideal cut off (Fs/2=high pass)
+    * Att=Minimum stop band attenuation (>21dB)
+    * M=Number of points in filter (ODD number)
+    * return the output coefficients (they are symetric only half generated)
+    */
+  int j,  Np = (M-1)/2;
+
+  float alpha, inoAlpha;
+  std::vector<float> A(Np+1);
+  std::vector<float> coeffs(Np*2);
+
+  // Calculate the impulse response of the ideal filter
+  A[0] = 2*(Fb-Fa)/Fs;
+  for (j=1; j<=Np; j++)
+  {
+    A[j] = (std::sinf(2*j*M_PI*Fb/Fs)-std::sin(2*j*M_PI*Fa/Fs))/(j*M_PI);
+  }
+  // Calculate the desired shape factor for the Kaiser-Bessel window
+  if (Att<21)
+  {
+    alpha = 0;
+  }
+  else if (Att>50)
+  {
+    alpha = 0.1102*(Att-8.7);
+  }
+  else
+  {
+    alpha = 0.5842*std::pow((Att-21), 0.4)+0.07886*(Att-21);
+  }
+  // Window the ideal response with the Kaiser-Bessel window
+  inoAlpha = Ino(alpha);
+  for (j=0; j<=Np; j++)
+  {
+    coeffs[Np+j] = A[j]*Ino(alpha*std::sqrt(1-(j*j/(Np*Np))))/inoAlpha;
+  }
+  for (j=0; j<Np; j++)
+  {
+    coeffs[j] = coeffs[M-1-j];
+  }
+
+  return coeffs;
+};
 
 void TxFilter::setFilter(int filterIdx)
 {
@@ -124,8 +192,7 @@ void TxFilter::setFilter(int filterIdx)
       ((stk::OnePole*)_filter)->setPole(-0.5f);
       break;
 
-    case DELAY:
-      _filter = new stk::Delay();
+    case DELAY:_filter = new stk::Delay();
       int1->setMinimum(0);
       int1->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int1->set(4096.f);
@@ -136,6 +203,58 @@ void TxFilter::setFilter(int filterIdx)
       int2->setLabel("Delay");
       ((stk::Delay*)_filter)->setMaximumDelay(int1->tick());
       ((stk::Delay*)_filter)->setDelay(int2->tick());
+      break;
+
+    case DELAYA:
+      _filter = new stk::DelayA();
+      int1->setMinimum(0);
+      int1->setMaximum((int)stk::Stk::sampleRate() * 0.5);
+      int1->set(4096.f);
+      int1->setLabel("Maximum");
+      int2->setMinimum(0);
+      int2->setMaximum((int)stk::Stk::sampleRate() * 0.5);
+      int2->set(0.f);
+      int2->setLabel("Delay");
+      ((stk::DelayA*)_filter)->setMaximumDelay(int1->tick());
+      ((stk::DelayA*)_filter)->setDelay(int2->tick());
+      break;
+
+    case DELAYL:
+      _filter = new stk::DelayL();
+      int1->setMinimum(0);
+      int1->setMaximum((int)stk::Stk::sampleRate() * 0.5);
+      int1->set(4096.f);
+      int1->setLabel("Maximum");
+      int2->setMinimum(0);
+      int2->setMaximum((int)stk::Stk::sampleRate() * 0.5);
+      int2->set(0.f);
+      int2->setLabel("Delay");
+      ((stk::DelayL*)_filter)->setMaximumDelay(int1->tick());
+      ((stk::DelayL*)_filter)->setDelay(int2->tick());
+      break;
+
+    case FIR:
+      _filter = new stk::Fir();
+      int1->setMinimum(4);
+      int1->setMaximum(1024);
+      int1->set(64);
+      int1->setLabel("N");
+      int2->setMinimum(21);
+      int2->setMaximum(1000);
+      int2->set(64);
+      int2->setLabel("Db");
+      float1->setMinimum(0.f);
+      float1->setMaximum(20000.f);
+      float1->set(220.f);
+      float1->setLabel("Low");
+      float2->setMinimum(0.f);
+      float2->setMaximum(60000.f);
+      float2->set(4400.f);
+      float2->setLabel("High");
+      std::vector<float> coeffs = computeFirCoefficients(stk::Stk::sampleRate(), 
+        float1->tick(), float2->tick(), int2->tick(), int1->tick());
+
+      ((stk::Fir*)_filter)->setCoefficients(coeffs, true);
       break;
   }
   
@@ -180,6 +299,37 @@ stk::StkFloat TxFilter::tick(unsigned int)
       sample = ((stk::Delay*)_filter)->tick(input);
       break;
     }
+
+    case DELAYA:
+    {
+      int maxDelay = _params[TxFilter::INT1]->tick();
+      int delay = _params[TxFilter::INT2]->tick();
+      ((stk::DelayA*)_filter)->setMaximumDelay(maxDelay);
+      ((stk::DelayA*)_filter)->setDelay(delay);
+      sample = ((stk::DelayA*)_filter)->tick(input);
+      break;
+    }
+
+    case DELAYL:
+    {
+      int maxDelay = _params[TxFilter::INT1]->tick();
+      int delay = _params[TxFilter::INT2]->tick();
+      ((stk::DelayL*)_filter)->setMaximumDelay(maxDelay);
+      ((stk::DelayL*)_filter)->setDelay(delay);
+      sample = ((stk::DelayL*)_filter)->tick(input);
+      break;
+    }
+
+    case FIR:
+    {
+      
+      ((stk::Fir*)_filter)->setCoefficients(
+        computeFirCoefficients(stk::Stk::sampleRate(),
+          _params[FLOAT1]->tick(), _params[FLOAT2]->tick(), _params[INT2]->tick(), _params[INT1]->tick()), true);
+      
+      sample = ((stk::Fir*)_filter)->tick(input);
+      break;
+    }
   }
 
   _buffer.write(sample);
@@ -218,11 +368,23 @@ void TxFilter::draw()
       break;
   
     case DELAY:
+    case DELAYA:
+    case DELAYL:
       _params[TxFilter::INT1]->draw();
       ImGui::SameLine();
       _params[TxFilter::INT2]->draw();
       break;
 
+    case FIR:
+      _params[TxFilter::INT1]->draw();
+      ImGui::SameLine();
+      _params[TxFilter::FLOAT1]->draw();
+      ImGui::SameLine();
+      _params[TxFilter::FLOAT2]->draw();
+      ImGui::SameLine();
+      _params[TxFilter::INT2]->draw();
+      break;
+      
     default:
       break;
   }

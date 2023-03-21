@@ -21,12 +21,16 @@ class TxGraph {
     void                   draw();
 
   private:
+    void                   pick(const ImVec2& position);
     bool                   contains(const TxNode* node);
     int                    index(const TxNode* node);
     std::string          _name;
     std::vector<TxNode*> _nodes;
     TxNode*              _current;
     bool                 _active;
+
+    ImVec2               _offset;
+    ImVec2               _scale;
 };
 
 #endif // TX_GRAPH_H

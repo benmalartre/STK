@@ -124,10 +124,9 @@ GLFWwindow* openWindow(size_t width, size_t height)
 
 void setupStyle()
 {
-  ImGuiStyle* style = &ImGui::GetStyle();
-  ImGui::StyleColorsLight(style);
-  /*
-
+  ImGuiStyle& style = ImGui::GetStyle();
+  //ImGui::StyleColorsLight(style);
+  
 	style.GrabRounding = 0.f;
 	style.WindowRounding = 0.f;
 	style.ScrollbarRounding = 3.f;
@@ -170,7 +169,7 @@ void setupStyle()
 	style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 	style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.32f, 0.52f, 0.65f, 1.00f);
 	style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
-  */
+  
 }
 
 
