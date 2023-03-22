@@ -19,6 +19,12 @@ public:
 
   static const uint32_t NumBits = 4;
 
+  enum Parameters {
+    TRIGGER = TxNode::LAST,
+    BPM,
+    LAST
+  };
+
 public:
   TxSequencer(const std::string& name);
   TxSequencer(const std::string& name, uint32_t bpm, uint64_t length);

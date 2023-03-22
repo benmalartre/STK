@@ -16,6 +16,8 @@ TxSequencer::TxSequencer(const std::string& name, uint32_t bpm, uint64_t length)
   , _length(length)
   , _running(false)
 {
+  _params.push_back(new TxParameterBool("Running", &_running));
+  _params.push_back(new TxParameterInt("Bpm", 1, 440, &_bpm, TxParameter::KNOB));
 }
 
 TxSequencer::~TxSequencer()

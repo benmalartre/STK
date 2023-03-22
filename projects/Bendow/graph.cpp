@@ -98,16 +98,17 @@ static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
 int TxGraph::pick(const ImVec2& pos)
 {
   _selected = NULL;
-  size_t nodeIdx = _nodes.size()-1;
+
+  int nodeIdx = _nodes.size()-1;
   for (; nodeIdx >= 0; --nodeIdx) {
     TxNode* node = _nodes[nodeIdx];
-    std::cout << "check inside node : " << node->name() << std::endl;
     if(inside(pos, node->position() * _scale + _offset, 
       (node->position() + node->size()) * _scale + _offset))
       {
         _selected = node;
-        std::cout << "selected node : " << _selected << std::endl;
-        
+        if (_selected && _selected != _nodes.back()) {
+          std::swap(_nodes[index(_selected)], _nodes.back());
+        }
         int portIdx = node->pick(pos);
         if(portIdx > -1) {
           return TxGraph::INPUT;
@@ -130,20 +131,26 @@ void TxGraph::draw()
   ImGui::SetNextWindowPos(pos);
   ImGui::SetNextWindowSize(size);
   ImGui::Begin(_name.c_str(), NULL, TxGraph::Flags);
-  ImGui::SetWindowFontScale(_scale);
+  io.FontGlobalScale = _scale;
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImU32 GRID_COLOR = IM_COL32(200, 200, 200, 40);
+  float GRID_SZ = 64.0f * _scale;
+  ImVec2 win_pos = ImGui::GetCursorScreenPos();
+  ImVec2 canvas_sz = ImGui::GetWindowSize();
+  for (float x = fmodf(_offset.x, GRID_SZ); x < canvas_sz.x; x += GRID_SZ)
+    drawList->AddLine(ImVec2(x, 0.0f) + win_pos, ImVec2(x, canvas_sz.y) + win_pos, GRID_COLOR);
+  for (float y = fmodf(_offset.y, GRID_SZ); y < canvas_sz.y; y += GRID_SZ)
+    drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
  
   int picked = TxGraph::NONE;
   if(io.MouseWheel) {
-    _scale += io.MouseWheel * 0.1f;
+    _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
   if (io.MouseClicked[0]) {
     picked = pick(ImGui::GetMousePos());
     if (_selected) {
       offset = ImGui::GetMousePos() - _selected->position();
-      if (_selected != _nodes[_nodes.size()-1]) {
-        std::swap(_nodes[index(_selected)], _nodes[_nodes.size() - 1]);
-        std::cout << "fuckinswapnodes :(" << std::endl;
-      }
     }
   }
 
@@ -154,9 +161,7 @@ void TxGraph::draw()
 
   if (!picked) {
     if (io.MouseDown[0] && _selected) {
-      if (_selected) {
-        _selected->setPosition(ImGui::GetMousePos() - offset);
-      }
+      _selected->setPosition(ImGui::GetMousePos() - offset);
     }
     else if (io.MouseDown[2]) {
       _offset += io.MouseDelta;

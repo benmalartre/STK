@@ -200,13 +200,11 @@ void TxParameterFloat::set(stk::StkFloat value)
 void TxParameterFloat::setMinimum(stk::StkFloat value)
 {
   _minimum = value;
-  std::cout << "tx float set min : " << _minimum << std::endl;
 }
 
 void TxParameterFloat::setMaximum(stk::StkFloat value)
 {
   _maximum = value;
-  std::cout << "tx float set max : " << _maximum << std::endl;
 }
 
 stk::StkFloat TxParameterFloat::tick()
@@ -231,7 +229,14 @@ bool TxParameterFloat::draw()
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
       0.f, "%.3f", ImGuiKnobVariant_WiperDot);
   }
-  ImGui::Button("o", ImVec2(20, 20));
+  //ImGui::Button("o", ImVec2(20, 20));
+  ImGuiIO& io = ImGui::GetIO();
+  const float scale = io.FontGlobalScale;
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  const ImVec2 center = ImGui::GetCursorScreenPos() + ImVec2(24,12) * scale;
+  drawList->AddCircleFilled(center, 8.f * scale, ImColor({ 0,0,0,128 }), 32);
+  drawList->AddCircle(center, 12.f * scale, ImColor({ 180,180,180,255 }), 32, 4.f * scale);
+
   ImGui::EndGroup();
 
   if(modified && _callback) _callback->execute();
