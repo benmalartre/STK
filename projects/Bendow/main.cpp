@@ -270,49 +270,43 @@ int main()
   }
   TxGraph* graph = new TxGraph("Graph");
   
-  sequencer = new TxSequencer("Sequencer");
-  graph->addNode(sequencer);
+  sequencer = new TxSequencer(graph, "Sequencer");
   sequencer->setLength(16);
   for(size_t t = 0; t < 16; ++t)
     sequencer->setBeat(t, {1, BASS[t]});
   sequencer->start();
   
-  TxOscillator* oscillator = new TxOscillator("Oscillator");
-  graph->addNode(oscillator);
+  /*
+  TxOscillator* oscillator = new TxOscillator(graph, "Oscillator");
   oscillator->setHarmonics(7);
 
-  TxOscillator* oscillator2 = new TxOscillator("Oscillator2");
-  graph->addNode(oscillator2);
+  TxOscillator* oscillator2 = new TxOscillator(graph, "Oscillator2");
   oscillator2->setHarmonics(3);
   
-  TxAdsr* adsr = new TxAdsr("Adsr");
-  graph->addNode(adsr);
-  adsr->connect(sequencer, "Trigger");
-  oscillator->connect(sequencer, "Frequency", 1);
+  TxAdsr* adsr = new TxAdsr(graph, "Adsr");
+  graph->addConnexion(adsr->connect(sequencer, "Trigger"));
+  graph->addConnexion(oscillator->connect(sequencer, "Frequency", 1));
 
   oscillator->connect(adsr, "Envelope");
 
-  TxLfo* lfo = new TxLfo("Lfo");
-  graph->addNode(lfo);
+  TxLfo* lfo = new TxLfo(graph, "Lfo");
   lfo->setFrequency(0.01f);
   lfo->setAmplitude(5.f);
   lfo->setOffset(6.f);
 
-  TxArythmetic* arythmetic = new TxArythmetic("Arythmetic");
-  graph->addNode(arythmetic);
-  arythmetic->connect(sequencer, "Input1", 1);
-  arythmetic->connect(lfo, "Input2");
+  TxArythmetic* arythmetic = new TxArythmetic(graph, "Arythmetic");
+  graph->addConnexion(arythmetic->connect(sequencer, "Input1", 1));
+  graph->addConnexion(arythmetic->connect(lfo, "Input2"));
 
-  oscillator->connect(arythmetic, "Frequency");
+  graph->addConnexion(oscillator->connect(arythmetic, "Frequency"));
   
-  TxFilter* filter = new TxFilter("Filter");
-  filter->connect(oscillator, "Samples");
-  graph->addNode(filter);
+  TxFilter* filter = new TxFilter(graph, "Filter");
+  graph->addConnexion(filter->connect(oscillator, "Input"));
   
   //TxEffect* chorus = new TxEffect("Effect");
   //chorus->connect(oscillator, "Samples");
   //graph->addNode(chorus);
- 
+  */
 
   graphs.push_back(graph);
   /*

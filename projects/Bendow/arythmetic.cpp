@@ -11,15 +11,15 @@ const char* TxArythmetic::ModeName[TxArythmetic::NumMode] = {
   "Mix"
 };
 
-TxArythmetic::TxArythmetic(const std::string& name) 
-  : TxNode(name)
+TxArythmetic::TxArythmetic(TxGraph* parent, const std::string& name) 
+  : TxNode(parent, name)
   , _mode(ADD)
 {
-  _params.push_back(new TxParameterEnum("Mode", &TxArythmetic::ModeName[0], 
+  _params.push_back(new TxParameterEnum(this, "Mode", &TxArythmetic::ModeName[0], 
     TxArythmetic::NumMode, &_mode));  
-  _params.push_back(new TxParameterSamples("Input1"));
-  _params.push_back(new TxParameterSamples("Input2"));
-  _params.push_back(new TxParameterFloat("Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
+  _params.push_back(new TxParameterSamples(this, "Input1", false, 1));
+  _params.push_back(new TxParameterSamples(this, "Input2", false, 1));
+  _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
 }
 
@@ -83,7 +83,6 @@ void TxArythmetic::setMode(int mode)
 
 void TxArythmetic::_drawImpl()
 {
-  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* mode = _params[TxArythmetic::MODE];

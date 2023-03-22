@@ -8,11 +8,14 @@
 
 
 class TxNode;
+class TxGraph;
+
+#define PLUG_WIDTH 64.f
 
 struct TxConnexion {
-  TxNode*       start;
-  TxNode*       end;
-  TxParameter*  target;
+  TxParameter* source;
+  TxParameter* target;
+  int channel;
 };
 
 class TxNode {
@@ -22,11 +25,11 @@ public:
   static const int PortSize;
 
   enum Parameters {
-    SAMPLES,
+    OUTPUT,
     LAST
   };
 
-  TxNode(const std::string& name, uint32_t numChannels=1);
+  TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels=1);
   virtual ~TxNode();
   virtual stk::StkFloat tick(unsigned int=0) = 0;
   virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
@@ -34,6 +37,7 @@ public:
   int numChannels();
   const std::string& name();
   const ImVec2& position();
+  ImVec2 offsetScalePosition();
   virtual const ImVec2& size() = 0;
   const ImVec4& color();
   void setDirty(bool state);
@@ -42,14 +46,14 @@ public:
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
   void commonControls();
-  void drawInput();
   int pick(const ImVec2& pos);
   
-  void draw(const ImVec2& offset, const float& scale, bool* modified);
+  void draw(bool* modified);
   virtual void reset() = 0;
 
 protected:
   virtual void              _drawImpl(bool* modified) {};
+  TxGraph*                  _parent;
   ImVec2                    _position;
   ImVec2                    _size;
   ImVec4                    _color;

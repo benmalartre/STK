@@ -20,14 +20,15 @@ public:
   };
 
   enum Parameters {
-    MODDEPTH = TxNode::LAST,
+    INPUT = TxNode::LAST,
+    MODDEPTH,
     MODFREQUENCY,
     DELAY,
     MAXIMUMDELAY,
     LAST
   };
   
-  TxEffect(const std::string& name);
+  TxEffect(TxGraph* parent, const std::string& name);
   ~TxEffect();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;

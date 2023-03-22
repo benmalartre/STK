@@ -1,23 +1,23 @@
 #include "sequencer.h"
 
-ImVec2 TxSequencer::Size(512, 256);
+ImVec2 TxSequencer::Size(520, 300);
 
-TxSequencer::TxSequencer(const std::string& name)
-  : TxNode(name, TX_NUM_CHANNELS)
+TxSequencer::TxSequencer(TxGraph* parent, const std::string& name)
+  : TxNode(parent, name, TX_NUM_CHANNELS)
   , _bpm(60)
   , _length(8)
   , _running(false)
 {
 }
 
-TxSequencer::TxSequencer(const std::string& name, uint32_t bpm, uint64_t length)
-  : TxNode(name, TX_NUM_CHANNELS)
+TxSequencer::TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm, uint64_t length)
+  : TxNode(parent, name, TX_NUM_CHANNELS)
   , _bpm(bpm)
   , _length(length)
   , _running(false)
 {
-  _params.push_back(new TxParameterBool("Running", &_running));
-  _params.push_back(new TxParameterInt("Bpm", 1, 440, &_bpm, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Running", &_running));
+  _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
 }
 
 TxSequencer::~TxSequencer()
@@ -143,7 +143,6 @@ void TxSequencer::_drawImpl(bool* modified)
   TxTime& time = TxTime::instance();
   float t = time.get();
 
-  //commonControls();
   TxSequencer::Index index = timeToIndex(t);
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
@@ -168,6 +167,9 @@ void TxSequencer::_drawImpl(bool* modified)
     if (drawBeat(i, index.second, (i == index.first)))*modified = true;
     if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
+
+  ImGui::SameLine();
+  commonControls();
 }
 
 void TxSequencer::reset()

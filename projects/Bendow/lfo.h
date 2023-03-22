@@ -14,7 +14,7 @@ public:
     OFFSET, 
     LAST
   };
-  TxLfo(const std::string& name);
+  TxLfo(TxGraph* parent, const std::string& name);
   ~TxLfo();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;

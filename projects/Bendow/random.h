@@ -11,7 +11,7 @@ public:
     MAXIMUM, 
     SEED
   };
-  TxRandom(const std::string& name);
+  TxRandom(TxGraph* parent, const std::string& name);
   ~TxRandom();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;

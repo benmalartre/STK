@@ -34,20 +34,26 @@ public:
     ODD         = 16
   };
 
-  TxParameter(const std::string& name, void* data, 
+  TxParameter(TxNode* node, const std::string& name, void* data, 
     short type=NONE, int flags=HORIZONTAL);
   virtual ~TxParameter();
+  TxNode* node();
   const std::string& name();
   const std::string& label();
+  const ImVec2& plug();
+  const float& radius();
   void setLabel(const std::string& label);
   void connect(TxNode* node, short channel=0);
   void disconnect();
+ 
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;
   virtual bool draw() = 0;
   void setCallback(TxCallback* callback);
 
 protected:
+  void              _drawPlug();
+  TxNode*           _node;
   short             _type;
   int               _flags;
   std::string       _name;
@@ -56,11 +62,13 @@ protected:
   short             _channel;
   void*             _data;
   TxCallback*       _callback;
+  ImVec2            _plug;
+  float             _radius;
 };
 
 class TxParameterBool : public TxParameter {
 public:
-  TxParameterBool(const std::string& name, bool* data);
+  TxParameterBool(TxNode* node, const std::string& name, bool* data);
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
@@ -69,7 +77,7 @@ public:
 
 class TxParameterInt : public TxParameter {
 public:
-  TxParameterInt(const std::string& name, int minimum, int maximum, int* data,
+  TxParameterInt(TxNode* node, const std::string& name, int minimum, int maximum, int* data,
     int flags=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
@@ -85,7 +93,7 @@ private:
 
 class TxParameterEnum : public TxParameter {
 public:
-  TxParameterEnum(const std::string& name, const char** names, int num, int* data);
+  TxParameterEnum(TxNode* node, const std::string& name, const char** names, int num, int* data);
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
@@ -98,7 +106,7 @@ private:
 
 class TxParameterFloat : public TxParameter {
 public:
-  TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, 
+  TxParameterFloat(TxNode* node, const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum,
     stk::StkFloat* data, int flags=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
@@ -114,7 +122,7 @@ private:
 
 class TxParameterString : public TxParameter {
 public:
-  TxParameterString(const std::string& name, std::string* data, int flags=HORIZONTAL);
+  TxParameterString(TxNode* node, const std::string& name, std::string* data, int flags=HORIZONTAL);
 
   void set(stk::StkFloat value) override;
   const std::string& get();
@@ -127,14 +135,16 @@ private:
 
 class TxParameterSamples : public TxParameter {
 public:
-  TxParameterSamples(const std::string& name);
+  TxParameterSamples(TxNode* node, const std::string& name, bool io=true, int nChannels=1);
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
   bool draw() override;
 
 private:
-  stk::StkFrames*    _frames;;
+  stk::StkFrames*    _frames;
+  bool               _io;
+  int                _nChannels;
 };
 
 #endif // TX_PARAMETER_H

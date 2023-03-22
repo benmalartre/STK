@@ -1,7 +1,7 @@
 #include "value.h"
 
-TxValue::TxValue(const std::string& name)
-  : TxNode(name)
+TxValue::TxValue(TxGraph* parent, const std::string& name)
+  : TxNode(parent, name)
 {
   
 }

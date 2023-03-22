@@ -5,8 +5,9 @@
 
 // TxParameter (base class)
 // ---------------------------------------------------------------
-TxParameter::TxParameter(const std::string& name, void* data, short type, int flags)
-  : _name(name)
+TxParameter::TxParameter(TxNode* node, const std::string& name, void* data, short type, int flags)
+  : _node(node)
+  , _name(name)
   , _label(name)
   , _input(NULL)
   , _type(type)
@@ -14,6 +15,7 @@ TxParameter::TxParameter(const std::string& name, void* data, short type, int fl
   , _data(data)
   , _callback(NULL)
   , _channel(0)
+  , _plug(0, 0)
 {
 }
 
@@ -24,6 +26,10 @@ TxParameter::~TxParameter()
   }
 }
 
+TxNode* TxParameter::node()
+{
+  return _node;
+}
 const std::string& TxParameter::name()
 {
   return _name;
@@ -33,6 +39,16 @@ const std::string& TxParameter::label()
 {
   return _label;
 };
+
+const ImVec2& TxParameter::plug()
+{
+  return _plug;
+}
+
+const float& TxParameter::radius()
+{
+  return _radius;
+}
 
 void TxParameter::setLabel(const std::string& label)
 {
@@ -55,10 +71,37 @@ void TxParameter::setCallback(TxCallback* callback)
   _callback = callback;
 }
 
+void TxParameter::_drawPlug()
+{
+  ImGuiIO& io = ImGui::GetIO();
+  const float scale = io.FontGlobalScale;
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  const ImVec2 center = ImGui::GetCursorScreenPos() + ImVec2(24, 12) * scale;
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 12);
+  ImGui::InvisibleButton("##plug", ImVec2(24 * scale, 24 * scale));
+  if (ImGui::BeginDragDropSource()) {
+    ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+    ImGui::Text("This is a drag and drop source");
+    ImGui::EndDragDropSource();
+  }
+  else if (ImGui::IsDragDropActive()) {
+    if (ImGui::BeginDragDropTarget()) {
+      ImGui::Text("This is a drag and drop target");
+      ImGui::EndDragDropTarget();
+    }
+  }
+
+  drawList->AddCircleFilled(center, 8.f * scale, ImColor({ 0,0,0,128 }), 32);
+  drawList->AddCircle(center, 12.f * scale, ImColor({ 180,180,180,255 }), 32, 4.f * scale);
+
+  _plug = center;
+  _radius = 16.f * scale;
+}
+
 // TxParameterBool
 // ---------------------------------------------------------------
-TxParameterBool::TxParameterBool(const std::string& name, bool* data)
-  : TxParameter(name, (void*)data, TxParameter::BOOL)
+TxParameterBool::TxParameterBool(TxNode* node, const std::string& name, bool* data)
+  : TxParameter(node, name, (void*)data, TxParameter::BOOL)
 {
 }
 void TxParameterBool::set(stk::StkFloat value)
@@ -77,17 +120,20 @@ stk::StkFloat TxParameterBool::tick()
 
 bool TxParameterBool::draw()
 {
-  ImGui::Button("o", ImVec2(20,20));
+  ImGui::BeginGroup();
+  _drawPlug();
 
   ImGui::SameLine();
-  return ImGui::Checkbox(_label.c_str(), (bool*)_data);
+  bool modified = ImGui::Checkbox(_label.c_str(), (bool*)_data);
+  ImGui::EndGroup();
+  return modified;
 }
 
 // TxParameterInt
 // ---------------------------------------------------------------
-TxParameterInt::TxParameterInt(const std::string& name, int minimum, int maximum, 
+TxParameterInt::TxParameterInt(TxNode* node, const std::string& name, int minimum, int maximum,
   int* data, int flags)
-  : TxParameter(name, (void*)data, TxParameter::INT, flags)
+  : TxParameter(node, name, (void*)data, TxParameter::INT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
 {
@@ -130,7 +176,7 @@ bool TxParameterInt::draw()
     modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
   
-  ImGui::Button("o", ImVec2(20, 20));
+  _drawPlug();
   ImGui::EndGroup();
   if(modified && _callback) _callback->execute();
   return modified;
@@ -138,8 +184,8 @@ bool TxParameterInt::draw()
 
 // TxParameterEnum
 // ---------------------------------------------------------------
-TxParameterEnum::TxParameterEnum(const std::string& name, const char** names, int num, int* data)
-  : TxParameter(name, (void*)data, TxParameter::ENUM)
+TxParameterEnum::TxParameterEnum(TxNode* node, const std::string& name, const char** names, int num, int* data)
+  : TxParameter(node, name, (void*)data, TxParameter::ENUM)
   , _names(names)
   , _num(num)
 {
@@ -178,15 +224,16 @@ bool TxParameterEnum::draw()
     }
     ImGui::EndCombo();
   }
+
   if(modified && _callback) _callback->execute();
   return modified;
 }
 
 // TxParameterFloat
 // ---------------------------------------------------------------
-TxParameterFloat::TxParameterFloat(const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum, 
+TxParameterFloat::TxParameterFloat(TxNode* node, const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum,
   stk::StkFloat* data, int flags)
-  : TxParameter(name, (void*)data, TxParameter::FLOAT, flags)
+  : TxParameter(node, name, (void*)data, TxParameter::FLOAT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
 {
@@ -225,17 +272,13 @@ bool TxParameterFloat::draw()
   }
   else if (_flags & TxParameter::VERTICAL) {
     modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
-  } else if (_flags & TxParameter::KNOB) {
-    modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
+  }
+  else if (_flags & TxParameter::KNOB) {
+    modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot);
   }
-  //ImGui::Button("o", ImVec2(20, 20));
-  ImGuiIO& io = ImGui::GetIO();
-  const float scale = io.FontGlobalScale;
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
-  const ImVec2 center = ImGui::GetCursorScreenPos() + ImVec2(24,12) * scale;
-  drawList->AddCircleFilled(center, 8.f * scale, ImColor({ 0,0,0,128 }), 32);
-  drawList->AddCircle(center, 12.f * scale, ImColor({ 180,180,180,255 }), 32, 4.f * scale);
+
+  _drawPlug();
 
   ImGui::EndGroup();
 
@@ -245,8 +288,8 @@ bool TxParameterFloat::draw()
 
 // TxParameterString
 // ---------------------------------------------------------------
-TxParameterString::TxParameterString(const std::string& name, std::string* data, int flags)
-  : TxParameter(name, (void*)data, TxParameter::STRING, flags)
+TxParameterString::TxParameterString(TxNode* node, const std::string& name, std::string* data, int flags)
+  : TxParameter(node, name, (void*)data, TxParameter::STRING, flags)
 {
 }
 
@@ -283,9 +326,11 @@ bool TxParameterString::draw()
 
 // TxParameterSamples
 // ---------------------------------------------------------------
-TxParameterSamples::TxParameterSamples(const std::string& name)
-  : TxParameter(name, NULL)
+TxParameterSamples::TxParameterSamples(TxNode* node, const std::string& name, bool io, int nChannels)
+  : TxParameter(node, name, NULL)
   , _frames(NULL)
+  , _io(io)
+  , _nChannels(nChannels)
 {
 }
 
@@ -304,5 +349,28 @@ stk::StkFloat TxParameterSamples::tick()
 
 bool TxParameterSamples::draw()
 {
+  ImGuiIO& io = ImGui::GetIO();
+  const float scale = io.FontGlobalScale;
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  const ImVec2 pMin = ImGui::GetWindowPos() + _node->offsetScalePosition();
+  const ImVec2 pMax = pMin + ImVec2(64, 48) * scale;
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 12);
+  ImGui::InvisibleButton("##plug", ImVec2(64, 48) * scale);
+  if (ImGui::BeginDragDropSource()) {
+    ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+    ImGui::Text("This is a drag and drop source");
+    ImGui::EndDragDropSource();
+  }
+  else if (ImGui::IsDragDropActive()) {
+    if (ImGui::BeginDragDropTarget()) {
+      ImGui::Text("This is a drag and drop target");
+      ImGui::EndDragDropTarget();
+    }
+  }
+
+  drawList->AddRectFilled(pMin, pMax, ImColor({ 180,180,180,255 }), 2.f * scale);
+
+  _plug = (pMin + pMax) * 0.5;
+  _radius = std::sqrtf(ImLengthSqr(pMax - pMin));
   return false;
 }

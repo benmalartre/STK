@@ -28,7 +28,8 @@ public:
   };
 
   enum Parameters {
-    FILTER = TxNode::LAST,
+    INPUT = TxNode::LAST,
+    FILTER,
     GAIN,
     FLOAT1,
     FLOAT2,
@@ -40,7 +41,7 @@ public:
     LAST
   };
   
-  TxFilter(const std::string& name);
+  TxFilter(TxGraph* parent, const std::string& name);
   ~TxFilter();
   void setFilter(int filterIdx);
   stk::StkFloat tick(unsigned int) override;

@@ -3,16 +3,16 @@
 
 ImVec2 TxLfo::Size(400, 200);
 
-TxLfo::TxLfo(const std::string& name) 
-  : TxNode(name)
+TxLfo::TxLfo(TxGraph* parent, const std::string& name) 
+  : TxNode(parent, name)
   , _frequency(0.2f)
   , _amplitude(6.f)
   , _offset(6.f)
 {
   _sine.setFrequency(_frequency);
-  _params.push_back(new TxParameterFloat("Frequency", 0.01f, 12.f, &_frequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Amplitude", 0.01f, 10.f, &_amplitude, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Offset", -100.f, 100.f, &_offset, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Frequency", 0.01f, 12.f, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Amplitude", 0.01f, 10.f, &_amplitude, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Offset", -100.f, 100.f, &_offset, TxParameter::KNOB));
   _buffer.scale(-10, 10);
 }
 
@@ -65,7 +65,6 @@ void TxLfo::setOffset(stk::StkFloat offset)
 
 void TxLfo::_drawImpl(bool* modified)
 {
-  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* frequency = _params[TxLfo::FREQUENCY];

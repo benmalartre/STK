@@ -20,8 +20,8 @@ const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "SingWave"
 };
 
-TxOscillator::TxOscillator(const std::string& name) 
-  : TxNode(name)
+TxOscillator::TxOscillator(TxGraph* parent, const std::string& name) 
+  : TxNode(parent, name)
   , _generator(NULL)
   , _waveFormIdx(-1)
   , _lastWaveFormIdx(-1)
@@ -30,11 +30,11 @@ TxOscillator::TxOscillator(const std::string& name)
   , _harmonics(3)
 {
   setWaveForm(BLIT);
-  _params.push_back(new TxParameterEnum("WaveForm", &TxOscillator::WaveFormName[0], 
+  _params.push_back(new TxParameterEnum(this, "WaveForm", &TxOscillator::WaveFormName[0], 
     TxOscillator::NumWaveForm, &_waveFormIdx));
-  _params.push_back(new TxParameterFloat("Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Envelope", 0.f, 2.f, &_envelope, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Envelope", 0.f, 2.f, &_envelope, TxParameter::KNOB));
 }
 
 TxOscillator::~TxOscillator() 
@@ -218,7 +218,6 @@ void TxOscillator::setHarmonics(int harmonics)
 
 void TxOscillator::_drawImpl(bool* modified)
 {
-  TxNode::drawInput();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* waveform = _params[TxOscillator::WAVEFORM];

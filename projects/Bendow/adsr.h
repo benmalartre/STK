@@ -17,7 +17,7 @@ public:
     LAST
   };
 
-  TxAdsr(const std::string& name);
+  TxAdsr(TxGraph* parent, const std::string& name);
   ~TxAdsr();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;

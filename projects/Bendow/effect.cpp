@@ -5,8 +5,8 @@
 #include <Echo.h>
 
 
-TxEffect::TxEffect(const std::string& name) 
-  : TxNode(name)
+TxEffect::TxEffect(TxGraph* parent, const std::string& name) 
+  : TxNode(parent, name)
   , _effect(NULL)
   , _effectIdx(-1)
   , _modDepth(0.5)
@@ -16,10 +16,11 @@ TxEffect::TxEffect(const std::string& name)
 {
   _effect = new stk::Echo();
   _effectIdx = ECHO;
-  _params.push_back(new TxParameterFloat("ModDepth", 0.f, 1.f, &_modDepth, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("ModFrequency", 1.f, 220.f, &_modFrequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("Delay", 0, 1000, &_delay, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("MaximumDelay", 0, 1000, &_maximumDelay, TxParameter::KNOB));
+  _params.push_back(new TxParameterSamples(this, "Input", false));
+  _params.push_back(new TxParameterFloat(this, "ModDepth", 0.f, 1.f, &_modDepth, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "ModFrequency", 1.f, 220.f, &_modFrequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Delay", 0, 1000, &_delay, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "MaximumDelay", 0, 1000, &_maximumDelay, TxParameter::KNOB));
 
 }
 
@@ -29,7 +30,7 @@ TxEffect::~TxEffect()
 
 stk::StkFloat TxEffect::tick(unsigned int)
 {
-  stk::StkFloat sample = _params[TxNode::SAMPLES]->tick();
+  stk::StkFloat sample = _params[TxEffect::INPUT]->tick();
   switch(_effectIdx) {
     case CHORUS:
       ((stk::Chorus*)_effect)->setModDepth(_modDepth);

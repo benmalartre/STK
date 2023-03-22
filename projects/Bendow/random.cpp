@@ -1,8 +1,8 @@
 #include "common.h"
 #include "random.h"
 
-TxRandom::TxRandom(const std::string& name)
-  : TxNode(name)
+TxRandom::TxRandom(TxGraph* parent, const std::string& name)
+  : TxNode(parent, name)
   , _minimum(-1.f)
   , _maximum(1.f)
   , _seed(0)
@@ -11,12 +11,12 @@ TxRandom::TxRandom(const std::string& name)
 {
   _rate = stk::Stk::sampleRate() / _frequency;
   srand(_seed);
-  _params.push_back(new TxParameterFloat("Frequency", _minimum, _maximum, &_frequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Minimum", -1000.f, 1000.f, &_minimum, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Frequency", _minimum, _maximum, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Minimum", -1000.f, 1000.f, &_minimum, TxParameter::KNOB));
   _params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
-  _params.push_back(new TxParameterFloat("Maximum", -1000.f, 1000.f, &_maximum, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Maximum", -1000.f, 1000.f, &_maximum, TxParameter::KNOB));
   _params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
-  _params.push_back(new TxParameterInt("Seed", 0, 65535, &_seed, TxParameter::HORIZONTAL));
+  _params.push_back(new TxParameterInt(this, "Seed", 0, 65535, &_seed, TxParameter::HORIZONTAL));
 }
 
 TxRandom::~TxRandom()

@@ -53,8 +53,8 @@ const char* TxFilter::FilterName[TxFilter::NumFilter] = {
   };
 
 
-TxFilter::TxFilter(const std::string& name) 
-  : TxNode(name)
+TxFilter::TxFilter(TxGraph* parent, const std::string& name) 
+  : TxNode(parent, name)
   , _filter(NULL)
   , _filterIdx(-1)
   , _gain(0.9f)
@@ -65,16 +65,17 @@ TxFilter::TxFilter(const std::string& name)
   , _int2(0)
   , _int3(0)
 {
-  _params.push_back(new TxParameterEnum("Filter", &TxFilter::FilterName[0],
+  _params.push_back(new TxParameterSamples(this, "Input", false, 1));
+  _params.push_back(new TxParameterEnum(this, "Filter", &TxFilter::FilterName[0],
     TxFilter::NumFilter, &_filterIdx));
-  _params.push_back(new TxParameterFloat("Gain", 0.f, 1.f, &_gain, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Float1", -1.f, 1.f, &_float1, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Float2", -1.f, 1.f, &_float2, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Float3", -1.f, 1.f, &_float3, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("Int1", 0, 12, &_int1, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("Int2", 0, 12, &_int2, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt("Int3", 0, 12, &_int3, TxParameter::KNOB));
-  _params.push_back(new TxParameterBool("Bool1", &_bool1));
+  _params.push_back(new TxParameterFloat(this, "Gain", 0.f, 1.f, &_gain, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Float1", -1.f, 1.f, &_float1, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Float2", -1.f, 1.f, &_float2, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Float3", -1.f, 1.f, &_float3, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Int1", 0, 12, &_int1, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Int2", 0, 12, &_int2, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Int3", 0, 12, &_int3, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Bool1", &_bool1));
   setFilter(ONEPOLE);
 
 }
@@ -272,7 +273,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
   if (_params[FILTER]->tick() != _lastFilterIdx) {
     setFilter(_filterIdx);
   }
-  stk::StkFloat input = _params[TxNode::SAMPLES]->tick();
+  stk::StkFloat input = _params[TxFilter::INPUT]->tick();
   stk::StkFloat gain = _params[TxFilter::GAIN]->tick();
   stk::StkFloat sample = 0.f;
   _filter->setGain(gain);
@@ -349,7 +350,6 @@ stk::StkFrames& TxFilter::tick(stk::StkFrames& frames, unsigned int channel)
 
 void TxFilter::_drawImpl(bool* modified)
 {
-  TxNode::drawInput();
   ImGui::BeginGroup();
 
   ImGui::SetNextItemWidth(128);

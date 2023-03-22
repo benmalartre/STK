@@ -26,8 +26,8 @@ public:
   };
 
 public:
-  TxSequencer(const std::string& name);
-  TxSequencer(const std::string& name, uint32_t bpm, uint64_t length);
+  TxSequencer(TxGraph* parent, const std::string& name);
+  TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm, uint64_t length);
   ~TxSequencer();
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);

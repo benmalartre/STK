@@ -1,22 +1,26 @@
 #include "common.h" 
 #include "node.h"
+#include "graph.h"
 
 const int TxNode::Flags = 
+  //ImGuiWindowFlags_NoBackground |
   ImGuiWindowFlags_NoScrollbar |
   ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 const int TxNode::PortSize = 32;
 
-TxNode::TxNode(const std::string& name, uint32_t numChannels)
-  : _nChannels(numChannels)
+TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
+  : _parent(parent)
+  , _nChannels(numChannels)
   , _name(name)
   , _dirty(true)
   , _position(RANDOM_LO_HI(0,200), RANDOM_LO_HI(0,200))
   , _size(100,25)
-  , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.0)
+  , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 0.25)
 {
+  _parent->addNode(this);
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
-  _params.push_back(new TxParameterSamples("Samples"));
+  _params.push_back(new TxParameterSamples(this, "Output", true, _nChannels));
 }
 
 TxNode::~TxNode()
@@ -51,6 +55,11 @@ const ImVec4& TxNode::color()
   return _color;
 }
 
+ImVec2 TxNode::offsetScalePosition()
+{
+  return _position * _parent->scale() + _parent->offset();
+}
+
 void TxNode::setDirty(bool state) 
 {
   _dirty = state;
@@ -73,7 +82,7 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
     parameter->connect(node, channel);
     std::cout << "connect : " << node->name() << " -> " << 
       _name << ":" << name << "(channel=" << channel << ")" << std::endl;
-    return new TxConnexion({node, this, parameter});
+    return new TxConnexion({node->_params[OUTPUT], parameter, channel});
   }
   return NULL;
 }
@@ -99,27 +108,20 @@ TxParameter* TxNode::getParameter(const std::string& name)
 void TxNode::commonControls()
 {
   ImGui::BeginGroup();
-  _buffer.draw();
+  _params[OUTPUT]->draw();
   ImGui::EndGroup();
 }
 
-void TxNode::draw(const ImVec2& offset, const float& scale, bool* modified)
+void TxNode::draw(bool* modified)
 {
+  const float scale = _parent->scale();
   ImGui::PushStyleColor(ImGuiCol_ChildBg, _color);
-  ImGui::SetCursorPos(_position * scale + offset);
+  ImGui::SetCursorPos(_position * scale + _parent->offset());
   ImGui::BeginChild(_name.c_str(), size() * scale, NULL, TxNode::Flags);
 
-  ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 10 , ImGui::GetCursorPosY() + 10) * scale);
+  ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 10 + PLUG_WIDTH, ImGui::GetCursorPosY() + 10) * scale);
   _drawImpl(modified);
 
   ImGui::EndChild();
   ImGui::PopStyleColor();
-}
-
-void TxNode::drawInput()
-{
-  ImGui::BeginGroup();
-  ImGui::Selectable("Input", false, 0, ImVec2(TxNode::PortSize, TxNode::PortSize));
-  ImGui::EndGroup();
-  ImGui::SameLine();
 }

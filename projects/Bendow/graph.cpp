@@ -59,6 +59,16 @@ TxNode* TxGraph::selected()
   return _selected;
 }
 
+const ImVec2& TxGraph::offset()
+{
+  return _offset;
+}
+
+const float& TxGraph::scale()
+{
+  return _scale;
+}
+
 
 std::vector<TxNode*>& TxGraph::nodes()
 {
@@ -70,6 +80,7 @@ void TxGraph::addNode(TxNode* node)
   if(!contains(node)) {
     _nodes.push_back(node);
     _current = node;
+    _selection.push_back(true);
   }
 }
 
@@ -78,7 +89,24 @@ void TxGraph::removeNode(TxNode* node)
   int idx = index(node);
   if(idx >= 0) {
     _nodes.erase(_nodes.begin() + idx);
+    _selection.erase(_selection.begin() + idx);
     delete node;
+  }
+}
+
+void TxGraph::addConnexion(TxConnexion* connexion)
+{
+  _connexions.push_back(connexion);
+}
+
+void TxGraph::removeConnexion(TxConnexion* connexion)
+{
+  for (size_t c = 0; c < _connexions.size(); ++c) {
+    if (_connexions[c] == connexion) {
+      _connexions.erase(_connexions.begin() + c);
+      delete connexion;
+      return;
+    }
   }
 }
 
@@ -121,10 +149,6 @@ int TxGraph::pick(const ImVec2& pos)
 
 void TxGraph::draw()
 {
-  static int counter = 0;
-  static ImU32 whiteColor = ImColor({ 255,255,255,255 });
-  static ImU32 blackColor = ImColor({ 0,0,0,255 });
-  static ImVec2 offset;
   ImGuiIO& io = ImGui::GetIO();
   const ImVec2 pos(0, 100);
   const ImVec2 size = io.DisplaySize - pos;
@@ -144,9 +168,16 @@ void TxGraph::draw()
     drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
  
   int picked = TxGraph::NONE;
+  ImVec2 offset;
   if(io.MouseWheel) {
     _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
+
+  bool modified = false;
+  for (auto& node: _nodes) {
+    node->draw(&modified);
+  }
+
   if (io.MouseClicked[0]) {
     picked = pick(ImGui::GetMousePos());
     if (_selected) {
@@ -154,18 +185,29 @@ void TxGraph::draw()
     }
   }
 
-  bool modified = false;
-  for (auto& node: _nodes) {
-    node->draw(_offset, _scale, &modified);
+  ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
+  if (io.MouseDown[0] && ImGui::IsDragDropActive()) {
+    foregroundList->AddLine(io.MouseClickedPos[0], ImGui::GetMousePos(), ImColor({ 255,0,0,255 }), 8.f * _scale);
   }
 
+  for (auto& connexion : _connexions) {
+    std::cout << "source : " << connexion->source->name() << std::endl;
+    std::cout << "target : " << connexion->target->name() << std::endl;
+    std::cout << "source : " << connexion->source->plug()[0] << "," << connexion->source->plug()[1] << std::endl;
+    std::cout << "target : " << connexion->target->plug()[0] << "," << connexion->target->plug()[1] << std::endl;
+    foregroundList->AddLine(
+      connexion->source->plug(), 
+      connexion->target->plug(), 
+      ImColor({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f }), 
+      connexion->target->radius());
+  }
+  
   if (!picked) {
     if (io.MouseDown[0] && _selected) {
       _selected->setPosition(ImGui::GetMousePos() - offset);
     }
     else if (io.MouseDown[2]) {
       _offset += io.MouseDelta;
-      std::cout << "offset : " << _offset[0] << "," << _offset[1] << std::endl;
     }
   }
   

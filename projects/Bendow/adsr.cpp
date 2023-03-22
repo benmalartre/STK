@@ -3,19 +3,19 @@
 
 ImVec2 TxAdsr::Size(240, 120);
 
-TxAdsr::TxAdsr(const std::string& name) 
-  : TxNode(name)
+TxAdsr::TxAdsr(TxGraph* parent, const std::string& name) 
+  : TxNode(parent, name)
   , _attack(0.05f)
   , _decay(0.025f)
   , _sustain(0.9f)
   , _release(0.25f)
   , _trigger(false)
 {
-  _params.push_back(new TxParameterFloat("Attack", 0.01f, 1.f, &_attack, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Decay", 0.01f, 1.f, &_decay, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Sustain", 0.01f, 1.f, &_sustain, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat("Release", 0.01f, 1.f, &_release, TxParameter::KNOB));
-  _params.push_back(new TxParameterBool("Trigger", &_trigger));
+  _params.push_back(new TxParameterFloat(this, "Attack", 0.01f, 1.f, &_attack, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Decay", 0.01f, 1.f, &_decay, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Sustain", 0.01f, 1.f, &_sustain, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Release", 0.01f, 1.f, &_release, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Trigger", &_trigger));
 
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
 }
@@ -79,9 +79,9 @@ void TxAdsr::setSustain(stk::StkFloat sustain)
 
 void TxAdsr::_drawImpl(bool* modified)
 {
-  TxNode::drawInput();
   ImGui::BeginGroup();
-  ImGui::Checkbox("Trigger", &_trigger);
+  TxParameter* trigger = _params[TxAdsr::TRIGGER];
+  trigger->draw();
   
   TxParameter* attack = _params[TxAdsr::ATTACK];
   if (attack->draw() && modified)*modified = true;
