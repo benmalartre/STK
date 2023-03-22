@@ -77,6 +77,9 @@ stk::StkFloat TxParameterBool::tick()
 
 bool TxParameterBool::draw()
 {
+  ImGui::Button("o", ImVec2(20,20));
+
+  ImGui::SameLine();
   return ImGui::Checkbox(_label.c_str(), (bool*)_data);
 }
 
@@ -117,6 +120,7 @@ stk::StkFloat TxParameterInt::tick()
 bool TxParameterInt::draw()
 {
   bool modified = false;
+  ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
     modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
@@ -125,6 +129,9 @@ bool TxParameterInt::draw()
   } else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
+  
+  ImGui::Button("o", ImVec2(20, 20));
+  ImGui::EndGroup();
   if(modified && _callback) _callback->execute();
   return modified;
 }
@@ -214,6 +221,7 @@ stk::StkFloat TxParameterFloat::tick()
 bool TxParameterFloat::draw()
 {
   bool modified = false;
+  ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
     modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
@@ -223,8 +231,10 @@ bool TxParameterFloat::draw()
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
       0.f, "%.3f", ImGuiKnobVariant_WiperDot);
   }
-  if(modified && _callback) _callback->execute();
+  ImGui::Button("o", ImVec2(20, 20));
+  ImGui::EndGroup();
 
+  if(modified && _callback) _callback->execute();
   return modified;
 }
 

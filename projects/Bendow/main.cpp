@@ -128,8 +128,10 @@ void setupStyle()
   //ImGui::StyleColorsLight(style);
   
   style.GrabRounding = 2.f;
-  style.ChildRounding = 12.f;
+  style.ChildRounding = 8.f;
   style.ChildBorderSize = 4.f;
+  style.FramePadding = ImVec2(2, 2);
+  style.WindowPadding = ImVec2(4, 4);
   style.WindowRounding = 0.f;
   style.ScrollbarRounding = 3.f;
   style.FrameRounding = 3.f;

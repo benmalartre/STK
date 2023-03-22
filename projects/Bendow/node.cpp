@@ -2,7 +2,8 @@
 #include "node.h"
 
 const int TxNode::Flags = 
-  ImGuiWindowFlags_NoScrollbar;
+  ImGuiWindowFlags_NoScrollbar |
+  ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 const int TxNode::PortSize = 32;
 
@@ -108,6 +109,7 @@ void TxNode::draw(const ImVec2& offset, const float& scale, bool* modified)
   ImGui::SetCursorPos(_position * scale + offset);
   ImGui::BeginChild(_name.c_str(), size() * scale, NULL, TxNode::Flags);
 
+  ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 10 , ImGui::GetCursorPosY() + 10) * scale);
   _drawImpl(modified);
 
   ImGui::EndChild();

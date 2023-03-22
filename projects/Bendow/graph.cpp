@@ -98,18 +98,21 @@ static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
 int TxGraph::pick(const ImVec2& pos)
 {
   _selected = NULL;
-  for(auto& node: _nodes) {
+  size_t nodeIdx = _nodes.size()-1;
+  for (; nodeIdx >= 0; --nodeIdx) {
+    TxNode* node = _nodes[nodeIdx];
     std::cout << "check inside node : " << node->name() << std::endl;
     if(inside(pos, node->position() * _scale + _offset, 
       (node->position() + node->size()) * _scale + _offset))
       {
         _selected = node;
+        std::cout << "selected node : " << _selected << std::endl;
         
         int portIdx = node->pick(pos);
         if(portIdx > -1) {
-
+          return TxGraph::INPUT;
         }
-        break;
+        return TxGraph::NODE;
       }
   }
   return TxGraph::NONE;
@@ -129,22 +132,27 @@ void TxGraph::draw()
   ImGui::Begin(_name.c_str(), NULL, TxGraph::Flags);
   ImGui::SetWindowFontScale(_scale);
  
+  int picked = TxGraph::NONE;
   if(io.MouseWheel) {
     _scale += io.MouseWheel * 0.1f;
   }
   if (io.MouseClicked[0]) {
-    pick(ImGui::GetMousePos());
+    picked = pick(ImGui::GetMousePos());
     if (_selected) {
       offset = ImGui::GetMousePos() - _selected->position();
+      if (_selected != _nodes[_nodes.size()-1]) {
+        std::swap(_nodes[index(_selected)], _nodes[_nodes.size() - 1]);
+        std::cout << "fuckinswapnodes :(" << std::endl;
+      }
     }
   }
 
   bool modified = false;
-  for (auto& node : _nodes) {
+  for (auto& node: _nodes) {
     node->draw(_offset, _scale, &modified);
   }
 
-  if (!modified) {
+  if (!picked) {
     if (io.MouseDown[0] && _selected) {
       if (_selected) {
         _selected->setPosition(ImGui::GetMousePos() - offset);
