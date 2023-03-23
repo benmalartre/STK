@@ -15,7 +15,7 @@ TxParameter::TxParameter(TxNode* node, const std::string& name, void* data, shor
   , _flags(flags)
   , _data(data)
   , _callback(NULL)
-  , _channel(0)
+  , _iChannel(0)
   , _plug(0, 0)
 {
 }
@@ -59,7 +59,7 @@ void TxParameter::setLabel(const std::string& label)
 void TxParameter::connect(TxNode* node, short channel)
 {
   _input = node;
-  _channel = channel;
+  _iChannel = channel;
 }
 
 void TxParameter::disconnect()
@@ -92,8 +92,13 @@ void TxParameter::_drawPlug()
     }
   }
 
-  drawList->AddCircleFilled(center, 8.f * scale, ImColor({ 0,0,0,128 }), 32);
-  drawList->AddCircle(center, 12.f * scale, ImColor({ 180,180,180,255 }), 32, 4.f * scale);
+  static const ImColor holeColor({ 0,0,0,128 });
+  ImColor plugColor({ 180,180,180,255 });
+  if (ImGui::IsItemHovered()) {
+    plugColor = ImColor({ 220,220,220,255 });
+  }
+  drawList->AddCircleFilled(center, 12.f * scale, holeColor, 32);
+  drawList->AddCircle(center, 12.f * scale, plugColor, 32, 4.f * scale);
 
   _plug = center;
   _radius = 16.f * scale;
@@ -113,7 +118,7 @@ void TxParameterBool::set(stk::StkFloat value)
 stk::StkFloat TxParameterBool::tick()
 {
   if(_input) {
-    const bool value = (bool)_input->tick(_channel);
+    const bool value = (bool)_input->tick(_iChannel);
     return (stk::StkFloat)value;
   }
   return *(stk::StkFloat*)_data;
@@ -158,7 +163,7 @@ void TxParameterInt::setMaximum(int value)
 stk::StkFloat TxParameterInt::tick()
 {
   if(_input) {
-    const int value = (int)_input->tick(_channel);
+    const int value = (int)_input->tick(_iChannel);
     return (stk::StkFloat)value;
   }
   return (stk::StkFloat)*(int*)_data;
@@ -200,7 +205,7 @@ void TxParameterEnum::set(stk::StkFloat value)
 stk::StkFloat TxParameterEnum::tick()
 {
   if(_input) {
-    const int value = ((int)_input->tick(_channel)) % _num;
+    const int value = ((int)_input->tick(_iChannel)) % _num;
     return (stk::StkFloat)value;
   }
   return (stk::StkFloat)*(int*)_data;
@@ -259,7 +264,7 @@ stk::StkFloat TxParameterFloat::tick()
 {
   if(_input) {
     
-    return _input->tick(_channel);
+    return _input->tick(_iChannel);
   }
   return *(stk::StkFloat*)_data;
 }
@@ -343,7 +348,7 @@ stk::StkFloat TxParameterSamples::tick()
 {
   if(_input) {
     
-    return _input->tick(_channel);
+    return _input->tick(_iChannel);
   }
   return 0.f;
 }
@@ -364,19 +369,21 @@ bool TxParameterSamples::draw()
   TxGraph* graph = _node->graph();
   ImVec2 pMin, pMax;
   float plugOffsetY = _node->size()[1] / (_nChannels + 1);
+  const float& scale = graph->scale();
+  const ImVec2& offset = graph->offset();
 
   for (size_t c = 0; c < _nChannels; ++c) {
     if (!_io) {
-      pMin = (_node->position() + ImVec2(0.f, plugOffsetY * (c+1))) * graph->scale() + graph->offset();
-      pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * graph->scale();
+      pMin = (_node->position() + ImVec2(0.f, plugOffsetY * (c+1))) * scale + offset;
+      pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
     else {
-      pMin = (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, plugOffsetY * (c + 1))) * graph->scale() + graph->offset();
-      pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * graph->scale();
+      pMin = (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, plugOffsetY * (c + 1))) * scale + offset;
+      pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
 
-    ImGui::SetCursorPos(pMin - ImGui::GetWindowPos());
-    ImGui::Button("##plug", ImVec2(TX_PLUG_WIDTH * 2, TX_PLUG_HEIGHT * 2) * graph->scale());
+    ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
+    ImGui::Button("##plug", ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
     if (ImGui::BeginDragDropSource()) {
       ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
       ImGui::Text("This is a drag and drop source");
@@ -389,20 +396,25 @@ bool TxParameterSamples::draw()
       }
     }
 
-    drawList->AddRectFilled(pMin, pMax, ImColor({ 180,180,180,255 }), 2.f * graph->scale());
+    ImColor plugColor = ImColor({ 180,180,180,255 });
+    if (ImGui::IsItemHovered()) {
+      plugColor = ImColor({ 220,220,220,255 });
+    }
+
+    drawList->AddRectFilled(pMin, pMax, plugColor, 2.f * scale);
     if (!_io) {
       drawList->AddRectFilled(
-        pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * graph->scale(),
+        pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
         pMax + ImVec2(0, TX_PLUG_DETAIL) * graph->scale(),
-        ImColor({ 180,180,180,255 }),
-        2.f * graph->scale());
+        plugColor,
+        2.f * scale);
     }
     else {
       drawList->AddRectFilled(
         pMin + ImVec2(0, -TX_PLUG_DETAIL) * graph->scale(),
-        pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * graph->scale(),
-        ImColor({ 180,180,180,255 }),
-        2.f * graph->scale());
+        pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
+        plugColor,
+        2.f * scale);
     }
   }
 

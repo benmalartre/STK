@@ -147,6 +147,19 @@ int TxGraph::pick(const ImVec2& pos)
   return TxGraph::NONE;
 }
 
+void TxGraph::_drawGrid()
+{
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImU32 GRID_COLOR = IM_COL32(200, 200, 200, 40);
+  float GRID_SZ = 64.0f * _scale;
+  ImVec2 win_pos = ImGui::GetCursorScreenPos();
+  ImVec2 canvas_sz = ImGui::GetWindowSize();
+  for (float x = fmodf(_offset.x, GRID_SZ); x < canvas_sz.x; x += GRID_SZ)
+    drawList->AddLine(ImVec2(x, 0.0f) + win_pos, ImVec2(x, canvas_sz.y) + win_pos, GRID_COLOR);
+  for (float y = fmodf(_offset.y, GRID_SZ); y < canvas_sz.y; y += GRID_SZ)
+    drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
+}
+
 void TxGraph::draw()
 {
   static float h = 0.f;
@@ -158,15 +171,7 @@ void TxGraph::draw()
   ImGui::Begin(_name.c_str(), NULL, TxGraph::Flags);
   io.FontGlobalScale = _scale;
 
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
-  ImU32 GRID_COLOR = IM_COL32(200, 200, 200, 40);
-  float GRID_SZ = 64.0f * _scale;
-  ImVec2 win_pos = ImGui::GetCursorScreenPos();
-  ImVec2 canvas_sz = ImGui::GetWindowSize();
-  for (float x = fmodf(_offset.x, GRID_SZ); x < canvas_sz.x; x += GRID_SZ)
-    drawList->AddLine(ImVec2(x, 0.0f) + win_pos, ImVec2(x, canvas_sz.y) + win_pos, GRID_COLOR);
-  for (float y = fmodf(_offset.y, GRID_SZ); y < canvas_sz.y; y += GRID_SZ)
-    drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
+  _drawGrid();
  
   int picked = TxGraph::NONE;
   ImVec2 offset;
@@ -207,37 +212,6 @@ void TxGraph::draw()
       ImColor({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f }), 
       8.f * _scale);
   }
-  
  
-  
-  //ImGui::PopClipRect();
-  /*
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-  ImGuiIO& io = ImGui::GetIO();
-  if (io.MouseClicked[0] && inside(ImGui::GetMousePos(), ImGui::GetWindowPos(), ImGui::GetWindowPos() + ImVec2(1024,1024))) {
-    pick(io.MouseClickedPos[0] - ImGui::GetWindowPos());
-  }
-
-  for (auto& node : _nodes) {
-    if (node == _selected) {
-      drawList->AddRectFilled(
-        node->position() * _scale + _offset + ImGui::GetWindowPos(),
-        (node->position() + node->size()) * _scale + _offset + ImGui::GetWindowPos(),
-        whiteColor, 2.f);
-      drawList->AddText(node->position() * _scale + _offset + ImGui::GetWindowPos() + ImVec2(20, 8),
-        blackColor, node->name().c_str());
-    }
-    else {
-      drawList->AddRectFilled(
-        node->position() * _scale + _offset + ImGui::GetWindowPos(),
-        (node->position() + node->size()) * _scale + _offset + ImGui::GetWindowPos(),
-        ImColor(node->color()), 2.f);
-      drawList->AddText(node->position() * _scale + _offset + ImGui::GetWindowPos() + ImVec2(20, 8), 
-        whiteColor, node->name().c_str());
-    }
-  }
-  */
   ImGui::End();
-  //if (_selected)_selected->draw();
 }

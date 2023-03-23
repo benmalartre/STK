@@ -54,13 +54,14 @@ public:
 
 protected:
   void              _drawPlug();
-  TxNode*           _node;
+
   short             _type;
   int               _flags;
   std::string       _name;
   std::string       _label;
+  TxNode*           _node;
   TxNode*           _input;
-  short             _channel;
+  short             _iChannel;
   void*             _data;
   TxCallback*       _callback;
   ImVec2            _plug;
