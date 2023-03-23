@@ -149,8 +149,9 @@ int TxGraph::pick(const ImVec2& pos)
 
 void TxGraph::draw()
 {
+  static float h = 0.f;
   ImGuiIO& io = ImGui::GetIO();
-  const ImVec2 pos(0, 100);
+  const ImVec2 pos(0, h);
   const ImVec2 size = io.DisplaySize - pos;
   ImGui::SetNextWindowPos(pos);
   ImGui::SetNextWindowSize(size);
@@ -173,11 +174,6 @@ void TxGraph::draw()
     _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
 
-  bool modified = false;
-  for (auto& node: _nodes) {
-    node->draw(&modified);
-  }
-
   if (io.MouseClicked[0]) {
     picked = pick(ImGui::GetMousePos());
     if (_selected) {
@@ -185,23 +181,6 @@ void TxGraph::draw()
     }
   }
 
-  ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
-  if (io.MouseDown[0] && ImGui::IsDragDropActive()) {
-    foregroundList->AddLine(io.MouseClickedPos[0], ImGui::GetMousePos(), ImColor({ 255,0,0,255 }), 8.f * _scale);
-  }
-
-  for (auto& connexion : _connexions) {
-    std::cout << "source : " << connexion->source->name() << std::endl;
-    std::cout << "target : " << connexion->target->name() << std::endl;
-    std::cout << "source : " << connexion->source->plug()[0] << "," << connexion->source->plug()[1] << std::endl;
-    std::cout << "target : " << connexion->target->plug()[0] << "," << connexion->target->plug()[1] << std::endl;
-    foregroundList->AddLine(
-      connexion->source->plug(), 
-      connexion->target->plug(), 
-      ImColor({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f }), 
-      connexion->target->radius());
-  }
-  
   if (!picked) {
     if (io.MouseDown[0] && _selected) {
       _selected->setPosition(ImGui::GetMousePos() - offset);
@@ -210,6 +189,26 @@ void TxGraph::draw()
       _offset += io.MouseDelta;
     }
   }
+
+  bool modified = false;
+  for (auto& node : _nodes) {
+    node->draw(RANDOM_0_1 > 0.5, &modified);
+  }
+
+  ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
+  if (io.MouseDown[0] && ImGui::IsDragDropActive()) {
+    foregroundList->AddLine(io.MouseClickedPos[0], ImGui::GetMousePos(), ImColor({ 255,0,0,255 }), 8.f * _scale);
+  }
+
+  for (auto& connexion : _connexions) {
+    foregroundList->AddLine(
+      connexion->source->plug(), 
+      connexion->target->plug(), 
+      ImColor({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f }), 
+      8.f * _scale);
+  }
+  
+ 
   
   //ImGui::PopClipRect();
   /*

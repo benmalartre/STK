@@ -18,8 +18,7 @@ public:
 
   enum Parameters {
     MODE = TxNode::LAST,
-    INPUT1,
-    INPUT2, 
+    INPUTS,
     FLOAT1,
     LAST
   };
@@ -33,7 +32,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl();
+  void _drawImpl(bool* modified) override;
 
 private:
   static ImVec2  Size;

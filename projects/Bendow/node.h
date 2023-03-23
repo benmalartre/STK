@@ -10,7 +10,13 @@
 class TxNode;
 class TxGraph;
 
-#define PLUG_WIDTH 64.f
+#define TX_TITLE_X 64.f
+#define TX_TITLE_Y 8.f
+#define TX_PADDING_X 16.f
+#define TX_PADDING_Y 4.f
+#define TX_PLUG_WIDTH 24.f
+#define TX_PLUG_HEIGHT 18.f
+#define TX_PLUG_DETAIL 6.f
 
 struct TxConnexion {
   TxParameter* source;
@@ -35,9 +41,9 @@ public:
   virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
+  TxGraph* graph();
   const std::string& name();
   const ImVec2& position();
-  ImVec2 offsetScalePosition();
   virtual const ImVec2& size() = 0;
   const ImVec4& color();
   void setDirty(bool state);
@@ -45,13 +51,14 @@ public:
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
   TxParameter* getParameter(const std::string& name);
-  void commonControls();
   int pick(const ImVec2& pos);
   
-  void draw(bool* modified);
+  void draw(bool selected, bool* modified);
   virtual void reset() = 0;
 
 protected:
+  void                      _drawCommonControls();
+  void                      _drawAlignLeft();
   virtual void              _drawImpl(bool* modified) {};
   TxGraph*                  _parent;
   ImVec2                    _position;

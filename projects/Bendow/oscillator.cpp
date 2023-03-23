@@ -9,7 +9,7 @@
 #include <Modulate.h>
 #include <Granulate.h>
 
-ImVec2 TxOscillator::Size(512, 120);
+ImVec2 TxOscillator::Size(300, 200);
 
 const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "Blit",
@@ -218,10 +218,12 @@ void TxOscillator::setHarmonics(int harmonics)
 
 void TxOscillator::_drawImpl(bool* modified)
 {
+  TxNode::_drawAlignLeft();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* waveform = _params[TxOscillator::WAVEFORM];
   if(waveform->draw() && modified)*modified = true;
+  TxNode::_drawAlignLeft();
   TxParameter* frequency = _params[TxOscillator::FREQUENCY];
   if(frequency->draw() && modified)*modified = true;
   ImGui::SameLine();
@@ -235,7 +237,7 @@ void TxOscillator::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  commonControls();
+  TxNode::_drawCommonControls();
 
 }
 

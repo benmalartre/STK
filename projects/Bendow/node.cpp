@@ -3,7 +3,7 @@
 #include "graph.h"
 
 const int TxNode::Flags = 
-  //ImGuiWindowFlags_NoBackground |
+  ImGuiWindowFlags_NoBackground |
   ImGuiWindowFlags_NoScrollbar |
   ImGuiWindowFlags_NoBringToFrontOnFocus;
 
@@ -16,7 +16,7 @@ TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
   , _dirty(true)
   , _position(RANDOM_LO_HI(0,200), RANDOM_LO_HI(0,200))
   , _size(100,25)
-  , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 0.25)
+  , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
 {
   _parent->addNode(this);
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
@@ -55,9 +55,9 @@ const ImVec4& TxNode::color()
   return _color;
 }
 
-ImVec2 TxNode::offsetScalePosition()
+TxGraph* TxNode::graph()
 {
-  return _position * _parent->scale() + _parent->offset();
+  return _parent;
 }
 
 void TxNode::setDirty(bool state) 
@@ -105,23 +105,41 @@ TxParameter* TxNode::getParameter(const std::string& name)
   return NULL;
 }
 
-void TxNode::commonControls()
+void TxNode::_drawCommonControls()
 {
+  ImGui::SameLine();
   ImGui::BeginGroup();
   _params[OUTPUT]->draw();
   ImGui::EndGroup();
 }
 
-void TxNode::draw(bool* modified)
+void TxNode::_drawAlignLeft()
 {
+  ImGui::SetCursorPosX((TX_PLUG_WIDTH + TX_PADDING_X) * _parent->scale());
+}
+
+void TxNode::draw(bool selected, bool* modified)
+{
+  static const ImColor whiteColor({ 255,255,255,255 });
   const float scale = _parent->scale();
-  ImGui::PushStyleColor(ImGuiCol_ChildBg, _color);
-  ImGui::SetCursorPos(_position * scale + _parent->offset());
+  const ImVec2 position = _position * scale + _parent->offset();
+  ImGui::SetCursorPos(position);
   ImGui::BeginChild(_name.c_str(), size() * scale, NULL, TxNode::Flags);
 
-  ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 10 + PLUG_WIDTH, ImGui::GetCursorPosY() + 10) * scale);
+  ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImVec2(TX_TITLE_X, TX_TITLE_Y)) * scale);
+  ImGui::TextColored({ 255,255,255,255 }, _name.c_str());
+  _drawAlignLeft();
   _drawImpl(modified);
 
   ImGui::EndChild();
-  ImGui::PopStyleColor();
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  if (selected) {
+    drawList->AddRect(
+      position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
+      position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, whiteColor, 4.f * scale, 0, 8.f * scale);
+  }
+  drawList->AddRectFilled(
+    position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
+    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, ImColor(_color), 4.f * scale);
 }

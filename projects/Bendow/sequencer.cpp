@@ -1,4 +1,5 @@
 #include "sequencer.h"
+#include "graph.h"
 
 ImVec2 TxSequencer::Size(520, 300);
 
@@ -158,6 +159,7 @@ void TxSequencer::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Text("Index : %i", index.first);
   */
+  TxNode::_drawAlignLeft();
   if (ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm",
     ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal) && modified)* modified = true;
   
@@ -168,8 +170,7 @@ void TxSequencer::_drawImpl(bool* modified)
     if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
 
-  ImGui::SameLine();
-  commonControls();
+  TxNode::_drawCommonControls();
 }
 
 void TxSequencer::reset()

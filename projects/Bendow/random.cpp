@@ -96,7 +96,7 @@ void TxRandom::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  commonControls();
+  TxNode::_drawCommonControls();
 }
 
 void TxRandom::reset()

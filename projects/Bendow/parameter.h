@@ -48,6 +48,7 @@ public:
  
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;
+  virtual stk::StkFloat tick(unsigned int channel) { return 0.f; };
   virtual bool draw() = 0;
   void setCallback(TxCallback* callback);
 
@@ -139,6 +140,7 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
+  stk::StkFloat tick(unsigned int channel) override;
   bool draw() override;
 
 private:

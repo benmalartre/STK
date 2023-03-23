@@ -275,11 +275,11 @@ int main()
   for(size_t t = 0; t < 16; ++t)
     sequencer->setBeat(t, {1, BASS[t]});
   sequencer->start();
+ 
   
-  /*
   TxOscillator* oscillator = new TxOscillator(graph, "Oscillator");
   oscillator->setHarmonics(7);
-
+  
   TxOscillator* oscillator2 = new TxOscillator(graph, "Oscillator2");
   oscillator2->setHarmonics(3);
   
@@ -288,13 +288,14 @@ int main()
   graph->addConnexion(oscillator->connect(sequencer, "Frequency", 1));
 
   oscillator->connect(adsr, "Envelope");
-
+  /*
   TxLfo* lfo = new TxLfo(graph, "Lfo");
   lfo->setFrequency(0.01f);
   lfo->setAmplitude(5.f);
   lfo->setOffset(6.f);
-
+  */
   TxArythmetic* arythmetic = new TxArythmetic(graph, "Arythmetic");
+  /*
   graph->addConnexion(arythmetic->connect(sequencer, "Input1", 1));
   graph->addConnexion(arythmetic->connect(lfo, "Input2"));
 
@@ -302,11 +303,11 @@ int main()
   
   TxFilter* filter = new TxFilter(graph, "Filter");
   graph->addConnexion(filter->connect(oscillator, "Input"));
-  
+  */
   //TxEffect* chorus = new TxEffect("Effect");
   //chorus->connect(oscillator, "Samples");
   //graph->addNode(chorus);
-  */
+  
 
   graphs.push_back(graph);
   /*

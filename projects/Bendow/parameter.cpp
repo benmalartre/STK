@@ -1,6 +1,7 @@
 #include "common.h"
 #include "parameter.h"
 #include "node.h"
+#include "graph.h"
 
 
 // TxParameter (base class)
@@ -347,28 +348,63 @@ stk::StkFloat TxParameterSamples::tick()
   return 0.f;
 }
 
+stk::StkFloat TxParameterSamples::tick(unsigned int channel)
+{
+  if (_input) {
+
+    return _input->tick(channel);
+  }
+  return 0.f;
+}
+
 bool TxParameterSamples::draw()
 {
   ImGuiIO& io = ImGui::GetIO();
-  const float scale = io.FontGlobalScale;
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
-  const ImVec2 pMin = ImGui::GetWindowPos() + _node->offsetScalePosition();
-  const ImVec2 pMax = pMin + ImVec2(64, 48) * scale;
-  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 12);
-  ImGui::InvisibleButton("##plug", ImVec2(64, 48) * scale);
-  if (ImGui::BeginDragDropSource()) {
-    ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
-    ImGui::Text("This is a drag and drop source");
-    ImGui::EndDragDropSource();
-  }
-  else if (ImGui::IsDragDropActive()) {
-    if (ImGui::BeginDragDropTarget()) {
-      ImGui::Text("This is a drag and drop target");
-      ImGui::EndDragDropTarget();
+  ImDrawList* drawList = ImGui::GetForegroundDrawList();
+  TxGraph* graph = _node->graph();
+  ImVec2 pMin, pMax;
+  float plugOffsetY = _node->size()[1] / (_nChannels + 1);
+
+  for (size_t c = 0; c < _nChannels; ++c) {
+    if (!_io) {
+      pMin = (_node->position() + ImVec2(0.f, plugOffsetY * (c+1))) * graph->scale() + graph->offset();
+      pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * graph->scale();
+    }
+    else {
+      pMin = (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, plugOffsetY * (c + 1))) * graph->scale() + graph->offset();
+      pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * graph->scale();
+    }
+
+    ImGui::SetCursorPos(pMin - ImGui::GetWindowPos());
+    ImGui::Button("##plug", ImVec2(TX_PLUG_WIDTH * 2, TX_PLUG_HEIGHT * 2) * graph->scale());
+    if (ImGui::BeginDragDropSource()) {
+      ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+      ImGui::Text("This is a drag and drop source");
+      ImGui::EndDragDropSource();
+    }
+    else if (ImGui::IsDragDropActive()) {
+      if (ImGui::BeginDragDropTarget()) {
+        ImGui::Text("This is a drag and drop target");
+        ImGui::EndDragDropTarget();
+      }
+    }
+
+    drawList->AddRectFilled(pMin, pMax, ImColor({ 180,180,180,255 }), 2.f * graph->scale());
+    if (!_io) {
+      drawList->AddRectFilled(
+        pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * graph->scale(),
+        pMax + ImVec2(0, TX_PLUG_DETAIL) * graph->scale(),
+        ImColor({ 180,180,180,255 }),
+        2.f * graph->scale());
+    }
+    else {
+      drawList->AddRectFilled(
+        pMin + ImVec2(0, -TX_PLUG_DETAIL) * graph->scale(),
+        pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * graph->scale(),
+        ImColor({ 180,180,180,255 }),
+        2.f * graph->scale());
     }
   }
-
-  drawList->AddRectFilled(pMin, pMax, ImColor({ 180,180,180,255 }), 2.f * scale);
 
   _plug = (pMin + pMax) * 0.5;
   _radius = std::sqrtf(ImLengthSqr(pMax - pMin));
