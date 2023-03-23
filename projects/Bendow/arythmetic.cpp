@@ -103,7 +103,7 @@ void TxArythmetic::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  TxNode::_drawCommonControls();
+  TxNode::_drawOutput();
 }
 
 void TxArythmetic::reset()

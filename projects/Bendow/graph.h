@@ -5,14 +5,12 @@
 #ifndef TX_GRAPH_H
 #define TX_GRAPH_H
 
-
 class TxGraph {
 public:
   enum Pick {
     NONE,
-    NODE,
-    INPUT,
-    OUTPUT
+    HEAD,
+    BODY
   };
   TxGraph(const std::string& name);
   ~TxGraph();
@@ -28,27 +26,28 @@ public:
   const float&            scale();
   stk::StkFloat           tick();
   TxNode*                 current();
-  TxNode*                 selected();
   std::vector<TxNode*>&   nodes();
   void                    draw();
 
 protected:            
   static const int        Flags;
   int                     pick(const ImVec2& position);
+  void                    select(const ImVec2& position);
   bool                    contains(const TxNode* node);
   int                     index(const TxNode* node);
 
 private:
-  void                        _drawGrid();
+  void                      _drawPopup();
+  void                      _drawGrid();
   std::string               _name;
   std::vector<TxNode*>      _nodes;
   std::vector<TxConnexion*> _connexions;
   std::vector<bool>         _selection;
   TxNode*                   _hovered;
   TxNode*                   _current;
-  TxNode*                   _selected;
   bool                      _active;
 
+  int                       _pick;
   bool                      _drag;
   ImVec2                    _offset;
   float                     _scale;

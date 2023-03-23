@@ -170,7 +170,7 @@ void TxSequencer::_drawImpl(bool* modified)
     if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
 
-  TxNode::_drawCommonControls();
+  TxNode::_drawOutput();
 }
 
 void TxSequencer::reset()

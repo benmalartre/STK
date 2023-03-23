@@ -9,6 +9,19 @@ const int TxNode::Flags =
 
 const int TxNode::PortSize = 32;
 
+const char* TxNode::NodeName[TxNode::NumNode] = {
+  "Value",
+  "Random",
+  "Oscillator",
+  "Sequencer",
+  "Lfo",
+  "Adsr",
+  "Arythmetic",
+  "Filter",
+  "Effect",
+  "Mixer"
+};
+
 TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
   : _parent(parent)
   , _nChannels(numChannels)
@@ -77,12 +90,12 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
-  TxParameter* parameter = getParameter(name);
-  if(parameter) {
-    parameter->connect(node, channel);
+  TxParameter* param = parameter(name);
+  if(param) {
+    param->connect(node, channel);
     std::cout << "connect : " << node->name() << " -> " << 
       _name << ":" << name << "(channel=" << channel << ")" << std::endl;
-    TxConnexion* connexion = new TxConnexion({node->_params[OUTPUT], parameter, channel});
+    TxConnexion* connexion = new TxConnexion({node->_params[OUTPUT], param, channel});
     _parent->addConnexion(connexion);
     return connexion;
   }
@@ -91,13 +104,13 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
 
 void TxNode::disconnect(const std::string& name) 
 {
-  TxParameter* parameter = getParameter(name);
-  if(parameter) {
-    parameter->disconnect();
+  TxParameter* param = parameter(name);
+  if(param) {
+    param->disconnect();
   }
 }
 
-TxParameter* TxNode::getParameter(const std::string& name)
+TxParameter* TxNode::parameter(const std::string& name)
 {
   for(auto& param: _params) {
     if(param->name() == name) {
@@ -107,12 +120,9 @@ TxParameter* TxNode::getParameter(const std::string& name)
   return NULL;
 }
 
-void TxNode::_drawCommonControls()
+void TxNode::_drawOutput()
 {
-  ImGui::SameLine();
-  ImGui::BeginGroup();
   _params[OUTPUT]->draw();
-  ImGui::EndGroup();
 }
 
 void TxNode::_drawAlignLeft()

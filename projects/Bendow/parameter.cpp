@@ -79,28 +79,23 @@ void TxParameter::_drawPlug()
   
   ImVec2 center;
   float radius;
-  switch (_type) {
-  case TxParameter::BOOL:
+  bool horizontal = (_type == TxParameter::BOOL) || _flags & TxParameter::HORIZONTAL;
+  if (horizontal) {
     center = ImGui::GetCursorScreenPos() + ImVec2(8, 8) * scale;
     radius = 8.f * scale;
-    //ImGui::SetCursorPosX(ImGui::GetCursorPosX());
-    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
-    break;
-
-  default:
+    ImGui::InvisibleButton("##plug", ImVec2(2 * radius, 2 * radius));
+  } else {
     center = ImGui::GetCursorScreenPos() + ImVec2(24, 12) * scale;
     radius = 12.f * scale;
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + radius);
-    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
-    break;
+    ImGui::InvisibleButton("##plug", ImVec2(2 * radius, 2 * radius));
   }
   
   if (ImGui::BeginDragDropSource()) {
     ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
     ImGui::Text("This is a drag and drop source");
     ImGui::EndDragDropSource();
-  }
-  else if (ImGui::IsDragDropActive()) {
+  } else if (ImGui::IsDragDropActive()) {
     if (ImGui::BeginDragDropTarget()) {
       ImGui::Text("This is a drag and drop target");
       ImGui::EndDragDropTarget();
@@ -190,6 +185,7 @@ bool TxParameterInt::draw()
   ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
     modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
+    ImGui::SameLine();
   }
   else if (_flags & TxParameter::VERTICAL) {
     modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100), (int*)_data, _minimum, _maximum);
@@ -290,6 +286,7 @@ bool TxParameterFloat::draw()
   ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
     modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+    ImGui::SameLine();
   }
   else if (_flags & TxParameter::VERTICAL) {
     modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
@@ -390,7 +387,7 @@ bool TxParameterSamples::draw()
     }
 
     ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
-    ImGui::Button("##plug", ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
+    ImGui::InvisibleButton("##plug", ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
     if (ImGui::BeginDragDropSource()) {
       ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
       ImGui::Text("This is a drag and drop source");

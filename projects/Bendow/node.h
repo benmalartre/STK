@@ -30,6 +30,22 @@ public:
   static const int Flags;
   static const int PortSize;
 
+  static const int NumNode = 10;
+  static const char* NodeName[NumNode];
+
+  enum Type {
+    VALUE,
+    RANDOM,
+    OSCILLATOR,
+    SEQUENCER,
+    LFO,
+    ADSR,
+    ARYTHMETIC,
+    FILTER,
+    EFFECT,
+    MIXER
+  };
+
   enum Parameters {
     OUTPUT,
     LAST
@@ -50,14 +66,14 @@ public:
   void setPosition(const ImVec2& pos);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
-  TxParameter* getParameter(const std::string& name);
+  TxParameter* parameter(const std::string& name);
   int pick(const ImVec2& pos);
   
   void draw(bool selected, bool* modified);
   virtual void reset() = 0;
 
 protected:
-  void                      _drawCommonControls();
+  void                      _drawOutput();
   void                      _drawAlignLeft();
   virtual void              _drawImpl(bool* modified) {};
   TxGraph*                  _parent;

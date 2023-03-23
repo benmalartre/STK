@@ -233,12 +233,7 @@ void TxOscillator::_drawImpl(bool* modified)
   TxParameter* envelope = _params[TxOscillator::ENVELOPE];
   if(envelope->draw() && modified)*modified = true;
   ImGui::EndGroup();
-
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
-  TxNode::_drawCommonControls();
-
+  TxNode::_drawOutput();
 }
 
 void TxOscillator::reset()

@@ -96,7 +96,7 @@ void TxAdsr::_drawImpl(bool* modified)
   if (release->draw() && modified)*modified = true;
   
   ImGui::EndGroup();
-  TxNode::_drawCommonControls();
+  TxNode::_drawOutput();
 }
 
 void TxAdsr::reset()

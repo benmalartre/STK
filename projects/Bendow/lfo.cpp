@@ -80,7 +80,7 @@ void TxLfo::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  TxNode::_drawCommonControls();
+  TxNode::_drawOutput();
 }
 
 void TxLfo::reset()

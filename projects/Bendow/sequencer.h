@@ -1,4 +1,3 @@
-#include <bitset>
 #include <vector>
 #include <chrono>
 #include <thread>
@@ -46,6 +45,7 @@ public:
 
 protected: 
   void _drawImpl(bool*) override;
+  
 private:
   static ImVec2       Size;
   Sequence            _sequence;

@@ -1,19 +1,21 @@
 #include "graph.h"
+#include "oscillator.h"
 
-const int TxGraph::Flags = 
-  ImGuiWindowFlags_NoResize | 
-  ImGuiWindowFlags_NoCollapse |
-  ImGuiWindowFlags_NoMove |
-  ImGuiWindowFlags_NoNav |
-  //ImGuiWindowFlags_NoBackground |
-  ImGuiWindowFlags_NoTitleBar |
-  ImGuiWindowFlags_NoInputs;
+static int CNT = 0;
+const int TxGraph::Flags =
+ImGuiWindowFlags_NoResize |
+ImGuiWindowFlags_NoCollapse |
+ImGuiWindowFlags_NoMove |
+ImGuiWindowFlags_NoNav |
+//ImGuiWindowFlags_NoBackground |
+ImGuiWindowFlags_NoTitleBar;/* |
+  ImGuiWindowFlags_NoInputs;*/
 
-TxGraph::TxGraph(const std::string& name) 
+TxGraph::TxGraph(const std::string& name)
   : _name(name)
   , _current(NULL)
-  , _selected(NULL)
   , _active(true)
+  , _pick(NONE)
   , _offset(ImVec2(100,100))
   , _scale(1.f)
 {};
@@ -52,11 +54,6 @@ void TxGraph::setCurrent(TxNode* node)
 TxNode* TxGraph::current()
 {
   return _current;
-}
-
-TxNode* TxGraph::selected()
-{
-  return _selected;
 }
 
 const ImVec2& TxGraph::offset()
@@ -118,33 +115,46 @@ stk::StkFloat TxGraph::tick()
 
 static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
 {
-  std::cout << "check inside: (" << point[0] << "," << point[1] << ") : (" << bmin[0] << "," << bmin[1] << "),(" << bmax[0] << ", " << bmax[1] << ")" << std::endl;
   return point[0] >= bmin[0] && point[0] <= bmax[0] &&
     point[1] >= bmin[1] && point[1] <= bmax[1];
 }
 
 int TxGraph::pick(const ImVec2& pos)
 {
-  _selected = NULL;
+  int nodeIdx = _nodes.size() - 1;
 
-  int nodeIdx = _nodes.size()-1;
   for (; nodeIdx >= 0; --nodeIdx) {
     TxNode* node = _nodes[nodeIdx];
-    if(inside(pos, node->position() * _scale + _offset, 
+    if (inside(pos, node->position() * _scale + _offset,
       (node->position() + node->size()) * _scale + _offset))
-      {
-        _selected = node;
-        if (_selected && _selected != _nodes.back()) {
-          std::swap(_nodes[index(_selected)], _nodes.back());
-        }
-        int portIdx = node->pick(pos);
-        if(portIdx > -1) {
-          return TxGraph::INPUT;
-        }
-        return TxGraph::NODE;
-      }
+    {
+      if ((pos.y - (node->position().y * _scale + _offset.y)) < TX_TITLE_Y * 2)
+        return TxGraph::HEAD;
+      return TxGraph::BODY;
+    }
   }
   return TxGraph::NONE;
+}
+
+void TxGraph::select(const ImVec2& pos)
+{
+  int nodeIdx = _nodes.size() - 1;
+  ImGuiIO& io = ImGui::GetIO();
+  if (!io.KeyMods)for (auto& selected : _selection)selected = false;
+
+  for (; nodeIdx >= 0; --nodeIdx) {
+    TxNode* node = _nodes[nodeIdx];
+    if (inside(pos, node->position() * _scale + _offset,
+      (node->position() + node->size()) * _scale + _offset))
+    {
+      if (io.KeyCtrl) {
+        _selection[nodeIdx] = 1 - _selection[nodeIdx];
+      } else {
+        _selection[nodeIdx] = true;
+      }
+      break;
+    }
+  }
 }
 
 void TxGraph::_drawGrid()
@@ -160,6 +170,26 @@ void TxGraph::_drawGrid()
     drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
 }
 
+void TxGraph::_drawPopup()
+{
+  static const char* name = "GraphNodesMenu";
+  if (ImGui::Button("Show popup")) {
+    ImGui::OpenPopup(name);
+  }
+
+  if (ImGui::BeginPopup(name)) {
+    for (size_t i = 0; i < TxNode::NumNode; ++i) {
+      ImGui::TextColored({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1 }, TxNode::NodeName[i]);
+    }
+
+    if (ImGui::Selectable("Oscillator")) {
+      new TxOscillator(this, (std::string("zob")+std::to_string(CNT++)).c_str());
+    }
+
+    ImGui::EndPopup();
+  }
+}
+
 void TxGraph::draw()
 {
   static float h = 0.f;
@@ -169,35 +199,43 @@ void TxGraph::draw()
   ImGui::SetNextWindowPos(pos);
   ImGui::SetNextWindowSize(size);
   ImGui::Begin(_name.c_str(), NULL, TxGraph::Flags);
-  io.FontGlobalScale = _scale;
 
-  _drawGrid();
- 
-  int picked = TxGraph::NONE;
-  ImVec2 offset;
-  if(io.MouseWheel) {
+  if (io.MouseWheel) {
     _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
-
+  io.FontGlobalScale = _scale;
+  _drawGrid();
+ 
+  if (!io.MouseDown[0]) {
+    _pick = pick(ImGui::GetMousePos());
+  }
   if (io.MouseClicked[0]) {
-    picked = pick(ImGui::GetMousePos());
-    if (_selected) {
-      offset = ImGui::GetMousePos() - _selected->position();
-    }
+    select(ImGui::GetMousePos());
+    _drag = _pick == TxGraph::HEAD;
+  } else if (io.MouseReleased[0]) {
+    _drag = false;
   }
 
-  if (!picked) {
-    if (io.MouseDown[0] && _selected) {
-      _selected->setPosition(ImGui::GetMousePos() - offset);
+  if (_drag) {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+    if (io.MouseDown[0] && !ImGui::IsDragDropActive()) {
+      for (size_t n = 0; n < _nodes.size(); ++n) {
+        if (!_selection[n])continue;
+        _nodes[n]->setPosition(_nodes[n]->position() + io.MouseDelta * 1.f / _scale);
+      }
     }
-    else if (io.MouseDown[2]) {
-      _offset += io.MouseDelta;
-    }
+  } else {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
   }
-
+  if (io.MouseDown[2]) {
+    _offset += io.MouseDelta;
+  }
+  _drawPopup();
+  
   bool modified = false;
-  for (auto& node : _nodes) {
-    node->draw(RANDOM_0_1 > 0.5, &modified);
+  for (size_t n = 0; n < _nodes.size(); ++n) {
+    TxNode* node = _nodes[n];
+    node->draw(_selection[n], &modified);
   }
 
   ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
