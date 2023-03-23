@@ -1,7 +1,7 @@
 #include "common.h"
 #include "adsr.h"
 
-ImVec2 TxAdsr::Size(240, 120);
+ImVec2 TxAdsr::Size(300, 200);
 
 TxAdsr::TxAdsr(TxGraph* parent, const std::string& name) 
   : TxNode(parent, name)
@@ -96,6 +96,7 @@ void TxAdsr::_drawImpl(bool* modified)
   if (release->draw() && modified)*modified = true;
   
   ImGui::EndGroup();
+  TxNode::_drawCommonControls();
 }
 
 void TxAdsr::reset()

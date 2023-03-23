@@ -1,7 +1,7 @@
 #include "common.h"
 #include "arythmetic.h"
 
-ImVec2 TxArythmetic::Size(512, 128);
+ImVec2 TxArythmetic::Size(400, 200);
 
 const char* TxArythmetic::ModeName[TxArythmetic::NumMode] = {
   "Add",
@@ -34,8 +34,8 @@ const ImVec2& TxArythmetic::size()
 
 stk::StkFloat TxArythmetic::tick(unsigned int)
 {
-  const stk::StkFloat input1 = _params[INPUTS]->tick(0);
-  const stk::StkFloat input2 = _params[INPUTS]->tick(1);
+  const stk::StkFloat input1 = _params[INPUT1]->tick();
+  const stk::StkFloat input2 = _params[INPUT2]->tick();
   const stk::StkFloat float1 = _params[FLOAT1]->tick();
   stk::StkFloat sample = 0.f;
   switch(_mode) {
@@ -83,8 +83,10 @@ void TxArythmetic::setMode(int mode)
 
 void TxArythmetic::_drawImpl(bool* modified)
 {
-  TxParameter* inputs = _params[INPUTS];
-  inputs->draw();
+  TxParameter* input1 = _params[INPUT1];
+  input1->draw();
+  TxParameter* input2 = _params[INPUT2];
+  input2->draw();
   ImGui::SameLine();
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);

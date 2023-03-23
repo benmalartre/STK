@@ -74,12 +74,27 @@ void TxParameter::setCallback(TxCallback* callback)
 
 void TxParameter::_drawPlug()
 {
-  ImGuiIO& io = ImGui::GetIO();
-  const float scale = io.FontGlobalScale;
+  const float& scale = _node->graph()->scale();
   ImDrawList* drawList = ImGui::GetWindowDrawList();
-  const ImVec2 center = ImGui::GetCursorScreenPos() + ImVec2(24, 12) * scale;
-  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 12);
-  ImGui::InvisibleButton("##plug", ImVec2(24 * scale, 24 * scale));
+  
+  ImVec2 center;
+  float radius;
+  switch (_type) {
+  case TxParameter::BOOL:
+    center = ImGui::GetCursorScreenPos() + ImVec2(8, 8) * scale;
+    radius = 8.f * scale;
+    //ImGui::SetCursorPosX(ImGui::GetCursorPosX());
+    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
+    break;
+
+  default:
+    center = ImGui::GetCursorScreenPos() + ImVec2(24, 12) * scale;
+    radius = 12.f * scale;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + radius);
+    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
+    break;
+  }
+  
   if (ImGui::BeginDragDropSource()) {
     ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
     ImGui::Text("This is a drag and drop source");
@@ -97,11 +112,11 @@ void TxParameter::_drawPlug()
   if (ImGui::IsItemHovered()) {
     plugColor = ImColor({ 220,220,220,255 });
   }
-  drawList->AddCircleFilled(center, 12.f * scale, holeColor, 32);
-  drawList->AddCircle(center, 12.f * scale, plugColor, 32, 4.f * scale);
+  drawList->AddCircleFilled(center, radius, holeColor, 32);
+  drawList->AddCircle(center, radius, plugColor, 32, 4.f * scale);
 
   _plug = center;
-  _radius = 16.f * scale;
+  _radius = radius;
 }
 
 // TxParameterBool
@@ -353,14 +368,6 @@ stk::StkFloat TxParameterSamples::tick()
   return 0.f;
 }
 
-stk::StkFloat TxParameterSamples::tick(unsigned int channel)
-{
-  if (_input) {
-
-    return _input->tick(channel);
-  }
-  return 0.f;
-}
 
 bool TxParameterSamples::draw()
 {

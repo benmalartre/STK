@@ -18,7 +18,8 @@ public:
 
   enum Parameters {
     MODE = TxNode::LAST,
-    INPUTS,
+    INPUT1,
+    INPUT2,
     FLOAT1,
     LAST
   };

@@ -276,34 +276,30 @@ int main()
     sequencer->setBeat(t, {1, BASS[t]});
   sequencer->start();
  
-  
   TxOscillator* oscillator = new TxOscillator(graph, "Oscillator");
   oscillator->setHarmonics(7);
   
-  TxOscillator* oscillator2 = new TxOscillator(graph, "Oscillator2");
-  oscillator2->setHarmonics(3);
-  
   TxAdsr* adsr = new TxAdsr(graph, "Adsr");
-  graph->addConnexion(adsr->connect(sequencer, "Trigger"));
-  graph->addConnexion(oscillator->connect(sequencer, "Frequency", 1));
+  adsr->connect(sequencer, "Trigger");
 
   oscillator->connect(adsr, "Envelope");
-  /*
+  
   TxLfo* lfo = new TxLfo(graph, "Lfo");
   lfo->setFrequency(0.01f);
   lfo->setAmplitude(5.f);
   lfo->setOffset(6.f);
-  */
-  TxArythmetic* arythmetic = new TxArythmetic(graph, "Arythmetic");
-  /*
-  graph->addConnexion(arythmetic->connect(sequencer, "Input1", 1));
-  graph->addConnexion(arythmetic->connect(lfo, "Input2"));
-
-  graph->addConnexion(oscillator->connect(arythmetic, "Frequency"));
   
-  TxFilter* filter = new TxFilter(graph, "Filter");
-  graph->addConnexion(filter->connect(oscillator, "Input"));
-  */
+  TxArythmetic* arythmetic = new TxArythmetic(graph, "Arythmetic");
+  
+  arythmetic->connect(sequencer, "Input1", 1);
+  arythmetic->connect(lfo, "Input2");
+
+  oscillator->connect(arythmetic, "Frequency");
+  graph->setCurrent(oscillator);
+
+  //TxFilter* filter = new TxFilter(graph, "Filter");
+  //filter->connect(oscillator, "Input");
+  
   //TxEffect* chorus = new TxEffect("Effect");
   //chorus->connect(oscillator, "Samples");
   //graph->addNode(chorus);

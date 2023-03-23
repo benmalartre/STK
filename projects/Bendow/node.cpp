@@ -82,7 +82,9 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
     parameter->connect(node, channel);
     std::cout << "connect : " << node->name() << " -> " << 
       _name << ":" << name << "(channel=" << channel << ")" << std::endl;
-    return new TxConnexion({node->_params[OUTPUT], parameter, channel});
+    TxConnexion* connexion = new TxConnexion({node->_params[OUTPUT], parameter, channel});
+    _parent->addConnexion(connexion);
+    return connexion;
   }
   return NULL;
 }

@@ -141,7 +141,6 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  stk::StkFloat tick(unsigned int channel) override;
   bool draw() override;
 
 private:
