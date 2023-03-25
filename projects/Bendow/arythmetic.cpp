@@ -1,7 +1,8 @@
 #include "common.h"
 #include "arythmetic.h"
+#include "graph.h"
 
-ImVec2 TxArythmetic::Size(400, 200);
+ImVec2 TxArythmetic::Size(300, 100);
 
 const char* TxArythmetic::ModeName[TxArythmetic::NumMode] = {
   "Add",
@@ -89,7 +90,7 @@ void TxArythmetic::_drawImpl(bool* modified)
   input2->draw();
   ImGui::SameLine();
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128);
+  ImGui::SetNextItemWidth(128 * _parent->scale());
   TxParameter* mode = _params[TxArythmetic::MODE];
   if(mode->draw() && modified)*modified = true;
   if (mode->tick() == MIX) {

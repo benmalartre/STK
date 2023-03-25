@@ -128,11 +128,14 @@ int TxGraph::pick(const ImVec2& pos)
     if (inside(pos, node->position() * _scale + _offset,
       (node->position() + node->size()) * _scale + _offset))
     {
-      if ((pos.y - (node->position().y * _scale + _offset.y)) < TX_TITLE_Y * 2)
+      _hovered = nodeIdx;
+      if ((pos.y - (node->position().y * _scale + _offset.y)) < TX_TITLE_Y * 2) {
         return TxGraph::HEAD;
+      }
       return TxGraph::BODY;
     }
   }
+  _hovered = -1;
   return TxGraph::NONE;
 }
 
@@ -194,6 +197,9 @@ void TxGraph::draw()
 {
   static float h = 0.f;
   ImGuiIO& io = ImGui::GetIO();
+  ImGuiStyle& style = ImGui::GetStyle();
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing * _scale);
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing * _scale);
   const ImVec2 pos(0, h);
   const ImVec2 size = io.DisplaySize - pos;
   ImGui::SetNextWindowPos(pos);
@@ -209,6 +215,7 @@ void TxGraph::draw()
   if (!io.MouseDown[0]) {
     _pick = pick(ImGui::GetMousePos());
   }
+  
   if (io.MouseClicked[0]) {
     select(ImGui::GetMousePos());
     _drag = _pick == TxGraph::HEAD;
@@ -216,16 +223,20 @@ void TxGraph::draw()
     _drag = false;
   }
 
+  if (_pick == TxGraph::HEAD || _drag) {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
+  }
+  else {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+  }
+
   if (_drag) {
-    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
     if (io.MouseDown[0] && !ImGui::IsDragDropActive()) {
       for (size_t n = 0; n < _nodes.size(); ++n) {
         if (!_selection[n])continue;
         _nodes[n]->setPosition(_nodes[n]->position() + io.MouseDelta * 1.f / _scale);
       }
     }
-  } else {
-    ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
   }
   if (io.MouseDown[2]) {
     _offset += io.MouseDelta;
@@ -252,4 +263,5 @@ void TxGraph::draw()
   }
  
   ImGui::End();
+  ImGui::PopStyleVar(2);
 }

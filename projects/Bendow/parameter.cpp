@@ -284,6 +284,7 @@ bool TxParameterFloat::draw()
 {
   bool modified = false;
   ImGui::BeginGroup();
+
   if (_flags & TxParameter::HORIZONTAL) {
     modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
     ImGui::SameLine();
@@ -295,7 +296,6 @@ bool TxParameterFloat::draw()
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot);
   }
-
   _drawPlug();
 
   ImGui::EndGroup();
@@ -372,7 +372,7 @@ bool TxParameterSamples::draw()
   ImDrawList* drawList = ImGui::GetForegroundDrawList();
   TxGraph* graph = _node->graph();
   ImVec2 pMin, pMax;
-  float plugOffsetY = _node->size()[1] / (_nChannels + 1);
+  float plugOffsetY = 2 * TX_PLUG_HEIGHT;
   const float& scale = graph->scale();
   const ImVec2& offset = graph->offset();
 

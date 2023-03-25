@@ -1,5 +1,6 @@
 #include "common.h"
 #include "oscillator.h"
+#include "graph.h"
 #include <Blit.h>
 #include <BlitSaw.h>
 #include <BlitSquare.h>
@@ -220,7 +221,7 @@ void TxOscillator::_drawImpl(bool* modified)
 {
   TxNode::_drawAlignLeft();
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128);
+  ImGui::SetNextItemWidth(128 * _parent->scale());
   TxParameter* waveform = _params[TxOscillator::WAVEFORM];
   if(waveform->draw() && modified)*modified = true;
   TxNode::_drawAlignLeft();

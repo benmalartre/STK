@@ -1,7 +1,7 @@
 #include "common.h"
 #include "adsr.h"
 
-ImVec2 TxAdsr::Size(300, 200);
+ImVec2 TxAdsr::Size(340, 200);
 
 TxAdsr::TxAdsr(TxGraph* parent, const std::string& name) 
   : TxNode(parent, name)

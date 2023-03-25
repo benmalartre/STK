@@ -43,10 +43,10 @@ private:
   std::vector<TxNode*>      _nodes;
   std::vector<TxConnexion*> _connexions;
   std::vector<bool>         _selection;
-  TxNode*                   _hovered;
   TxNode*                   _current;
   bool                      _active;
 
+  int                       _hovered;
   int                       _pick;
   bool                      _drag;
   ImVec2                    _offset;

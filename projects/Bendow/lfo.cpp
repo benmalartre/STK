@@ -1,7 +1,8 @@
 #include "common.h"
 #include "lfo.h"
+#include "graph.h"
 
-ImVec2 TxLfo::Size(400, 200);
+ImVec2 TxLfo::Size(300, 200);
 
 TxLfo::TxLfo(TxGraph* parent, const std::string& name) 
   : TxNode(parent, name)
@@ -66,7 +67,7 @@ void TxLfo::setOffset(stk::StkFloat offset)
 void TxLfo::_drawImpl(bool* modified)
 {
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128);
+  ImGui::SetNextItemWidth(128 * _parent->scale());
   TxParameter* frequency = _params[TxLfo::FREQUENCY];
   if(frequency->draw() && modified)*modified = true;
   ImGui::SameLine();
