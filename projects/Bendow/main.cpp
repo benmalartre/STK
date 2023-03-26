@@ -8,6 +8,8 @@
 #include "arythmetic.h"
 #include "sequencer.h"
 #include "graph.h"
+#include "factory.h"
+#include "fonts/sweet16.h"
 
 #include <GLFW/glfw3.h>
 
@@ -24,8 +26,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   TxTime& time = TxTime::instance();
   for ( unsigned int i=0; i < nBufferFrames; ++i) {
     const float sample = graph->tick();
-    *samples++ = sample;
-    *samples++ = sample;
+    //*samples++ = sample;
+    //*samples++ = sample;
     time.increment();
   }
 
@@ -76,7 +78,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_STENCIL_BITS, 8);
   glfwWindowHint(GLFW_SAMPLES, 4);
   
-  GLFWwindow* window = glfwCreateWindow(width,height,"BendoW",NULL,NULL);
+  GLFWwindow* window = glfwCreateWindow(width,height,"bendow",NULL,NULL);
 
    // window datas
   //glfwSetWindowUserPointer(window, this);
@@ -125,7 +127,7 @@ GLFWwindow* openWindow(size_t width, size_t height)
 void setupStyle()
 {
   ImGuiStyle& style = ImGui::GetStyle();
-  //ImGui::StyleColorsLight(style);
+  //ImGui::StyleColorsLight(&style);
   
   style.GrabRounding = 2.f;
   style.ChildRounding = 8.f;
@@ -174,6 +176,7 @@ void setupStyle()
   style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
   style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.32f, 0.52f, 0.65f, 1.00f);
   style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
+ 
 }
 
 
@@ -217,7 +220,7 @@ void draw(GLFWwindow* window)
   //drawPlot(display_w, display_h);
   for(auto& graph: graphs)graph->draw();
 
-  //ImGui::ShowDemoWindow();
+  ImGui::ShowDemoWindow();
   //ImPlot::ShowDemoWindow();
   ImGui::Render();
 
@@ -241,6 +244,11 @@ int main()
   
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330 ");
+
+  ImGuiIO& io = ImGui::GetIO();
+  //io.Fonts->AddFontDefault();
+  io.Fonts->AddFontFromFileTTF("fonts/tahoma.ttf", 24);
+  AddSweet16Font();
 
   setupStyle();
   
@@ -268,6 +276,7 @@ int main()
     error.printMessage();
     return 0;
   }
+  TxFactory::initialize();
   TxGraph* graph = new TxGraph("Graph");
   
   sequencer = new TxSequencer(graph, "Sequencer");

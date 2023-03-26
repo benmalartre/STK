@@ -14,7 +14,7 @@ TxLfo::TxLfo(TxGraph* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "Frequency", 0.01f, 12.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Amplitude", 0.01f, 10.f, &_amplitude, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Offset", -100.f, 100.f, &_offset, TxParameter::KNOB));
-  _buffer.scale(-10, 10);
+  //_buffer.scale(-10, 10);
 }
 
 TxLfo::~TxLfo() 
@@ -30,7 +30,7 @@ stk::StkFloat TxLfo::tick(unsigned int)
 {
   _sine.setFrequency(_frequency);
   const stk::StkFloat sample = _sine.tick() * _amplitude +_offset;
-  _buffer.write(sample);
+  //_buffer.write(sample);
   return sample;
 }
 

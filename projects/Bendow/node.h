@@ -10,18 +10,11 @@
 class TxNode;
 class TxGraph;
 
-#define TX_TITLE_X 64.f
-#define TX_TITLE_Y 8.f
-#define TX_PADDING_X 16.f
-#define TX_PADDING_Y 4.f
-#define TX_PLUG_WIDTH 24.f
-#define TX_PLUG_HEIGHT 18.f
-#define TX_PLUG_DETAIL 6.f
-
 struct TxConnexion {
   TxParameter* source;
   TxParameter* target;
-  int channel;
+  int sourceChannel;
+  int targetChannel;
 };
 
 class TxNode {
@@ -57,19 +50,24 @@ public:
   virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
-  TxGraph* graph();
+  
+  bool selected();
   const std::string& name();
   const ImVec2& position();
   virtual const ImVec2& size() = 0;
   const ImVec4& color();
+  const ImColor& color(short colorIdx);
+  TxGraph* graph();
+  TxParameter* parameter(const std::string& name);
+
   void setDirty(bool state);
+  void setSelected(bool state);
   void setPosition(const ImVec2& pos);
   TxConnexion* connect(TxNode* node, const std::string& name, short channel=0);
   void disconnect(const std::string& name);
-  TxParameter* parameter(const std::string& name);
-  int pick(const ImVec2& pos);
   
-  void draw(bool selected, bool* modified);
+  int pick(const ImVec2& pos);
+  void draw(bool* modified);
   virtual void reset() = 0;
 
 protected:
@@ -81,12 +79,12 @@ protected:
   ImVec2                    _size;
   ImVec4                    _color;
   int                       _expended;
+  bool                      _selected;
 
   std::string               _name;
   int                       _nChannels;
   bool                      _dirty;
   stk::StkFrames            _frames;
-  TxBuffer                  _buffer;
   std::vector<TxParameter*> _params;
 };
 

@@ -1,7 +1,10 @@
+#include "node.h"
 #include "sequencer.h"
 #include "graph.h"
+#include "factory.h"
 
 ImVec2 TxSequencer::Size(520, 300);
+
 
 TxSequencer::TxSequencer(TxGraph* parent, const std::string& name)
   : TxNode(parent, name, TX_NUM_CHANNELS)
@@ -102,7 +105,7 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
+bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current, float scale)
 {
   bool modified = false;
   ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -110,7 +113,7 @@ bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
 
   Beat* beat = &_sequence[beatIdx];
   ImGui::BeginGroup();
-  if (ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(20, 120),
+  if (ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(20, 120) * scale,
     &beat->second, 0, 255))modified = true;
 
   ImGui::BeginGroup();
@@ -124,7 +127,7 @@ bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current)
       : (bit ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
 
     ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(4, 12))) {
+    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(4, 12) * scale)) {
       BIT_FLIP(beat->first, i);
       modified = true;
     }
@@ -166,7 +169,7 @@ void TxSequencer::_drawImpl(bool* modified)
   ImGui::SameLine();
 
   for(size_t i = 0; i < _sequence.size(); ++i) {
-    if (drawBeat(i, index.second, (i == index.first)))*modified = true;
+    if (drawBeat(i, index.second, (i == index.first), _parent->scale()))*modified = true;
     if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
 

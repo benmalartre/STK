@@ -85,7 +85,7 @@ stk::StkFloat TxOscillator::tick(unsigned int)
       sample = ((stk::SingWave*)_generator)->tick() * _envelope;
       break;
   }   
-  _buffer.write(sample);
+  //_buffer.write(sample);
   return sample;
 }
 

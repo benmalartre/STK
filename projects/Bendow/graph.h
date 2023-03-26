@@ -19,6 +19,9 @@ public:
   void                    setCurrent(TxNode* node);
   void                    addNode(TxNode* node);
   void                    removeNode(TxNode* node);
+  TxConnexion*            startConnexion(TxParameter* param, int channel);
+  void                    updateConnexion(TxParameter* param, int channel, bool state);
+  void                    terminateConnexion();
   void                    addConnexion(TxConnexion* connexion);
   void                    removeConnexion(TxConnexion* connexion);
 
@@ -37,13 +40,15 @@ protected:
   int                     index(const TxNode* node);
 
 private:
+  void                      _createNodeByType(int type);
+  void                      _drawConnexion(TxConnexion* connexion);
   void                      _drawPopup();
   void                      _drawGrid();
   std::string               _name;
   std::vector<TxNode*>      _nodes;
   std::vector<TxConnexion*> _connexions;
-  std::vector<bool>         _selection;
   TxNode*                   _current;
+  TxConnexion*              _connexion;
   bool                      _active;
 
   int                       _hovered;

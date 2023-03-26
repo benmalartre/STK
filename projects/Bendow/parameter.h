@@ -27,21 +27,22 @@ public:
   };
 
   enum Flag {
-    HORIZONTAL  = 1,
-    VERTICAL    = 2,
-    KNOB        = 4,
-    EVEN        = 8,
-    ODD         = 16
+    HORIZONTAL    = 1,
+    VERTICAL      = 2,
+    KNOB          = 4,
+    SEVENSEGMENTS = 8
   };
 
   TxParameter(TxNode* node, const std::string& name, void* data, 
     short type=NONE, int flags=HORIZONTAL);
   virtual ~TxParameter();
   TxNode* node();
+  short type();
+  const int& flags();
   const std::string& name();
   const std::string& label();
-  const ImVec2& plug();
-  const float& radius();
+  const ImVec2& plug(short channel);
+  const float& radius(short channel);
   void setLabel(const std::string& label);
   void connect(TxNode* node, short channel=0);
   void disconnect();
@@ -53,7 +54,7 @@ public:
   void setCallback(TxCallback* callback);
 
 protected:
-  void              _drawPlug();
+  void              _drawPlug(short channel);
 
   short             _type;
   int               _flags;
@@ -64,8 +65,8 @@ protected:
   short             _iChannel;
   void*             _data;
   TxCallback*       _callback;
-  ImVec2            _plug;
-  float             _radius;
+  ImVec2            _plug[2];
+  float             _radius[2];
 };
 
 class TxParameterBool : public TxParameter {
@@ -139,6 +140,8 @@ class TxParameterSamples : public TxParameter {
 public:
   TxParameterSamples(TxNode* node, const std::string& name, bool io=true, int nChannels=1);
 
+  void setIndex(int index);
+  bool io();
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
   bool draw() override;
@@ -147,6 +150,7 @@ private:
   stk::StkFrames*    _frames;
   bool               _io;
   int                _nChannels;
+  int                _index;
 };
 
 #endif // TX_PARAMETER_H

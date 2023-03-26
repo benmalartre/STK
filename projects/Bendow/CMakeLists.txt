@@ -117,6 +117,7 @@ SET(SOURCES
 	adsr.cpp
 	sequencer.cpp
 	graph.cpp
+	factory.cpp
 	main.cpp
 )
 

@@ -339,7 +339,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
     }
   }
 
-  _buffer.write(sample);
+  //_buffer.write(sample);
   return sample;
 }
 

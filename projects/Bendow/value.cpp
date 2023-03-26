@@ -1,5 +1,7 @@
 #include "value.h"
 
+ImVec2 TxValue::Size(100, 60);
+
 TxValue::TxValue(TxGraph* parent, const std::string& name)
   : TxNode(parent, name)
 {
@@ -9,6 +11,11 @@ TxValue::TxValue(TxGraph* parent, const std::string& name)
 TxValue::~TxValue()
 {
 
+}
+
+const ImVec2& TxValue::size()
+{
+  return TxValue::Size;
 }
 
 void TxValue::setValue(const stk::StkFloat& value)

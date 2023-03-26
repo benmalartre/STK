@@ -29,6 +29,7 @@
 #define RANDOM_LO_HI(LO, HI) ((LO) + (float)rand() / \
   (float)(RAND_MAX / ((HI) - (LO))))
 
+
 // a=target variable, b=bit number to act upon 0-n 
 #define BIT_SET(a,b) ((a) |= (1<<(b)))
 #define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
@@ -40,6 +41,41 @@
 #define BITMASK_CLEAR(x,y) ((x) &= (~(y)))
 #define BITMASK_FLIP(x,y) ((x) ^= (y))
 #define BITMASK_CHECK(x,y) (((x) & (y)) == (y))
+
+
+// commons
+#define TX_TITLE_HEIGHT 32.f
+#define TX_TITLE_X 64.f
+#define TX_TITLE_Y 8.f
+#define TX_PADDING_X 16.f
+#define TX_PADDING_Y 4.f
+#define TX_PLUG_WIDTH 12.f
+#define TX_PLUG_HEIGHT 12.f
+#define TX_PLUG_DETAIL 6.f
+#define TX_CONTOUR_WIDTH 3.333f
+#define TX_NODE_ROUNDING 2.f
+
+// macros
+#define REGISTER_NODE(CLASS, ID) \
+TxNode* create##CLASS(TxGraph* graph, const std::string& name) { \
+  return new CLASS(graph, name);\
+};
+
+#define DEFINE_NODE(CLASS) \
+  create##CLASS
+
+
+enum TX_COLOR_INDEX {
+  TX_COLOR_CONTOUR_ID,
+  TX_COLOR_PLUG_ID
+};
+
+static ImColor TX_PLUG_COLOR_DEFAULT = ImColor({ 180,180,180,255 });
+static ImColor TX_CONTOUR_COLOR_DEFAULT = ImColor({ 50,50,50,  255 });
+static ImColor TX_PLUG_COLOR_SELECTED = ImColor({ 200,200,200,255 });
+static ImColor TX_CONTOUR_COLOR_SELECTED = ImColor({ 220,220,220,  255 });
+
+
  
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();

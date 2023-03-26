@@ -20,6 +20,7 @@ TxArythmetic::TxArythmetic(TxGraph* parent, const std::string& name)
     TxArythmetic::NumMode, &_mode));  
   _params.push_back(new TxParameterSamples(this, "Input1", false, 1));
   _params.push_back(new TxParameterSamples(this, "Input2", false, 1));
+  ((TxParameterSamples*)_params.back())->setIndex(1);
   _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
 }
@@ -60,7 +61,6 @@ stk::StkFloat TxArythmetic::tick(unsigned int)
       sample = (1.f - float1) * input1 + float1 * input2;
       break;
   }
-  _buffer.write(sample);
   return sample;
 }
 

@@ -40,7 +40,7 @@ public:
   void stop();
   Index timeToIndex(float time);
 
-  bool drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool active);
+  bool drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
   void reset() override;
 
 protected: 
@@ -52,8 +52,6 @@ private:
   int                 _bpm;
   int                 _length;
   bool                _running;
-
-  
 };
 
 #endif // TX_SEQUENCER_H

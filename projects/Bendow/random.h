@@ -13,6 +13,7 @@ public:
   };
   TxRandom(TxGraph* parent, const std::string& name);
   ~TxRandom();
+  const ImVec2& size();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
   void setMinimum(stk::StkFloat value);
@@ -26,6 +27,7 @@ protected:
   void _drawImpl(bool*) override;
 
 private:
+  static const ImVec2  Size;
   stk::StkFloat  _value;
   stk::StkFloat  _lastFrequency;
   stk::StkFloat  _frequency;

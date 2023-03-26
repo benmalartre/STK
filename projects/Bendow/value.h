@@ -12,10 +12,14 @@ public:
   void setValue(const stk::StkFloat& value);
   void reset() override;
 
+  const ImVec2& size() override;
+
 protected:
+
   void _drawImpl(bool*) override;
 
 private:
+  static ImVec2  Size;
   stk::StkFloat  _value;
 };
 

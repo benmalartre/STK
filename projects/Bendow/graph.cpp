@@ -1,5 +1,6 @@
+#include "common.h"
 #include "graph.h"
-#include "oscillator.h"
+#include "factory.h"
 
 static int CNT = 0;
 const int TxGraph::Flags =
@@ -14,6 +15,7 @@ ImGuiWindowFlags_NoTitleBar;/* |
 TxGraph::TxGraph(const std::string& name)
   : _name(name)
   , _current(NULL)
+  , _connexion(NULL)
   , _active(true)
   , _pick(NONE)
   , _offset(ImVec2(100,100))
@@ -77,7 +79,7 @@ void TxGraph::addNode(TxNode* node)
   if(!contains(node)) {
     _nodes.push_back(node);
     _current = node;
-    _selection.push_back(true);
+    node->setSelected(true);
   }
 }
 
@@ -86,9 +88,40 @@ void TxGraph::removeNode(TxNode* node)
   int idx = index(node);
   if(idx >= 0) {
     _nodes.erase(_nodes.begin() + idx);
-    _selection.erase(_selection.begin() + idx);
     delete node;
   }
+}
+
+TxConnexion* TxGraph::startConnexion(TxParameter* param, int channel)
+{
+  if(!_connexion)_connexion = new TxConnexion({ param, NULL, channel, 0 });
+  return _connexion;
+}
+
+void TxGraph::updateConnexion(TxParameter* param, int channel, bool status)
+{
+  if (!_connexion) return;
+  if (status) {
+    _connexion->target = param;
+    _connexion->targetChannel = channel;
+  }
+  else if (param == _connexion->target) {
+    _connexion->target = NULL;
+    _connexion->targetChannel = 0;
+  }
+}
+
+void TxGraph::terminateConnexion()
+{
+  if (!_connexion) return;
+
+  if (_connexion->target) {
+    _connexions.push_back(_connexion);
+  }
+  else {
+    delete _connexion;
+  }
+  _connexion = NULL;
 }
 
 void TxGraph::addConnexion(TxConnexion* connexion)
@@ -143,7 +176,7 @@ void TxGraph::select(const ImVec2& pos)
 {
   int nodeIdx = _nodes.size() - 1;
   ImGuiIO& io = ImGui::GetIO();
-  if (!io.KeyMods)for (auto& selected : _selection)selected = false;
+  if (!io.KeyMods)for (auto& node : _nodes)node->setSelected(false);
 
   for (; nodeIdx >= 0; --nodeIdx) {
     TxNode* node = _nodes[nodeIdx];
@@ -151,13 +184,18 @@ void TxGraph::select(const ImVec2& pos)
       (node->position() + node->size()) * _scale + _offset))
     {
       if (io.KeyCtrl) {
-        _selection[nodeIdx] = 1 - _selection[nodeIdx];
+        _nodes[nodeIdx]->setSelected(1 - _nodes[nodeIdx]->selected());
       } else {
-        _selection[nodeIdx] = true;
+        _nodes[nodeIdx]->setSelected(true);
       }
       break;
     }
   }
+}
+
+void TxGraph::_createNodeByType(int type)
+{
+  TxNode* node = TxFactory::createNodeByType(this, type);
 }
 
 void TxGraph::_drawGrid()
@@ -182,14 +220,76 @@ void TxGraph::_drawPopup()
 
   if (ImGui::BeginPopup(name)) {
     for (size_t i = 0; i < TxNode::NumNode; ++i) {
-      ImGui::TextColored({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1 }, TxNode::NodeName[i]);
+      //ImGui::TextColored({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1 }, TxNode::NodeName[i]);
+      if (ImGui::Selectable(TxNode::NodeName[i])) {
+        _createNodeByType(i);
+      }
     }
 
-    if (ImGui::Selectable("Oscillator")) {
-      new TxOscillator(this, (std::string("zob")+std::to_string(CNT++)).c_str());
-    }
+   
 
     ImGui::EndPopup();
+  }
+}
+
+void TxGraph::_drawConnexion(TxConnexion* connexion)
+{
+  bool inverse = connexion->source->type() == TxParameter::SAMPLES && 
+    !((TxParameterSamples*)connexion->source)->io();
+
+  ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
+  ImVec2 p0, p1, p2, p3;
+  if (!inverse) {
+    p0 = connexion->source->plug(connexion->sourceChannel);
+    if (connexion->target) {
+      p3 = connexion->target->plug(connexion->targetChannel);
+    } else {
+      p3 = ImGui::GetMousePos();
+    }
+    p1 = p0 + ImVec2(100 * _scale, 0);
+    p2 = p3 - ImVec2(100 * _scale, 0);
+  }
+  else {
+    p3 = connexion->source->plug(connexion->sourceChannel);
+    if (connexion->target) {
+      p0 = connexion->target->plug(connexion->targetChannel);
+    }
+    else {
+      p0 = ImGui::GetMousePos();
+    }
+    p1 = p0 + ImVec2(100 * _scale, 0);
+    p2 = p3 - ImVec2(100 * _scale, 0);
+  }
+  
+  foregroundList->AddBezierCubic(
+    p0, p1, p2, p3,
+    TX_CONTOUR_COLOR_DEFAULT,
+    8.f * _scale
+  );
+
+  foregroundList->AddBezierCubic(
+    p0, p1, p2, p3,
+    ImColor(ImGui::GetStyle().Colors[ImGuiCol_PlotHistogram]),
+    (8.f - TX_CONTOUR_WIDTH) * _scale
+  );
+
+  const ImVec2 plugSize(TX_PLUG_WIDTH * _scale * 0.5, (TX_PLUG_HEIGHT + TX_PLUG_DETAIL) * 0.5 * _scale);
+  const ImVec2 plugOffset(-TX_PLUG_WIDTH * 0.75 * _scale, 0);
+  if (connexion->source->type() == TxParameter::SAMPLES) {
+    foregroundList->AddRect(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
+    foregroundList->AddRectFilled(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
+  }
+  else {
+    foregroundList->AddCircle(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
+    foregroundList->AddCircleFilled(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
+  }
+  if (connexion->target && connexion->target->type() == TxParameter::SAMPLES) {
+    foregroundList->AddRect(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
+    foregroundList->AddRectFilled(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
+  }
+  else {
+    foregroundList->AddCircle(p3, TX_PLUG_WIDTH * _scale, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
+    foregroundList->AddCircleFilled(p3, TX_PLUG_WIDTH * _scale, TX_PLUG_COLOR_DEFAULT, 32);
   }
 }
 
@@ -221,6 +321,7 @@ void TxGraph::draw()
     _drag = _pick == TxGraph::HEAD;
   } else if (io.MouseReleased[0]) {
     _drag = false;
+    terminateConnexion();
   }
 
   if (_pick == TxGraph::HEAD || _drag) {
@@ -233,7 +334,7 @@ void TxGraph::draw()
   if (_drag) {
     if (io.MouseDown[0] && !ImGui::IsDragDropActive()) {
       for (size_t n = 0; n < _nodes.size(); ++n) {
-        if (!_selection[n])continue;
+        if (!_nodes[n]->selected())continue;
         _nodes[n]->setPosition(_nodes[n]->position() + io.MouseDelta * 1.f / _scale);
       }
     }
@@ -246,20 +347,15 @@ void TxGraph::draw()
   bool modified = false;
   for (size_t n = 0; n < _nodes.size(); ++n) {
     TxNode* node = _nodes[n];
-    node->draw(_selection[n], &modified);
+    node->draw(&modified);
   }
 
-  ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
-  if (io.MouseDown[0] && ImGui::IsDragDropActive()) {
-    foregroundList->AddLine(io.MouseClickedPos[0], ImGui::GetMousePos(), ImColor({ 255,0,0,255 }), 8.f * _scale);
+  if (_connexion && io.MouseDown[0] && ImGui::IsDragDropActive()) {
+    _drawConnexion(_connexion);
   }
 
   for (auto& connexion : _connexions) {
-    foregroundList->AddLine(
-      connexion->source->plug(), 
-      connexion->target->plug(), 
-      ImColor({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f }), 
-      8.f * _scale);
+    _drawConnexion(connexion);
   }
  
   ImGui::End();

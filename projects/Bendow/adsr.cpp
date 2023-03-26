@@ -77,6 +77,12 @@ void TxAdsr::setSustain(stk::StkFloat sustain)
   _adsr.setSustainLevel(_sustain);
 }
 
+void TxAdsr::setRelease(stk::StkFloat release)
+{
+  _release = release;
+  _adsr.setReleaseRate(_release);
+}
+
 void TxAdsr::_drawImpl(bool* modified)
 {
   ImGui::BeginGroup();

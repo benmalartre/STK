@@ -1,6 +1,8 @@
 #include "common.h"
 #include "random.h"
 
+const ImVec2 TxRandom::Size(200, 100);
+
 TxRandom::TxRandom(TxGraph* parent, const std::string& name)
   : TxNode(parent, name)
   , _minimum(-1.f)
@@ -22,6 +24,11 @@ TxRandom::TxRandom(TxGraph* parent, const std::string& name)
 TxRandom::~TxRandom()
 {
 
+}
+
+const ImVec2& TxRandom::size()
+{
+  return TxRandom::Size;
 }
 
 void TxRandom::updateBounds()

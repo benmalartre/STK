@@ -53,6 +53,11 @@ int TxNode::pick(const ImVec2& pos)
   return -1;
 }
 
+bool TxNode::selected()
+{
+  return _selected;
+}
+
 const std::string& TxNode::name()
 {
   return _name;
@@ -68,6 +73,27 @@ const ImVec4& TxNode::color()
   return _color;
 }
 
+const ImColor& TxNode::color(short colorIdx)
+{
+  if (_selected) {
+    switch (colorIdx) {
+    case TX_COLOR_PLUG_ID:
+      return TX_PLUG_COLOR_SELECTED;
+    case TX_COLOR_CONTOUR_ID:
+      return TX_CONTOUR_COLOR_SELECTED;
+    }
+  }
+  else {
+    switch (colorIdx) {
+    case TX_COLOR_PLUG_ID:
+      return TX_PLUG_COLOR_DEFAULT;
+    case TX_COLOR_CONTOUR_ID:
+      return TX_CONTOUR_COLOR_DEFAULT;
+    }
+  }
+  return ImColor({ 100,100,100,255 });
+}
+
 TxGraph* TxNode::graph()
 {
   return _parent;
@@ -76,6 +102,11 @@ TxGraph* TxNode::graph()
 void TxNode::setDirty(bool state) 
 {
   _dirty = state;
+};
+
+void TxNode::setSelected(bool state)
+{
+  _selected = state;
 };
 
 void TxNode::setPosition(const ImVec2& pos)
@@ -130,28 +161,35 @@ void TxNode::_drawAlignLeft()
   ImGui::SetCursorPosX((TX_PLUG_WIDTH + TX_PADDING_X) * _parent->scale());
 }
 
-void TxNode::draw(bool selected, bool* modified)
+void TxNode::draw(bool* modified)
 {
-  static const ImColor whiteColor({ 255,255,255,255 });
   const float scale = _parent->scale();
   const ImVec2 position = _position * scale + _parent->offset();
+  //ImGui::PushStyleColor(ImGuiCol_ChildBg, _color);
   ImGui::SetCursorPos(position);
   ImGui::BeginChild(_name.c_str(), size() * scale, NULL, TxNode::Flags);
 
   ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImVec2(TX_TITLE_X, TX_TITLE_Y)) * scale);
+  //ImGui::PushFont()
+  ImGui::SetWindowFontScale(1.0);
   ImGui::TextColored({ 255,255,255,255 }, _name.c_str());
+  ImGui::SetWindowFontScale(0.5);
   _drawAlignLeft();
   _drawImpl(modified);
 
   ImGui::EndChild();
 
+  //ImGui::PopStyleColor();
+
   ImDrawList* drawList = ImGui::GetWindowDrawList();
-  if (selected) {
-    drawList->AddRect(
-      position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
-      position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, whiteColor, 4.f * scale, 0, 8.f * scale);
-  }
+
+  drawList->AddRect(
+    position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
+    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
+    color(TX_COLOR_CONTOUR_ID), 
+    TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
+  
   drawList->AddRectFilled(
     position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
-    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, ImColor(_color), 4.f * scale);
+    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, ImColor(_color), TX_NODE_ROUNDING * scale);
 }
