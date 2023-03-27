@@ -1,11 +1,12 @@
 #include "value.h"
 
-ImVec2 TxValue::Size(100, 60);
+ImVec2 TxValue::Size(200, 120);
 
 TxValue::TxValue(TxGraph* parent, const std::string& name)
   : TxNode(parent, name)
 {
-  
+  _value = 0.f;
+  _params.push_back(new TxParameterFloat(this, "Value", -10000, 10000, &_value, TxParameter::KNOB));
 }
 
 TxValue::~TxValue()
@@ -36,9 +37,15 @@ stk::StkFrames& TxValue::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxValue::_drawImpl(bool*)
+void TxValue::_drawImpl(bool* modified)
 {
+  ImGui::BeginGroup();
+  TxParameter* value = _params[TxValue::VALUE];
+  if (value->draw() && modified)*modified = true;
+  ImGui::EndGroup();
 
+  ImGui::SameLine();
+  TxNode::_drawOutput();
 }
 
 void TxValue::reset()

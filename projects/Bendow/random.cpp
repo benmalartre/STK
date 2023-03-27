@@ -1,7 +1,7 @@
 #include "common.h"
 #include "random.h"
 
-const ImVec2 TxRandom::Size(200, 100);
+const ImVec2 TxRandom::Size(250, 150);
 
 TxRandom::TxRandom(TxGraph* parent, const std::string& name)
   : TxNode(parent, name)

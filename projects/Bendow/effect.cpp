@@ -4,6 +4,7 @@
 #include <Chorus.h>
 #include <Echo.h>
 
+const ImVec2 TxEffect::Size(300, 250);
 
 TxEffect::TxEffect(TxGraph* parent, const std::string& name) 
   : TxNode(parent, name)
@@ -26,6 +27,11 @@ TxEffect::TxEffect(TxGraph* parent, const std::string& name)
 
 TxEffect::~TxEffect() 
 {
+}
+
+const ImVec2& TxEffect::size()
+{
+  return TxEffect::Size;
 }
 
 stk::StkFloat TxEffect::tick(unsigned int)

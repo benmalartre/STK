@@ -3,6 +3,21 @@
 #include "node.h"
 #include "graph.h"
 
+static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
+{
+  std::cout << "check compatibility : " << param->name() << std::endl;
+  if (!connexion)return false;
+  if (param->node() == connexion->source->node())return false;
+  std::cout << "check io : " << connexion->source->type() << std::endl;
+  if (connexion->source->type() == TxParameter::SAMPLES && ((TxParameterSamples*)connexion->source)->io()) {
+    return param->type() != TxParameter::SAMPLES || (param->type() == TxParameter::SAMPLES &&
+      ((TxParameterSamples*)connexion->source)->io() != ((TxParameterSamples*)param)->io());
+  }
+  else {
+    return param->type() == TxParameter::SAMPLES && !((TxParameterSamples*)param)->io();
+  }
+}
+
 
 // TxParameter (base class)
 // ---------------------------------------------------------------
@@ -84,43 +99,53 @@ void TxParameter::setCallback(TxCallback* callback)
 
 void TxParameter::_drawPlug(short channel)
 {
-  const float& scale = _node->graph()->scale();
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
-  
+  TxGraph* graph = _node->graph();
+  const float& scale = graph->scale();
   ImVec2 center;
   float radius;
   bool horizontal = (_type == TxParameter::BOOL) || _flags & TxParameter::HORIZONTAL;
   if (horizontal) {
     center = ImGui::GetCursorScreenPos() + ImVec2(8, 8) * scale;
     radius = 8.f * scale;
-    ImGui::InvisibleButton("##plug", ImVec2(2 * radius, 2 * radius));
+    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
   } else {
     center = ImGui::GetCursorScreenPos() + ImVec2(24, 12) * scale;
     radius = 12.f * scale;
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + radius);
-    ImGui::InvisibleButton("##plug", ImVec2(2 * radius, 2 * radius));
+    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
   }
+
+  ImColor plugColor = TX_PLUG_COLOR_DEFAULT;
   
   if (ImGui::BeginDragDropSource()) {
     ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
     ImGui::Text("This is a drag and drop source");
     ImGui::EndDragDropSource();
   } else if (ImGui::IsDragDropActive()) {
-    if (ImGui::BeginDragDropTarget()) {
+    if (_checkCompatibility(this, graph->connexion()) && ImGui::BeginDragDropTarget()) {
       _node->graph()->updateConnexion(this, channel, true);
+      plugColor = TX_PLUG_COLOR_SELECTED;
       ImGui::EndDragDropTarget();
     } else {
       _node->graph()->updateConnexion(this, 0, false);
     }
   }
 
-  static const ImColor holeColor({ 0,0,0,128 });
-  ImColor plugColor({ 180,180,180,255 });
-  if (ImGui::IsItemHovered()) {
-    plugColor = ImColor({ 220,220,220,255 });
+  TxConnexion* connexion = _node->graph()->connexion();
+  
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  
+  if (connexion && _checkCompatibility(this, graph->connexion())) {
+    _node->graph()->setSplitterChannel(TxGraph::WIRE);
+    drawList->AddCircleFilled(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32);
+    drawList->AddCircle(center, radius, TX_CONTOUR_COLOR_SELECTED, 32, (TX_CONTOUR_WIDTH + TX_PLUG_DETAIL) * scale);
+    drawList->AddCircle(center, radius, TX_PLUG_COLOR_AVAILABLE, 32, TX_CONTOUR_WIDTH * scale);
+  } else {
+    _node->graph()->setSplitterChannel(TxGraph::LAST);
+    drawList->AddCircleFilled(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32);
+    drawList->AddCircle(center, radius, plugColor, 32, TX_CONTOUR_WIDTH * scale);
   }
-  drawList->AddCircleFilled(center, radius, holeColor, 32);
-  drawList->AddCircle(center, radius, plugColor, 32, 4.f * scale);
+  
 
   _plug[channel] = center;
   _radius[channel] = radius;
@@ -453,7 +478,7 @@ stk::StkFloat TxParameterSamples::tick()
 bool TxParameterSamples::draw()
 {
   ImGuiIO& io = ImGui::GetIO();
-  ImDrawList* drawList = ImGui::GetForegroundDrawList();
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
   TxGraph* graph = _node->graph();
   ImVec2 pMin, pMax;
   float plugOffsetY = 3 * TX_PLUG_HEIGHT;
@@ -487,7 +512,11 @@ bool TxParameterSamples::draw()
       } else {
         _node->graph()->updateConnexion(this, 0, false);
       }
+    }
 
+    ImColor plugColor = _node->color(TX_COLOR_PLUG_ID);
+    if (ImGui::IsDragDropActive() && _checkCompatibility(this, _node->graph()->connexion() )) {
+      plugColor = TX_PLUG_COLOR_AVAILABLE;
     }
 
     drawList->AddRect(pMin, pMax, _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
@@ -506,19 +535,19 @@ bool TxParameterSamples::draw()
         TX_CONTOUR_WIDTH * scale);
     }
 
-    drawList->AddRectFilled(pMin, pMax, _node->color(TX_COLOR_PLUG_ID), TX_NODE_ROUNDING * scale);
+    drawList->AddRectFilled(pMin, pMax, plugColor, TX_NODE_ROUNDING * scale);
     if (!_io) {
       drawList->AddRectFilled(
         pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
         pMax + ImVec2(0, TX_PLUG_DETAIL) * graph->scale(),
-        _node->color(TX_COLOR_PLUG_ID),
+        plugColor,
         TX_NODE_ROUNDING * scale);
     }
     else {
       drawList->AddRectFilled(
         pMin + ImVec2(0, -TX_PLUG_DETAIL) * graph->scale(),
         pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
-        _node->color(TX_COLOR_PLUG_ID),
+        plugColor,
         TX_NODE_ROUNDING * scale);
     }
     _plug[c] = (pMin + pMax) * 0.5;

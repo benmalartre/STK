@@ -9,6 +9,9 @@
 #include "oscillator.h"
 #include "random.h"
 #include "sequencer.h"
+//#include "mixer.h"
+#include "effect.h"
+#include "filter.h"
 
 REGISTER_NODE(TxAdsr, TxNode::ADSR)
 REGISTER_NODE(TxLfo, TxNode::LFO)
@@ -17,7 +20,9 @@ REGISTER_NODE(TxValue, TxNode::VALUE)
 REGISTER_NODE(TxOscillator, TxNode::OSCILLATOR)
 REGISTER_NODE(TxRandom, TxNode::RANDOM)
 REGISTER_NODE(TxSequencer, TxNode::SEQUENCER)
-
+//REGISTER_NODE(TxMixer, TxNode::MIXER)
+REGISTER_NODE(TxEffect, TxNode::EFFECT)
+REGISTER_NODE(TxFilter, TxNode::FILTER)
 
 TxFactory& TxFactory::get() {
   static TxFactory factory;

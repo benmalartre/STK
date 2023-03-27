@@ -124,6 +124,11 @@ void TxGraph::terminateConnexion()
   _connexion = NULL;
 }
 
+TxConnexion* TxGraph::connexion()
+{
+  return _connexion;
+}
+
 void TxGraph::addConnexion(TxConnexion* connexion)
 {
   _connexions.push_back(connexion);
@@ -193,6 +198,21 @@ void TxGraph::select(const ImVec2& pos)
   }
 }
 
+void TxGraph::initSpliter()
+{
+  _splitter.Split(ImGui::GetWindowDrawList(), TxGraph::CNT);
+}
+
+void TxGraph::setSplitterChannel(int channel)
+{
+  _splitter.SetCurrentChannel(ImGui::GetWindowDrawList(), channel);
+}
+
+void TxGraph::terminateSplitter()
+{
+  _splitter.Merge(ImGui::GetWindowDrawList());
+}
+
 void TxGraph::_createNodeByType(int type)
 {
   TxNode* node = TxFactory::createNodeByType(this, type);
@@ -237,7 +257,7 @@ void TxGraph::_drawConnexion(TxConnexion* connexion)
   bool inverse = connexion->source->type() == TxParameter::SAMPLES && 
     !((TxParameterSamples*)connexion->source)->io();
 
-  ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 p0, p1, p2, p3;
   if (!inverse) {
     p0 = connexion->source->plug(connexion->sourceChannel);
@@ -261,13 +281,13 @@ void TxGraph::_drawConnexion(TxConnexion* connexion)
     p2 = p3 - ImVec2(100 * _scale, 0);
   }
   
-  foregroundList->AddBezierCubic(
+  drawList->AddBezierCubic(
     p0, p1, p2, p3,
     TX_CONTOUR_COLOR_DEFAULT,
     8.f * _scale
   );
 
-  foregroundList->AddBezierCubic(
+  drawList->AddBezierCubic(
     p0, p1, p2, p3,
     ImColor(ImGui::GetStyle().Colors[ImGuiCol_PlotHistogram]),
     (8.f - TX_CONTOUR_WIDTH) * _scale
@@ -276,26 +296,27 @@ void TxGraph::_drawConnexion(TxConnexion* connexion)
   const ImVec2 plugSize(TX_PLUG_WIDTH * _scale * 0.5, (TX_PLUG_HEIGHT + TX_PLUG_DETAIL) * 0.5 * _scale);
   const ImVec2 plugOffset(-TX_PLUG_WIDTH * 0.75 * _scale, 0);
   if (connexion->source->type() == TxParameter::SAMPLES) {
-    foregroundList->AddRect(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
-    foregroundList->AddRectFilled(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
+    drawList->AddRect(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddRectFilled(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
   }
   else {
-    foregroundList->AddCircle(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
-    foregroundList->AddCircleFilled(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
+    drawList->AddCircle(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddCircleFilled(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
   }
   if (connexion->target && connexion->target->type() == TxParameter::SAMPLES) {
-    foregroundList->AddRect(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
-    foregroundList->AddRectFilled(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
+    drawList->AddRect(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddRectFilled(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
   }
   else {
-    foregroundList->AddCircle(p3, TX_PLUG_WIDTH * _scale, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
-    foregroundList->AddCircleFilled(p3, TX_PLUG_WIDTH * _scale, TX_PLUG_COLOR_DEFAULT, 32);
+    drawList->AddCircle(p3, TX_PLUG_WIDTH * _scale, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddCircleFilled(p3, TX_PLUG_WIDTH * _scale, TX_PLUG_COLOR_DEFAULT, 32);
   }
 }
 
 void TxGraph::draw()
 {
   static float h = 0.f;
+  
   ImGuiIO& io = ImGui::GetIO();
   ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing * _scale);
@@ -306,6 +327,8 @@ void TxGraph::draw()
   ImGui::SetNextWindowSize(size);
   ImGui::Begin(_name.c_str(), NULL, TxGraph::Flags);
 
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  initSpliter();
   if (io.MouseWheel) {
     _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
@@ -347,9 +370,12 @@ void TxGraph::draw()
   bool modified = false;
   for (size_t n = 0; n < _nodes.size(); ++n) {
     TxNode* node = _nodes[n];
+    ImGui::PushID(node->name().c_str());
     node->draw(&modified);
+    ImGui::PopID();
   }
 
+  setSplitterChannel(TxGraph::WIRE);
   if (_connexion && io.MouseDown[0] && ImGui::IsDragDropActive()) {
     _drawConnexion(_connexion);
   }
@@ -357,7 +383,13 @@ void TxGraph::draw()
   for (auto& connexion : _connexions) {
     _drawConnexion(connexion);
   }
+
+  setSplitterChannel(TxGraph::MIDDLE);
+  if (ImGui::IsDragDropActive()) {
+    drawList->AddRectFilled(pos, pos + size, ImColor({ 0,0,0,100 }));
+  }
  
+  terminateSplitter();
   ImGui::End();
   ImGui::PopStyleVar(2);
 }

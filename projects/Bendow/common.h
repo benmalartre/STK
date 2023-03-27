@@ -74,6 +74,7 @@ static ImColor TX_PLUG_COLOR_DEFAULT = ImColor({ 180,180,180,255 });
 static ImColor TX_CONTOUR_COLOR_DEFAULT = ImColor({ 50,50,50,  255 });
 static ImColor TX_PLUG_COLOR_SELECTED = ImColor({ 200,200,200,255 });
 static ImColor TX_CONTOUR_COLOR_SELECTED = ImColor({ 220,220,220,  255 });
+static ImColor TX_PLUG_COLOR_AVAILABLE = ImColor({ 255,200,100,255 });
 
 
  

@@ -33,12 +33,14 @@ public:
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
+  const ImVec2& size();
   void reset() override;
 
 protected:
   void _drawImpl(bool*) override;
 
 private:
+  static const ImVec2 Size;
   stk::Effect*  _effect;
   short         _effectIdx;
   stk::StkFloat _modDepth;

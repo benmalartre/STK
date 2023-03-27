@@ -12,11 +12,23 @@ public:
     HEAD,
     BODY
   };
+
+  enum Layer {
+    FIRST,
+    MIDDLE,
+    LAST,
+    WIRE,
+    CNT
+  };
+
   TxGraph(const std::string& name);
   ~TxGraph();
 
   void                    setActive(bool state);
   void                    setCurrent(TxNode* node);
+  void                    initSpliter();
+  void                    setSplitterChannel(int channel);
+  void                    terminateSplitter();
   void                    addNode(TxNode* node);
   void                    removeNode(TxNode* node);
   TxConnexion*            startConnexion(TxParameter* param, int channel);
@@ -29,6 +41,7 @@ public:
   const float&            scale();
   stk::StkFloat           tick();
   TxNode*                 current();
+  TxConnexion*            connexion();
   std::vector<TxNode*>&   nodes();
   void                    draw();
 
@@ -51,6 +64,7 @@ private:
   TxConnexion*              _connexion;
   bool                      _active;
 
+  ImDrawListSplitter        _splitter;
   int                       _hovered;
   int                       _pick;
   bool                      _drag;

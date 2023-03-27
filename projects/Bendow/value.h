@@ -5,6 +5,10 @@
 
 class TxValue : public TxNode {
 public:
+  enum Parameters {
+    VALUE = TxNode::LAST,
+    LAST
+  };
   TxValue(TxGraph* parent, const std::string& name);
   ~TxValue();
   stk::StkFloat tick(unsigned int) override;

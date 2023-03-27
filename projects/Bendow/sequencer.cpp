@@ -12,6 +12,7 @@ TxSequencer::TxSequencer(TxGraph* parent, const std::string& name)
   , _length(8)
   , _running(false)
 {
+  setLength(4);
 }
 
 TxSequencer::TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm, uint64_t length)
@@ -20,6 +21,7 @@ TxSequencer::TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm,
   , _length(length)
   , _running(false)
 {
+  setLength(length);
   _params.push_back(new TxParameterBool(this, "Running", &_running));
   _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
 }
@@ -108,7 +110,6 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
 bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current, float scale)
 {
   bool modified = false;
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
   const std::string hiddenPrefix = "##" + std::to_string(beatIdx);
 
   Beat* beat = &_sequence[beatIdx];
@@ -144,10 +145,12 @@ bool TxSequencer::drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool current, floa
 
 void TxSequencer::_drawImpl(bool* modified)
 {  
+  
   TxTime& time = TxTime::instance();
   float t = time.get();
 
   TxSequencer::Index index = timeToIndex(t);
+  /*
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
   if(ImGui::Button("Reset Time")) time.reset();
@@ -156,23 +159,23 @@ void TxSequencer::_drawImpl(bool* modified)
   //ImGui::SameLine();
   ImGui::SetNextItemWidth(100);
   ImGui::Text("Time : %fs", t);
-  /*
+  
   ImGui::SameLine();
   ImGui::Text("Rate : %fs", time.rate());
   ImGui::SameLine();
   ImGui::Text("Index : %i", index.first);
-  */
+  
   TxNode::_drawAlignLeft();
   if (ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm",
     ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal) && modified)* modified = true;
   
   ImGui::SameLine();
-
+  */
   for(size_t i = 0; i < _sequence.size(); ++i) {
     if (drawBeat(i, index.second, (i == index.first), _parent->scale()))*modified = true;
     if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
-
+  
   TxNode::_drawOutput();
 }
 
