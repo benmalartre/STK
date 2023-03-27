@@ -47,13 +47,14 @@
 #define TX_TITLE_HEIGHT 32.f
 #define TX_TITLE_X 64.f
 #define TX_TITLE_Y 8.f
-#define TX_PADDING_X 16.f
+#define TX_PADDING_X 4.f
 #define TX_PADDING_Y 4.f
 #define TX_PLUG_WIDTH 12.f
 #define TX_PLUG_HEIGHT 12.f
 #define TX_PLUG_DETAIL 6.f
 #define TX_CONTOUR_WIDTH 3.333f
 #define TX_NODE_ROUNDING 2.f
+#define TX_KNOB_SIZE 52.f
 
 // macros
 #define REGISTER_NODE(CLASS, ID) \

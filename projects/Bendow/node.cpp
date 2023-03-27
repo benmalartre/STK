@@ -152,6 +152,53 @@ TxParameter* TxNode::parameter(const std::string& name)
   return NULL;
 }
 
+void TxNode::_drawPopup()
+{
+
+  if (ImGui::BeginPopup((_name + "Popup").c_str())) {
+    //ImGui::ColorButton("Color", _color);
+    ImGui::ColorEdit3("Color", &_color.x);
+
+    // State
+    static char input[32]{ "" };
+
+    // Code
+    const bool is_input_text_enter_pressed = ImGui::InputText("##input", input, sizeof(input), ImGuiInputTextFlags_EnterReturnsTrue);
+    const bool is_input_text_active = ImGui::IsItemActive();
+    const bool is_input_text_activated = ImGui::IsItemActivated();
+
+    if (is_input_text_activated)
+      ImGui::OpenPopup("##popup");
+
+    {
+      ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
+      //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
+      if (ImGui::BeginPopup("##popup", ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
+      {
+        static const char* autocomplete[] = { "cats", "dogs", "rabbits", "turtles" };
+
+        for (int i = 0; i < IM_ARRAYSIZE(autocomplete); i++)
+        {
+          //if (strstr(autocomplete[i], input) == NULL)
+          //    continue;
+          if (ImGui::Selectable(autocomplete[i]))
+          {
+            ImGui::ClearActiveID();
+            strcpy(input, autocomplete[i]);
+          }
+        }
+
+        if (is_input_text_enter_pressed || (!is_input_text_active && !ImGui::IsWindowFocused()))
+          ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+      }
+    }
+
+    ImGui::EndPopup();
+  }
+}
+
 void TxNode::_drawOutput()
 {
   _params[OUTPUT]->draw();
@@ -162,36 +209,27 @@ void TxNode::_drawAlignLeft()
   ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * _parent->scale() + _parent->offset()[0]);
 }
 
+void TxNode::_drawAlignTop()
+{
+  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * _parent->scale() + _parent->offset()[1]);
+}
+
 void TxNode::draw(bool* modified)
 {
   const float scale = _parent->scale();
   const ImVec2 position = _position * scale + _parent->offset();
 
-  //ImGui::PushStyleColor(ImGuiCol_ChildBg, _color);
-  ImGui::SetCursorPos(position);
-  //ImGui::BeginChild(_name.c_str(), size() * scale, true, TxNode::Flags);
-
-  //ImGui::SetCursorPos(ImGui::GetCursorPos() + (ImVec2(TX_TITLE_X, TX_TITLE_Y)) * scale);
-  //ImGui::PushFont()
-  ImGui::SetWindowFontScale(1.0);
-  ImGui::TextColored({ 255,255,255,255 }, _name.c_str());
-  ImGui::SetWindowFontScale(0.5);
+  ImGui::SetCursorPos(position + ImVec2(TX_PADDING_X, TX_PADDING_Y) * scale);
   _parent->setSplitterChannel(TxGraph::MIDDLE + _selected);
   _drawAlignLeft();
   _drawImpl(modified);
 
-  //ImGui::EndChild();
-
-  //ImGui::PopStyleColor();
-  /*
-  ImGui::SetCursorPos(position);
-  ImGui::PushStyleColor(ImGuiCol_Button, _color);
-  if (ImGui::Button("##hiddenBtn", size() * scale)) {
-  }
-  ImGui::PopStyleColor();
-  */
   _parent->setSplitterChannel(TxGraph::FIRST + _selected);
+  
   ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImGui::PushFont(TX_FONT_TITLE);
+  drawList->AddText(position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, TX_CONTOUR_COLOR_SELECTED, _name.c_str());
+  ImGui::PopFont();
 
   drawList->AddRect(
     position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
@@ -202,5 +240,7 @@ void TxNode::draw(bool* modified)
   drawList->AddRectFilled(
     position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
     position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, ImColor(_color), TX_NODE_ROUNDING * scale);
-  
+    
+  _drawPopup();
+ 
 }

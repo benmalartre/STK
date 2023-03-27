@@ -10,6 +10,9 @@
 class TxNode;
 class TxGraph;
 
+extern ImFont* TX_FONT_BASE;
+extern ImFont* TX_FONT_TITLE;
+
 struct TxConnexion {
   TxParameter* source;
   TxParameter* target;
@@ -71,8 +74,10 @@ public:
   virtual void reset() = 0;
 
 protected:
+  void                      _drawPopup();
   void                      _drawOutput();
   void                      _drawAlignLeft();
+  void                      _drawAlignTop();
   virtual void              _drawImpl(bool* modified) {};
   TxGraph*                  _parent;
   ImVec2                    _position;

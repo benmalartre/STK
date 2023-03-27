@@ -9,13 +9,15 @@
 #include "sequencer.h"
 #include "graph.h"
 #include "factory.h"
-#include "fonts/sweet16.h"
 
 #include <GLFW/glfw3.h>
 
 TxSequencer* sequencer;
 stk::StkFrames frames;
 std::vector<TxGraph*> graphs;
+
+ImFont* TX_FONT_BASE = NULL;
+ImFont* TX_FONT_TITLE = NULL;
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
@@ -247,8 +249,8 @@ int main()
 
   ImGuiIO& io = ImGui::GetIO();
   //io.Fonts->AddFontDefault();
-  io.Fonts->AddFontFromFileTTF("fonts/tahoma.ttf", 24);
-  AddSweet16Font();
+  TX_FONT_BASE = io.Fonts->AddFontFromFileTTF("fonts/tahoma.ttf", 16);
+  TX_FONT_TITLE = io.Fonts->AddFontFromFileTTF("fonts/tahomabd.ttf", 24);
 
   setupStyle();
   

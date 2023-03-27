@@ -47,7 +47,7 @@ public:
 
 protected:            
   static const int        Flags;
-  int                     pick(const ImVec2& position);
+  TxNode*                 pick(const ImVec2& position);
   void                    select(const ImVec2& position);
   bool                    contains(const TxNode* node);
   int                     index(const TxNode* node);
@@ -65,8 +65,8 @@ private:
   bool                      _active;
 
   ImDrawListSplitter        _splitter;
-  int                       _hovered;
-  int                       _pick;
+  TxNode*                   _hovered;
+  TxNode*                   _pick;
   bool                      _drag;
   ImVec2                    _offset;
   float                     _scale;

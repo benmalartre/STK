@@ -24,6 +24,7 @@ REGISTER_NODE(TxSequencer, TxNode::SEQUENCER)
 REGISTER_NODE(TxEffect, TxNode::EFFECT)
 REGISTER_NODE(TxFilter, TxNode::FILTER)
 
+
 TxFactory& TxFactory::get() {
   static TxFactory factory;
   return factory;

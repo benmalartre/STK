@@ -5,13 +5,11 @@
 
 static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
 {
-  std::cout << "check compatibility : " << param->name() << std::endl;
   if (!connexion)return false;
   if (param->node() == connexion->source->node())return false;
-  std::cout << "check io : " << connexion->source->type() << std::endl;
   if (connexion->source->type() == TxParameter::SAMPLES && ((TxParameterSamples*)connexion->source)->io()) {
-    return param->type() != TxParameter::SAMPLES || (param->type() == TxParameter::SAMPLES &&
-      ((TxParameterSamples*)connexion->source)->io() != ((TxParameterSamples*)param)->io());
+    return param->type() != TxParameter::SAMPLES || 
+      ((TxParameterSamples*)connexion->source)->io() != ((TxParameterSamples*)param)->io();
   }
   else {
     return param->type() == TxParameter::SAMPLES && !((TxParameterSamples*)param)->io();
@@ -106,13 +104,13 @@ void TxParameter::_drawPlug(short channel)
   bool horizontal = (_type == TxParameter::BOOL) || _flags & TxParameter::HORIZONTAL;
   if (horizontal) {
     center = ImGui::GetCursorScreenPos() + ImVec2(8, 8) * scale;
-    radius = 8.f * scale;
-    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
+    radius = 4.f * scale;
+    ImGui::InvisibleButton("##plug", ImVec2(2 * radius, 2 * radius));
   } else {
     center = ImGui::GetCursorScreenPos() + ImVec2(24, 12) * scale;
-    radius = 12.f * scale;
+    radius = 8.f * scale;
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + radius);
-    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
+    ImGui::InvisibleButton("##plug", ImVec2(2 * radius, 2 * radius));
   }
 
   ImColor plugColor = TX_PLUG_COLOR_DEFAULT;
@@ -132,21 +130,17 @@ void TxParameter::_drawPlug(short channel)
   }
 
   TxConnexion* connexion = _node->graph()->connexion();
-  
   ImDrawList* drawList = ImGui::GetWindowDrawList();
-  
+  drawList->AddCircle(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * scale);
+  drawList->AddCircleFilled(center, radius, TX_PLUG_COLOR_DEFAULT, 32);
+  drawList->AddCircleFilled(center, radius * 0.6, TX_CONTOUR_COLOR_DEFAULT, 32);
+
   if (connexion && _checkCompatibility(this, graph->connexion())) {
-    _node->graph()->setSplitterChannel(TxGraph::WIRE);
-    drawList->AddCircleFilled(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32);
-    drawList->AddCircle(center, radius, TX_CONTOUR_COLOR_SELECTED, 32, (TX_CONTOUR_WIDTH + TX_PLUG_DETAIL) * scale);
-    drawList->AddCircle(center, radius, TX_PLUG_COLOR_AVAILABLE, 32, TX_CONTOUR_WIDTH * scale);
-  } else {
-    _node->graph()->setSplitterChannel(TxGraph::LAST);
-    drawList->AddCircleFilled(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32);
-    drawList->AddCircle(center, radius, plugColor, 32, TX_CONTOUR_WIDTH * scale);
+    ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
+    foregroundList->AddCircle(center, radius, TX_PLUG_COLOR_AVAILABLE, 32, 2 * TX_CONTOUR_WIDTH * scale);
+    //foregroundList->AddCircleFilled(center, radius, TX_PLUG_COLOR_AVAILABLE, 32);
   }
   
-
   _plug[channel] = center;
   _radius[channel] = radius;
 }
@@ -285,9 +279,9 @@ bool TxParameterInt::draw()
     ImGui::SameLine();
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100), (int*)_data, _minimum, _maximum);
+    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * _node->graph()->scale(), (int*)_data, _minimum, _maximum);
   } else if (_flags & TxParameter::KNOB) {
-    modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum);
+    modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE);
   } else if (_flags & TxParameter::SEVENSEGMENTS) {
 
   }
@@ -389,11 +383,11 @@ bool TxParameterFloat::draw()
     ImGui::SameLine();
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
+    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * _node->graph()->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
-      0.f, "%.3f", ImGuiKnobVariant_WiperDot);
+      0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE);
   }
   _drawPlug(0);
 
