@@ -14,6 +14,21 @@ struct TxParameterPreset {
   stk::StkFloat maximum;
 };
 
+#define TX_SEVENSEGMENTS_WIDTH 15.f
+#define TX_SEVENSEGMENTS_HEIGHT 7.f
+
+class TxSevenSegments {
+public:
+  static void drawDigit(ImDrawList* drawList, int n, ImVec2 e, ImVec2 p, ImVec4 c);
+  static void drawDigits(ImDrawList* d, ImVec2 a, ImVec2 b, ImVec2 sz, ImVec4 c, float t);
+  static void setWidth(float  width);
+  static void setHeight(float height);
+
+  static char _kd[];
+  static float W;
+  static float H;
+};
+
 class TxParameter {
 public:
   enum Type {

@@ -1,7 +1,6 @@
 #include "common.h"
 #include "adsr.h"
 
-ImVec2 TxAdsr::Size(340, 200);
 
 TxAdsr::TxAdsr(TxGraph* parent, const std::string& name) 
   : TxNode(parent, name)
@@ -18,6 +17,7 @@ TxAdsr::TxAdsr(TxGraph* parent, const std::string& name)
   _params.push_back(new TxParameterBool(this, "Trigger", &_trigger));
 
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
+  _size = ImVec2(TX_KNOB_SIZE * 5 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
 TxAdsr::~TxAdsr() 
@@ -25,7 +25,7 @@ TxAdsr::~TxAdsr()
 }
 const ImVec2& TxAdsr::size()
 {
-  return TxAdsr::Size;
+  return _size;
 }
 
 stk::StkFloat TxAdsr::tick(unsigned int)

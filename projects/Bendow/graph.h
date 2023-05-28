@@ -14,10 +14,8 @@ public:
   };
 
   enum Layer {
-    FIRST,
-    MIDDLE,
-    LAST,
-    WIRE,
+    BACKGROUND,
+    FOREGROUND,
     CNT
   };
 
@@ -51,9 +49,11 @@ protected:
   void                    select(const ImVec2& position);
   bool                    contains(const TxNode* node);
   int                     index(const TxNode* node);
+  void                    handleInput();
 
 private:
   void                      _createNodeByType(int type);
+  void                      _drawNode(TxNode* node, bool* modified);
   void                      _drawConnexion(TxConnexion* connexion);
   void                      _drawPopup();
   void                      _drawGrid();

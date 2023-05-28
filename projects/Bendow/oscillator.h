@@ -43,7 +43,6 @@ protected:
   void _drawImpl(bool*) override;
 
 private:
-  static ImVec2   Size;
   stk::Generator* _generator;
   stk::StkFloat   _frequency;
   stk::StkFloat   _envelope;

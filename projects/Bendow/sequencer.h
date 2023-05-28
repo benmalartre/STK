@@ -21,6 +21,7 @@ public:
   enum Parameters {
     TRIGGER = TxNode::LAST,
     BPM,
+    TIME,
     LAST
   };
 
@@ -47,11 +48,11 @@ protected:
   void _drawImpl(bool*) override;
   
 private:
-  static ImVec2       Size;
   Sequence            _sequence;
   int                 _bpm;
   int                 _length;
   bool                _running;
+  float               _time;
 };
 
 #endif // TX_SEQUENCER_H

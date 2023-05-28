@@ -2,7 +2,6 @@
 #include "lfo.h"
 #include "graph.h"
 
-ImVec2 TxLfo::Size(300, 200);
 
 TxLfo::TxLfo(TxGraph* parent, const std::string& name) 
   : TxNode(parent, name)
@@ -15,6 +14,7 @@ TxLfo::TxLfo(TxGraph* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "Amplitude", 0.01f, 10.f, &_amplitude, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Offset", -100.f, 100.f, &_offset, TxParameter::KNOB));
   //_buffer.scale(-10, 10);
+  _size = ImVec2(TX_KNOB_SIZE * 4 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2);
 }
 
 TxLfo::~TxLfo() 
@@ -23,7 +23,7 @@ TxLfo::~TxLfo()
 
 const ImVec2& TxLfo::size()
 {
-  return TxLfo::Size;
+  return _size;
 }
 
 stk::StkFloat TxLfo::tick(unsigned int)

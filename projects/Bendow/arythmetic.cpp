@@ -88,9 +88,10 @@ void TxArythmetic::_drawImpl(bool* modified)
   input1->draw();
   TxParameter* input2 = _params[INPUT2];
   input2->draw();
-  ImGui::SameLine();
+  TxNode::_drawAlignLeft();
+  TxNode::_drawAlignTop();
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128 * _parent->scale());
+  ImGui::SetNextItemWidth(TX_SLIDER_WIDTH * _parent->scale());
   TxParameter* mode = _params[TxArythmetic::MODE];
   if(mode->draw() && modified)*modified = true;
   if (mode->tick() == MIX) {
@@ -98,12 +99,8 @@ void TxArythmetic::_drawImpl(bool* modified)
     TxParameter* float1 = _params[TxArythmetic::FLOAT1];
     if(float1->draw() && modified)*modified = true;
   }
-
   ImGui::EndGroup();
 
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
   TxNode::_drawOutput();
 }
 

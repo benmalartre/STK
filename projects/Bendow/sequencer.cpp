@@ -3,18 +3,6 @@
 #include "graph.h"
 #include "factory.h"
 
-ImVec2 TxSequencer::Size(520, 300);
-
-
-TxSequencer::TxSequencer(TxGraph* parent, const std::string& name)
-  : TxNode(parent, name, TX_NUM_CHANNELS)
-  , _bpm(60)
-  , _length(8)
-  , _running(false)
-{
-  setLength(4);
-}
-
 TxSequencer::TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm, uint64_t length)
   : TxNode(parent, name, TX_NUM_CHANNELS)
   , _bpm(bpm)
@@ -24,6 +12,14 @@ TxSequencer::TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm,
   setLength(length);
   _params.push_back(new TxParameterBool(this, "Running", &_running));
   _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Time", -10000.f, 10000.f, &_time, TxParameter::SEVENSEGMENTS));
+
+  _size = ImVec2(200, 200);
+}
+
+TxSequencer::TxSequencer(TxGraph* parent, const std::string& name)
+  : TxSequencer(parent, name, 60, 8)
+{
 }
 
 TxSequencer::~TxSequencer()
@@ -64,7 +60,7 @@ void TxSequencer::stop()
 
 const ImVec2& TxSequencer::size()
 {
-  return TxSequencer::Size;
+  return _size;
 }
 
 TxSequencer::Index TxSequencer::timeToIndex(float time)
@@ -176,6 +172,7 @@ void TxSequencer::_drawImpl(bool* modified)
     if (i < _sequence.size() - 1)  ImGui::SameLine();
   }
   
+  _params[TIME]->draw();
   TxNode::_drawOutput();
 }
 

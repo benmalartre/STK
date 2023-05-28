@@ -10,8 +10,6 @@
 #include <Modulate.h>
 #include <Granulate.h>
 
-ImVec2 TxOscillator::Size(300, 200);
-
 const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "Blit",
   "BlitSaw",
@@ -36,6 +34,7 @@ TxOscillator::TxOscillator(TxGraph* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt(this, "Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Envelope", 0.f, 2.f, &_envelope, TxParameter::KNOB));
+  _size = ImVec2(TX_KNOB_SIZE * 4 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
 TxOscillator::~TxOscillator() 
@@ -45,7 +44,7 @@ TxOscillator::~TxOscillator()
 
 const ImVec2& TxOscillator::size()
 {
-  return TxOscillator::Size;
+  return _size;
 }
 
 stk::StkFloat TxOscillator::tick(unsigned int)

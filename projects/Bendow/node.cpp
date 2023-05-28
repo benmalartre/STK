@@ -220,15 +220,18 @@ void TxNode::draw(bool* modified)
   const ImVec2 position = _position * scale + _parent->offset();
 
   ImGui::SetCursorPos(position + ImVec2(TX_PADDING_X, TX_PADDING_Y) * scale);
-  _parent->setSplitterChannel(TxGraph::MIDDLE + _selected);
+  _parent->setSplitterChannel(TxGraph::FOREGROUND);
   _drawAlignLeft();
   _drawImpl(modified);
 
-  _parent->setSplitterChannel(TxGraph::FIRST + _selected);
+  _parent->setSplitterChannel(TxGraph::BACKGROUND);
   
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImGui::PushFont(TX_FONT_TITLE);
-  drawList->AddText(position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, TX_CONTOUR_COLOR_SELECTED, _name.c_str());
+  drawList->AddText(
+    position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, 
+    TX_CONTOUR_COLOR_SELECTED, 
+    _name.c_str());
   ImGui::PopFont();
 
   drawList->AddRect(
@@ -239,7 +242,9 @@ void TxNode::draw(bool* modified)
   
   drawList->AddRectFilled(
     position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
-    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, ImColor(_color), TX_NODE_ROUNDING * scale);
+    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
+    ImColor(_color), 
+    TX_NODE_ROUNDING * scale);
     
   _drawPopup();
  

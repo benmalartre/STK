@@ -249,6 +249,51 @@ void TxGraph::_drawPopup()
   }
 }
 
+void TxGraph::handleInput()
+{
+  static float time = 0.f;
+  ImGuiIO& io = ImGui::GetIO();
+  if (io.MouseWheel) {
+    _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
+  }
+  if (!io.MouseDown[0]) {
+    _pick = pick(ImGui::GetMousePos());
+  }
+  io.FontGlobalScale = _scale;
+
+  if (io.MouseClicked[0]) {
+    select(ImGui::GetMousePos());
+    _drag = 1 - ImGui::IsAnyItemHovered();
+  } else if (io.MouseReleased[0]) {
+    _drag = false;
+    terminateConnexion();
+  } else if (io.MouseDown[2]) {
+    _offset += io.MouseDelta;
+  }
+
+  time += 0.01f;
+
+  if (!_drag)return;
+
+  if (io.MouseDown[0] && !ImGui::IsDragDropActive()) {
+    for (size_t n = 0; n < _nodes.size(); ++n) {
+      if (!_nodes[n]->selected())continue;
+      _nodes[n]->setPosition(_nodes[n]->position() + io.MouseDelta * 1.f / _scale);
+    }
+  }
+}
+
+void TxGraph::_drawNode(TxNode* node, bool* modified)
+{
+  ImGuiIO& io = ImGui::GetIO();
+  ImGui::PushID(node->name().c_str());
+  if (node == _pick && io.MouseClicked[1]) {
+    ImGui::OpenPopup((_pick->name() + "Popup").c_str());
+  }
+  node->draw(modified);
+  ImGui::PopID();
+}
+
 void TxGraph::_drawConnexion(TxConnexion* connexion)
 {
   bool inverse = connexion->source->type() == TxParameter::SAMPLES && 
@@ -326,51 +371,17 @@ void TxGraph::draw()
 
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   initSpliter();
-  if (io.MouseWheel) {
-    _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
-  }
-  io.FontGlobalScale = _scale;
-  _drawGrid();
- 
-  if (!io.MouseDown[0]) {
-    _pick = pick(ImGui::GetMousePos());
-  }
+  handleInput();
 
-  if (io.MouseClicked[0]) {
-    select(ImGui::GetMousePos());
-    _drag = 1 - ImGui::IsAnyItemHovered();
-  }
-  else if (io.MouseReleased[0]) {
-    _drag = false;
-    terminateConnexion();
-  }
-  
-  if (_drag) {
-    if (io.MouseDown[0] && !ImGui::IsDragDropActive()) {
-      for (size_t n = 0; n < _nodes.size(); ++n) {
-        if (!_nodes[n]->selected())continue;
-        _nodes[n]->setPosition(_nodes[n]->position() + io.MouseDelta * 1.f / _scale);
-      }
-    }
-  }
-  if (io.MouseDown[2]) {
-    _offset += io.MouseDelta;
-  }
+  _drawGrid();
   _drawPopup();
   
   bool modified = false;
   for (size_t n = 0; n < _nodes.size(); ++n) {
-    TxNode* node = _nodes[n];
-    ImGui::PushID(node->name().c_str());
-    if (node == _pick && io.MouseClicked[1]) {
-      std::cout << "RIGHT CLICK : " << _pick << std::endl;
-      ImGui::OpenPopup((_pick->name() + "Popup").c_str());
-    }
-    node->draw(&modified);
-    ImGui::PopID();
+    _drawNode(_nodes[n], &modified);
   }
 
-  setSplitterChannel(TxGraph::WIRE);
+  setSplitterChannel(TxGraph::FOREGROUND);
   if (_connexion && io.MouseDown[0] && ImGui::IsDragDropActive()) {
     _drawConnexion(_connexion);
   }
@@ -379,7 +390,7 @@ void TxGraph::draw()
     _drawConnexion(connexion);
   }
 
-  setSplitterChannel(TxGraph::MIDDLE);
+  setSplitterChannel(TxGraph::BACKGROUND);
   if (ImGui::IsDragDropActive()) {
     drawList->AddRectFilled(pos, pos + size, ImColor({ 0,0,0,100 }));
   }

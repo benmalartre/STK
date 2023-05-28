@@ -220,9 +220,10 @@ void draw(GLFWwindow* window)
   */
 
   //drawPlot(display_w, display_h);
+  ImGui::ShowDemoWindow();
   for(auto& graph: graphs)graph->draw();
 
-  ImGui::ShowDemoWindow();
+  
   //ImPlot::ShowDemoWindow();
   ImGui::Render();
 
@@ -249,7 +250,7 @@ int main()
 
   ImGuiIO& io = ImGui::GetIO();
   //io.Fonts->AddFontDefault();
-  TX_FONT_BASE = io.Fonts->AddFontFromFileTTF("fonts/tahoma.ttf", 16);
+  TX_FONT_BASE = io.Fonts->AddFontFromFileTTF("fonts/tahoma.ttf", 13);
   TX_FONT_TITLE = io.Fonts->AddFontFromFileTTF("fonts/tahomabd.ttf", 24);
 
   setupStyle();

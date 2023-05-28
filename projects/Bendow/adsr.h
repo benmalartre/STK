@@ -32,7 +32,6 @@ protected:
   void _drawImpl(bool*) override;
 
 private:
-  static ImVec2 Size;
   stk::ADSR     _adsr;
   stk::StkFloat _attack;
   stk::StkFloat _decay;
