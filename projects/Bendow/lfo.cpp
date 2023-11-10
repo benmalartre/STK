@@ -48,22 +48,6 @@ stk::StkFrames& TxLfo::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxLfo::setFrequency(stk::StkFloat frequency)
-{
-  _frequency = frequency;
-  _sine.setFrequency(_frequency);
-}
-
-void TxLfo::setAmplitude(stk::StkFloat amplitude)
-{
-  _amplitude = amplitude;
-}
-
-void TxLfo::setOffset(stk::StkFloat offset)
-{
-  _offset = offset;
-}
-
 void TxLfo::_drawImpl(bool* modified)
 {
   ImGui::BeginGroup();

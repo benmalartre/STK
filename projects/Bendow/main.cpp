@@ -28,8 +28,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   TxTime& time = TxTime::instance();
   for ( unsigned int i=0; i < nBufferFrames; ++i) {
     const float sample = graph->tick();
-    //*samples++ = sample;
-    //*samples++ = sample;
+    *samples++ = sample;
+    *samples++ = sample;
     time.increment();
   }
 
@@ -220,7 +220,8 @@ void draw(GLFWwindow* window)
   */
 
   //drawPlot(display_w, display_h);
-  ImGui::ShowDemoWindow();
+  //ImGui::ShowDemoWindow();
+
   for(auto& graph: graphs)graph->draw();
 
   
@@ -282,6 +283,7 @@ int main()
   TxFactory::initialize();
   TxGraph* graph = new TxGraph("Graph");
   
+  /*
   sequencer = new TxSequencer(graph, "Sequencer");
   sequencer->setLength(16);
   for(size_t t = 0; t < 16; ++t)
@@ -315,7 +317,7 @@ int main()
   //TxEffect* chorus = new TxEffect("Effect");
   //chorus->connect(oscillator, "Samples");
   //graph->addNode(chorus);
-  
+  */
 
   graphs.push_back(graph);
   /*

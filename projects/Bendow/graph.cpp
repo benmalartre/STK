@@ -9,8 +9,8 @@ ImGuiWindowFlags_NoCollapse |
 ImGuiWindowFlags_NoMove |
 ImGuiWindowFlags_NoNav |
 ImGuiWindowFlags_NoBackground |
-ImGuiWindowFlags_NoTitleBar;/* |
-  ImGuiWindowFlags_NoInputs;*/
+ImGuiWindowFlags_NoTitleBar;
+/*|ImGuiWindowFlags_NoInputs;*/
 
 TxGraph::TxGraph(const std::string& name)
   : _name(name)

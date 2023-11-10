@@ -16,7 +16,7 @@ public:
   };
   void execute() {
     _func(_data, _value);
-  }
+  };
 private:
   CALLBACK_FN _func;
   void*       _data;

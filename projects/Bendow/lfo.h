@@ -18,9 +18,7 @@ public:
   ~TxLfo();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
-  void setFrequency(stk::StkFloat frequency);
-  void setAmplitude(stk::StkFloat amplitude);
-  void setOffset(stk::StkFloat offset);
+
   const ImVec2& size() override;
   void reset() override;
 
