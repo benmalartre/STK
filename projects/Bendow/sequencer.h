@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "node.h"
+#include "graph.h"
 
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
@@ -15,6 +16,12 @@ public:
   using Beat = std::pair<short, float>;
   using Sequence = std::vector<Beat>;
   using Index = std::pair<uint32_t, uint32_t>;
+
+  struct Track {
+    bool     _active;
+    TxGraph* _graph;
+    Sequence _sequence;
+  };
 
   static const uint32_t NumBits = 4;
 
@@ -26,13 +33,13 @@ public:
   };
 
 public:
-  TxSequencer(TxGraph* parent, const std::string& name);
-  TxSequencer(TxGraph* parent, const std::string& name, uint32_t bpm, uint64_t length);
+  TxSequencer(uint32_t numTracks);
+  TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length);
   ~TxSequencer();
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);
   
-  void setBeat(uint64_t time, const Beat& value);
+  void setBeat(uint32_t trackIdx, uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   
@@ -41,18 +48,19 @@ public:
   void stop();
   Index timeToIndex(float time);
 
-  bool drawBeat(uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
+  bool drawBeat(Track* track, uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
   void reset() override;
+  void draw(bool* modified) override;
 
-protected: 
-  void _drawImpl(bool*) override;
+  Track* getTrack(size_t index);
   
 private:
-  Sequence            _sequence;
-  int                 _bpm;
-  int                 _length;
-  bool                _running;
-  float               _time;
+  std::vector<Track>    _tracks;
+  int                   _bpm;
+  int                   _length;
+  bool                  _running;
+  float                 _time;
+  float                 _volume;
 };
 
 #endif // TX_SEQUENCER_H

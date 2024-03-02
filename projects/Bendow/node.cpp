@@ -32,7 +32,7 @@ TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
   , _size(100,25)
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
 {
-  _parent->addNode(this);
+  if(_parent)_parent->addNode(this);
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
   _params.push_back(new TxParameterSamples(this, "Output", true, _nChannels));
 }

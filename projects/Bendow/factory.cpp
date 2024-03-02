@@ -19,7 +19,7 @@ REGISTER_NODE(TxArythmetic, TxNode::ARYTHMETIC)
 REGISTER_NODE(TxValue, TxNode::VALUE)
 REGISTER_NODE(TxOscillator, TxNode::OSCILLATOR)
 REGISTER_NODE(TxRandom, TxNode::RANDOM)
-REGISTER_NODE(TxSequencer, TxNode::SEQUENCER)
+//REGISTER_NODE(TxSequencer, TxNode::SEQUENCER)
 //REGISTER_NODE(TxMixer, TxNode::MIXER)
 REGISTER_NODE(TxEffect, TxNode::EFFECT)
 REGISTER_NODE(TxFilter, TxNode::FILTER)
@@ -39,7 +39,7 @@ void TxFactory::initialize()
   constructorMap[TxNode::VALUE] = { &(DEFINE_NODE(TxValue)), 0 };
   constructorMap[TxNode::OSCILLATOR] = { &(DEFINE_NODE(TxOscillator)), 0 };
   constructorMap[TxNode::RANDOM] = { &(DEFINE_NODE(TxRandom)), 0 };
-  constructorMap[TxNode::SEQUENCER] = { &(DEFINE_NODE(TxSequencer)), 0 };
+  //constructorMap[TxNode::SEQUENCER] = { &(DEFINE_NODE(TxSequencer)), 0 };
 }
 
 

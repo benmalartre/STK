@@ -5,6 +5,7 @@
 #ifndef TX_GRAPH_H
 #define TX_GRAPH_H
 
+class TxSequencer;
 class TxGraph {
 public:
   enum Pick {
@@ -22,7 +23,6 @@ public:
   TxGraph(const std::string& name);
   ~TxGraph();
 
-  void                    setActive(bool state);
   void                    setCurrent(TxNode* node);
   void                    initSpliter();
   void                    setSplitterChannel(int channel);
@@ -42,6 +42,7 @@ public:
   TxConnexion*            connexion();
   std::vector<TxNode*>&   nodes();
   void                    draw();
+  void                    default(TxSequencer * sequencer, uint32_t trackIdx);
 
 protected:            
   static const int        Flags;
@@ -62,7 +63,6 @@ private:
   std::vector<TxConnexion*> _connexions;
   TxNode*                   _current;
   TxConnexion*              _connexion;
-  bool                      _active;
 
   ImDrawListSplitter        _splitter;
   TxNode*                   _hovered;

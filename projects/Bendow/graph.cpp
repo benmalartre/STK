@@ -1,5 +1,13 @@
 #include "common.h"
 #include "graph.h"
+#include "oscillator.h"
+#include "lfo.h"
+#include "adsr.h"
+#include "random.h"
+#include "filter.h"
+#include "effect.h"
+#include "arythmetic.h"
+#include "sequencer.h"
 #include "factory.h"
 
 static int CNT = 0;
@@ -16,7 +24,6 @@ TxGraph::TxGraph(const std::string& name)
   : _name(name)
   , _current(NULL)
   , _connexion(NULL)
-  , _active(true)
   , _pick(NULL)
   , _offset(ImVec2(100,100))
   , _scale(1.f)
@@ -43,11 +50,6 @@ int TxGraph::index(const TxNode* node)
   return -1;
 }
 
-void TxGraph::setActive(bool state)
-{
-  _active = state;
-}
-
 void TxGraph::setCurrent(TxNode* node)
 {
   _current = node;
@@ -67,6 +69,92 @@ const float& TxGraph::scale()
 {
   return _scale;
 }
+
+void TxGraph::default(TxSequencer* sequencer, uint32_t trackIdx)
+{
+
+  
+  TxOscillator* oscillator = new TxOscillator(this, "Oscillator");
+  oscillator->setHarmonics(7);
+
+  TxAdsr* adsr = new TxAdsr(this, "Adsr");
+  adsr->connect(sequencer, "Trigger", trackIdx);
+
+  oscillator->connect(adsr, "Envelope");
+  addNode(oscillator);
+  addNode(adsr);
+  setCurrent(oscillator);
+}
+/*
+TxLfo* lfo = new TxLfo(graph, "Lfo");
+lfo->FREQUENCY
+lfo->setFrequency(0.01f);
+lfo->setAmplitude(5.f);
+lfo->setOffset(6.f);
+
+TxArythmetic* arythmetic = new TxArythmetic(graph, "Arythmetic");
+
+arythmetic->connect(sequencer, "Input1", 1);
+arythmetic->connect(lfo, "Input2");
+
+oscillator->connect(arythmetic, "Frequency");
+graph->setCurrent(oscillator);
+
+//TxFilter* filter = new TxFilter(graph, "Filter");
+//filter->connect(oscillator, "Input");
+
+//TxEffect* chorus = new TxEffect("Effect");
+//chorus->connect(oscillator, "Samples");
+//graph->addNode(chorus);
+*/
+
+/*
+TxGraph* graph1 = new TxGraph("Graph1");
+graphs.push_back(graph1);
+TxOscillator* bass = new TxOscillator("Bass");
+bass->setFrequency(110.f);
+bass->setWaveForm(TxOscillator::BLITSQUARE);
+bass->setHarmonics(7);
+
+TxParameter* frequency = bass->getParameter("Frequency");
+TxParameter* harmonics = bass->getParameter("Harmonics");
+
+TxLfo* fLfo = new TxLfo("BassFrequencyLfo");
+fLfo->setFrequency(1.f);
+fLfo->setAmplitude(10.f);
+fLfo->setOffset(60.f);
+frequency->connect(fLfo);
+
+TxLfo* hLfo = new TxLfo("BassHarmonicsLfo");
+hLfo->setFrequency(0.1f);
+hLfo->setAmplitude(5.f);
+hLfo->setOffset(7.f);
+harmonics->connect(hLfo);
+
+graph1->addNode(fLfo);
+graph1->addNode(hLfo);
+graph1->addNode(bass);
+
+TxGraph* graph2 = new TxGraph("Graph2");
+graphs.push_back(graph2);
+TxOscillator* drum = new TxOscillator("Drum");
+drum->setFrequency(60.f);
+drum->setWaveForm(TxOscillator::BLITSAW);
+drum->setHarmonics(5);
+
+TxRandom* random = new TxRandom("DrumRandomFrequency");
+random->setMinimum(20.f);
+random->setMaximum(220.f);
+random->setFrequency(1.f);
+drum->connect(random, "Frequency");
+
+graph2->addNode(random);
+graph2->addNode(drum);
+*/
+//drum->setWaveForm(4);
+//drum->setFrequency(88.f);
+//for(size_t t = 0; t < 16; ++t)
+//  track2->setTime(1, t, DRUM[t]);
 
 
 std::vector<TxNode*>& TxGraph::nodes()
@@ -147,6 +235,7 @@ void TxGraph::removeConnexion(TxConnexion* connexion)
 
 stk::StkFloat TxGraph::tick()
 {
+  std::cout << "graph tick " << _current << std::endl;
   if(_current) return _current->tick();
   return 0.f;
 }
@@ -357,7 +446,7 @@ void TxGraph::_drawConnexion(TxConnexion* connexion)
 
 void TxGraph::draw()
 {
-  static float h = 0.f;
+  static float h = 250.f;
   
   ImGuiIO& io = ImGui::GetIO();
   ImGuiStyle& style = ImGui::GetStyle();

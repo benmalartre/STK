@@ -1,11 +1,4 @@
 #include "common.h"
-#include "oscillator.h"
-#include "lfo.h"
-#include "adsr.h"
-#include "random.h"
-#include "filter.h"
-#include "effect.h"
-#include "arythmetic.h"
 #include "sequencer.h"
 #include "graph.h"
 #include "factory.h"
@@ -14,7 +7,6 @@
 
 TxSequencer* sequencer;
 stk::StkFrames frames;
-std::vector<TxGraph*> graphs;
 
 ImFont* TX_FONT_BASE = NULL;
 ImFont* TX_FONT_TITLE = NULL;
@@ -23,16 +15,14 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
   stk::StkFloat *samples = (stk::StkFloat *) outputBuffer;
-  TxGraph* graph = graphs[0];
 
   TxTime& time = TxTime::instance();
-  for ( unsigned int i=0; i < nBufferFrames; ++i) {
-    const float sample = graph->tick();
+  for (unsigned int i = 0; i < nBufferFrames; ++i) {
+    const float sample = sequencer->tick(0);
     *samples++ = sample;
     *samples++ = sample;
     time.increment();
   }
-
 
   /*
   for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {
@@ -67,7 +57,6 @@ static uint8_t DRUM[16] = {
 
 GLFWwindow* openWindow(size_t width, size_t height)
 {
-  //glfwWindowHint(GLFW_DECORATED, false);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -81,48 +70,9 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_SAMPLES, 4);
   
   GLFWwindow* window = glfwCreateWindow(width,height,"bendow",NULL,NULL);
-
-   // window datas
-  //glfwSetWindowUserPointer(window, this);
-
-  // set current opengl context
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
 
-  //GetContextVersionInfos();
-  // load opengl functions
-  //GarchGLApiLoad();
-  //pxr::GlfContextCaps::InitInstance();
-  //pxr::GlfContextCaps const& caps = pxr::GlfContextCaps::GetInstance();
-  /*
-  CreateFontAtlas();
-  InitializeIcons();
-
-  // setup callbacks
-  glfwSetWindowSizeCallback(_window, ResizeCallback);
-  glfwSetMouseButtonCallback(_window, ClickCallback);
-  glfwSetScrollCallback(_window, ScrollCallback);
-  glfwSetKeyCallback(_window, KeyboardCallback);
-  glfwSetCharCallback(_window, CharCallback);
-  glfwSetCursorPosCallback(_window, MouseMoveCallback);
-  glfwSetWindowFocusCallback(_window, FocusCallback);
-  glfwSetInputMode(_window, GLFW_STICKY_KEYS, GLFW_TRUE);
-
-  // create main splittable view
-  _mainView = new View(NULL, pxr::GfVec2f(0,0), pxr::GfVec2f(_width, _height));
-  _mainView->SetWindow(this);
-  _splitter = new SplitterUI(_mainView);
-    
-  Resize(_width, _height);
-
-  glGenVertexArrays(1, &_vao);
-
-  GLSLProgram* pgm = InitShapeShader((void*)this);
-  _tool.SetProgram(pgm);
-  */
-  // ui
-  //SetupImgui();
-  //glfwMakeContextCurrent(NULL);
   return window;
 }
 
@@ -188,7 +138,7 @@ void draw(GLFWwindow* window)
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
-
+  bool modified = false;
   static float f = 0.0f;
   static bool show_test_window = true;
   static bool show_another_window = false;
@@ -222,8 +172,8 @@ void draw(GLFWwindow* window)
   //drawPlot(display_w, display_h);
   //ImGui::ShowDemoWindow();
 
-  for(auto& graph: graphs)graph->draw();
-
+  sequencer->draw(&modified);
+  
   
   //ImPlot::ShowDemoWindow();
   ImGui::Render();
@@ -255,7 +205,6 @@ int main()
   TX_FONT_TITLE = io.Fonts->AddFontFromFileTTF("fonts/tahomabd.ttf", 24);
 
   setupStyle();
-  
 
   // Set the global sample rate and rawwave path before creating class instances.
   stk::Stk::setSampleRate( 44100.0 );
@@ -270,7 +219,7 @@ int main()
   frames.resize(stk::RT_BUFFER_SIZE, TX_NUM_CHANNELS);
   RtAudioFormat format = 
     ( sizeof(stk::StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-  unsigned int bufferFrames = stk::RT_BUFFER_SIZE;
+  unsigned int bufferFrames = stk::RT_BUFFER_SIZE;  
   
   try {
     dac.openStream( &parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(), 
@@ -281,92 +230,12 @@ int main()
     return 0;
   }
   TxFactory::initialize();
-  TxGraph* graph = new TxGraph("Graph");
-  
-  /*
-  sequencer = new TxSequencer(graph, "Sequencer");
+  sequencer = new TxSequencer(1);
+
   sequencer->setLength(16);
-  for(size_t t = 0; t < 16; ++t)
-    sequencer->setBeat(t, {1, BASS[t]});
+  for (size_t t = 0; t < 16; ++t)
+    sequencer->setBeat(0, t, { 1, BASS[t] });
   sequencer->start();
- 
-  TxOscillator* oscillator = new TxOscillator(graph, "Oscillator");
-  oscillator->setHarmonics(7);
-  
-  TxAdsr* adsr = new TxAdsr(graph, "Adsr");
-  adsr->connect(sequencer, "Trigger");
-
-  oscillator->connect(adsr, "Envelope");
-  
-  TxLfo* lfo = new TxLfo(graph, "Lfo");
-  lfo->setFrequency(0.01f);
-  lfo->setAmplitude(5.f);
-  lfo->setOffset(6.f);
-  
-  TxArythmetic* arythmetic = new TxArythmetic(graph, "Arythmetic");
-  
-  arythmetic->connect(sequencer, "Input1", 1);
-  arythmetic->connect(lfo, "Input2");
-
-  oscillator->connect(arythmetic, "Frequency");
-  graph->setCurrent(oscillator);
-
-  //TxFilter* filter = new TxFilter(graph, "Filter");
-  //filter->connect(oscillator, "Input");
-  
-  //TxEffect* chorus = new TxEffect("Effect");
-  //chorus->connect(oscillator, "Samples");
-  //graph->addNode(chorus);
-  */
-
-  graphs.push_back(graph);
-  /*
-  TxGraph* graph1 = new TxGraph("Graph1");
-  graphs.push_back(graph1);
-  TxOscillator* bass = new TxOscillator("Bass");
-  bass->setFrequency(110.f);
-  bass->setWaveForm(TxOscillator::BLITSQUARE);
-  bass->setHarmonics(7);
-  
-  TxParameter* frequency = bass->getParameter("Frequency");
-  TxParameter* harmonics = bass->getParameter("Harmonics");
-
-  TxLfo* fLfo = new TxLfo("BassFrequencyLfo");
-  fLfo->setFrequency(1.f);
-  fLfo->setAmplitude(10.f);
-  fLfo->setOffset(60.f);
-  frequency->connect(fLfo);
-
-  TxLfo* hLfo = new TxLfo("BassHarmonicsLfo");
-  hLfo->setFrequency(0.1f);
-  hLfo->setAmplitude(5.f);
-  hLfo->setOffset(7.f);
-  harmonics->connect(hLfo);
-
-  graph1->addNode(fLfo);
-  graph1->addNode(hLfo);
-  graph1->addNode(bass);  
-
-  TxGraph* graph2 = new TxGraph("Graph2");
-  graphs.push_back(graph2);
-  TxOscillator* drum = new TxOscillator("Drum");
-  drum->setFrequency(60.f);
-  drum->setWaveForm(TxOscillator::BLITSAW);
-  drum->setHarmonics(5);
-
-  TxRandom* random = new TxRandom("DrumRandomFrequency");
-  random->setMinimum(20.f);
-  random->setMaximum(220.f);
-  random->setFrequency(1.f);
-  drum->connect(random, "Frequency");
-
-  graph2->addNode(random);
-  graph2->addNode(drum);
-  */
-  //drum->setWaveForm(4);
-  //drum->setFrequency(88.f);
-  //for(size_t t = 0; t < 16; ++t)
-  //  track2->setTime(1, t, DRUM[t]);
 
   try {
     dac.startStream();

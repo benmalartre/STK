@@ -70,7 +70,7 @@ public:
   void disconnect(const std::string& name);
   
   int pick(const ImVec2& pos);
-  void draw(bool* modified);
+  virtual void draw(bool* modified);
   virtual void reset() = 0;
 
 protected:

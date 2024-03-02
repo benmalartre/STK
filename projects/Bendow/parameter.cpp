@@ -209,75 +209,6 @@ stk::StkFloat TxParameterInt::tick()
   return (stk::StkFloat)*(int*)_data;
 }
 
-char TxSevenSegments::_kd[] = { 0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B };
-float TxSevenSegments::W = TX_SEVENSEGMENTS_WIDTH;
-float TxSevenSegments::H = TX_SEVENSEGMENTS_HEIGHT;
-
-void TxSevenSegments::setWidth(float width) {
-  W = width;
-  H = W / 2;
-}
-
-void TxSevenSegments::setHeight(float height) {
-  H = height;
-}
-
-void TxSevenSegments::drawDigit(ImDrawList* d, int n, ImVec2 e, ImVec2 p, ImVec4 c) {
-  float r[7][4] = {
-    {-1,-1,H,H},
-    {1,-1,-H,H},
-    {1,0,-H,-H},
-    {-1,1,H,-W * 1.5},
-    {-1,0,H,-H},
-    {-1,-1,H,H},
-    {-1,0,H,-H},
-  };
-  for (int i = 0; i < 7; i++) {
-    ImVec2 a, b;
-    if (i % 3 == 0) {
-      a = ImVec2(p.x + r[i][0] * e.x + r[i][2], p.y + r[i][1] * e.y + r[i][3] - H);
-      b = ImVec2(a.x + e.x * 2 - W, a.y + W);
-    }
-    else {
-      a = ImVec2(p.x + r[i][0] * e.x + r[i][2] - H, p.y + r[i][1] * e.y + r[i][3]);
-      b = ImVec2(a.x + W, a.y + e.y - W);
-    }
-    ImVec2 q = b - a;
-    float s = W * 0.6, u = s - H;
-    if (q.x > q.y) {
-      ImVec2 pp[] = {
-        {a.x + u,a.y + q.y * .5f},
-        {a.x + s,a.y},
-        {b.x - s,a.y},
-        {b.x - u,a.y + q.y * .5f},
-        {b.x - s,b.y},
-        {a.x + s,b.y}
-      };
-      d->AddConvexPolyFilled(pp, 6, (_kd[n] >> (6 - i)) & 1 ? ImColor(c) : 0x77000000);
-    }
-    else {
-      ImVec2 pp[] = {
-        {a.x + q.x * .5f,a.y + u},
-        {b.x,a.y + s},
-        {b.x,b.y - s},
-        {b.x - q.x * .5f,b.y - u},
-        {a.x,b.y - s},
-        {a.x,a.y + s} };
-      d->AddConvexPolyFilled(pp, 6, (_kd[n] >> (6 - i)) & 1 ? ImColor(c) : 0x77000000);
-    }
-  }
-}
-  
-void TxSevenSegments::drawDigits(ImDrawList* d, ImVec2 a, ImVec2 b, ImVec2 sz, ImVec4 c, float t)
-{ 
-  int _t = int(t / 60) * 100 + fmod(t, 60); 
-  float p = 0.02 * sz.x, s = sz.x / 4 - p, x = s * .5, y = sz.y * .5; 
-  for (int i = 0; i < 4; i++) { 
-    int _d = _t % 10; _t /= 10; 
-    drawDigit(d, _d, ImVec2(s * .5, y), ImVec2(b.x - x, a.y + y), c); x += s + p; 
-  } 
-}
-
 bool TxParameterInt::draw()
 {
   bool modified = false;
@@ -293,14 +224,6 @@ bool TxParameterInt::draw()
     _drawPlug(0);
   } else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE);
-    _drawPlug(0);
-  } else if (_flags & TxParameter::SEVENSEGMENTS) {
-    TxSevenSegments::drawDigits(
-      ImGui::GetForegroundDrawList(), 
-      ImGui::GetCursorScreenPos(), 
-      ImGui::GetCursorScreenPos() + ImVec2(10, 10), 
-      ImVec2(200,200) * _node->graph()->scale(), 
-      ImVec4(0,1,0,1), 666.f);
     _drawPlug(0);
   }
   
@@ -408,21 +331,6 @@ bool TxParameterFloat::draw()
   else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE);
-    _drawPlug(0);
-  }
-  else if (_flags & TxParameter::SEVENSEGMENTS) {
-    static ImVec2 P(0,0);
-    static ImVec2 S(100, 100);
-    static float W(1.f);
-    ImGui::SliderFloat2("7s_p", &P[0], 0, 1000.f);
-    ImGui::SliderFloat2("7s_s", &S[0], 0, 1000.f);
-    ImGui::SliderFloat("7s_w", &W, 0, 1000.f);
-    TxTime& time = TxTime::instance();
-    TxSevenSegments::setWidth(W);
-    TxSevenSegments::setWidth(W/2);
-    TxSevenSegments::drawDigits(
-      ImGui::GetForegroundDrawList(), 
-      P, P, S * _node->graph()->scale(), ImVec4(0, 1, 0.25, 1), time.get());
     _drawPlug(0);
   }
   
