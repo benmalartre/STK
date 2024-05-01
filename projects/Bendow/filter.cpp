@@ -328,11 +328,12 @@ stk::StkFloat TxFilter::tick(unsigned int)
 
     case FIR:
     {
-      
-      ((stk::Fir*)_filter)->setCoefficients(
+      std::vector<float> firCoefficients = 
         computeFirCoefficients(stk::Stk::sampleRate(),
           _params[FLOAT1]->tick(), _params[FLOAT2]->tick(), 
-          _params[INT2]->tick(), _params[INT1]->tick()), false);
+          _params[INT2]->tick(), _params[INT1]->tick());
+
+      ((stk::Fir*)_filter)->setCoefficients(firCoefficients, false);
       
       sample = ((stk::Fir*)_filter)->tick(input);
       break;

@@ -42,7 +42,7 @@ public:
   TxConnexion*            connexion();
   std::vector<TxNode*>&   nodes();
   void                    draw();
-  void                    default(TxSequencer * sequencer, uint32_t trackIdx);
+  void                    basic(TxSequencer * sequencer, uint32_t trackIdx);
 
 protected:            
   static const int        Flags;

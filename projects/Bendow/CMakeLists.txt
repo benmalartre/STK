@@ -27,17 +27,17 @@ FIND_PACKAGE(OpenGL REQUIRED)
 # system
 IF(APPLE)
   SET(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} 
-    -lm 
-    -framework CoreFoundation 
-    -framework AudioToolbox 
-    -framework AudioUnit 
-    -framework CoreAudio 
-    -framework CoreAudioKit
-    -framework CoreMIDI
-    -framework CoreMIDIServer
-    -framework Cocoa
-    -framework IOKit
-    -framework OpenGL
+    "-lm" 
+    "-framework CoreFoundation"
+    "-framework AudioToolbox" 
+    "-framework AudioUnit" 
+    "-framework CoreAudio" 
+    "-framework CoreAudioKit"
+    "-framework CoreMIDI"
+    "-framework CoreMIDIServer"
+    "-framework Cocoa"
+    "-framework IOKit"
+    "-framework OpenGL"
   )
 ELSEIF(WIN32)
  SET(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} 

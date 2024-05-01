@@ -13,7 +13,7 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   _tracks.resize(numTracks);
   for (size_t i = 0; i < numTracks; ++i) {
     _tracks[i]._graph = new TxGraph("Graph_Track"+std::to_string(i));
-    _tracks[i]._graph->default(this, i);
+    _tracks[i]._graph->basic(this, i);
     _tracks[i]._active = true;
 
   }

@@ -69,12 +69,12 @@ const ImVec2& TxNode::position()
   return _position;
 }
 
-const ImVec4& TxNode::color()
+const ImU32 TxNode::color()
 {
-  return _color;
+  return IM_COL32(_color.x, _color.y, _color.z, _color.w);
 }
 
-const ImColor& TxNode::color(short colorIdx)
+const ImU32 TxNode::color(short colorIdx)
 {
   if (_selected) {
     switch (colorIdx) {
@@ -92,7 +92,7 @@ const ImColor& TxNode::color(short colorIdx)
       return TX_CONTOUR_COLOR_DEFAULT;
     }
   }
-  return ImColor({ 100,100,100,255 });
+  return IM_COL32(100,100,100,255 );
 }
 
 TxGraph* TxNode::graph()

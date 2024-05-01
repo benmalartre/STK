@@ -489,7 +489,7 @@ bool TxParameterSamples::draw()
         TX_NODE_ROUNDING * scale);
     }
     _plug[c] = (pMin + pMax) * 0.5;
-    _radius[c] = std::sqrtf(ImLengthSqr(pMax - pMin));
+    _radius[c] = sqrtf(ImLengthSqr(pMax - pMin));
   }
   return false;
 }

@@ -70,7 +70,7 @@ const float& TxGraph::scale()
   return _scale;
 }
 
-void TxGraph::default(TxSequencer* sequencer, uint32_t trackIdx)
+void TxGraph::basic(TxSequencer* sequencer, uint32_t trackIdx)
 {
 
   
@@ -481,7 +481,7 @@ void TxGraph::draw()
 
   setSplitterChannel(TxGraph::BACKGROUND);
   if (ImGui::IsDragDropActive()) {
-    drawList->AddRectFilled(pos, pos + size, ImColor({ 0,0,0,100 }));
+    drawList->AddRectFilled(pos, pos + size, IM_COL32(0,0,0,100));
   }
  
   terminateSplitter();

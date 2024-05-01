@@ -58,8 +58,8 @@ public:
   const std::string& name();
   const ImVec2& position();
   virtual const ImVec2& size() = 0;
-  const ImVec4& color();
-  const ImColor& color(short colorIdx);
+  const ImU32 color();
+  const ImU32 color(short colorIdx);
   TxGraph* graph();
   TxParameter* parameter(const std::string& name);
 
