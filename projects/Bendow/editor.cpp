@@ -15,17 +15,16 @@ ImGuiWindowFlags_NoBackground |
 ImGuiWindowFlags_NoTitleBar;
 /*|ImGuiWindowFlags_NoInputs;*/
 
-TxEditor::TxEditor(TxGraph* graph)
+TxEditor::TxEditor(TxGraph* graph, bool navigatable)
   : _current(NULL)
   , _connexion(NULL)
   , _pick(NULL)
   , _graph(graph)
   , _offset(ImVec2(100,100))
   , _scale(1.f)
+  , _navigatable(navigatable)
 
 {};
-
-
 
 TxNode* TxEditor::current()
 {
@@ -144,13 +143,12 @@ void TxEditor::handleInput()
 {
   static float time = 0.f;
   ImGuiIO& io = ImGui::GetIO();
-  if (io.MouseWheel) {
+  if (io.MouseWheel && _navigatable) {
     _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
   if (!io.MouseDown[0]) {
     _pick = pick(ImGui::GetMousePos());
   }
-  io.FontGlobalScale = _scale;
 
   if (io.MouseClicked[0]) {
     select(ImGui::GetMousePos());
@@ -186,7 +184,7 @@ void TxEditor::setGraph(TxGraph* graph)
 }
 
 TxGraphEditor::TxGraphEditor(TxGraph* graph)
-  : TxEditor(graph)
+  : TxEditor(graph, true)
 {};
 
 TxGraphEditor::~TxGraphEditor()
@@ -325,6 +323,8 @@ void TxGraphEditor::draw()
   ImGui::SetNextWindowSize(size);
   ImGui::Begin("editor", NULL, TxEditor::Flags);
 
+  ImGui::SetWindowFontScale(_scale);
+
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   initSpliter();
   handleInput();
@@ -356,6 +356,7 @@ void TxGraphEditor::draw()
 
   ImGui::End();
   ImGui::PopStyleVar(2);
+
 }
 
  TxSequencerEditor::TxSequencerEditor(TxSequencer* sequencer)
@@ -370,5 +371,6 @@ void TxGraphEditor::draw()
 
  void TxSequencerEditor::draw()
 {
+  ImGuiIO& io = ImGui::GetIO();
   if(_sequencer)_sequencer->draw();
 }

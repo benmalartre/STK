@@ -1,3 +1,4 @@
+#include "common.h"
 #include "track.h"
 #include "sequencer.h"
 #include "graph.h"
@@ -6,6 +7,9 @@ TxTrack::TxTrack()
   : TxNode(NULL, TxNode::TRACK, "track")
   , _graph(NULL)
 {
+  _params.push_back(new TxParameterFloat(this, "Volume", 20.f, 3000.f, &_volume, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Trigger", &_trigger));
+  _params.push_back(new TxParameterFloat(this, "Value", 0.f, 2.f, &_value));
 }
 
 TxTrack::~TxTrack()
@@ -13,13 +17,18 @@ TxTrack::~TxTrack()
 
 }
 
-stk::StkFloat TxTrack::tick(unsigned int)
+stk::StkFloat TxTrack::tick(unsigned int channel)
 {
-  return 0.f;
+  Index index = TxTime::instance().index(_sequence.size());
+
+  const Beat& beat = _sequence[index.first];
+  if(channel == 0)return beat.first;
+  else if(channel == 1) return beat.second;
 }
 
 stk::StkFrames& TxTrack::tick(stk::StkFrames& frames, unsigned int channel)
 {
+  const Index index = TxTime::instance().index(_sequence.size());
   for(size_t i = 0; i < frames.size(); ++i) {
     frames[i] = 0.f;
   }
@@ -42,7 +51,7 @@ void TxTrack::reset()
   
 }
 
-void TxTrack::setBasicGraph()
+void TxTrack::basicGraph()
 {
   _graph = new TxGraph(this, "graph");
   _graph->basic(this);

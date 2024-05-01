@@ -18,15 +18,8 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   , _volume(1.f)
   , _running(false)
 {
-  std::cout << "sequencer constructor" << std::endl;
-  _tracks.resize(numTracks);
-  std::cout << "num tracks : " << _tracks.size() << std::endl;
-  for (size_t i = 0; i < numTracks; ++i) {
-    std::cout << "setup basic graph" << std::endl;
-    _tracks[i].setBasicGraph();
-    std::cout << "basic graph ok" << std::endl;
-
-  }
+  TxTime& time = TxTime::instance();
+  time.setBPM(_bpm);
   setLength(length);
   _params.push_back(new TxParameterBool(this, "Running", &_running));
   _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
@@ -34,6 +27,10 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   _params.push_back(new TxParameterFloat(this, "Time", -10000.f, 10000.f, &_time, TxParameter::FLOAT));
 
   _size = ImVec2(200, 200);
+
+  _tracks.resize(numTracks);
+  for (size_t i = 0; i < numTracks; ++i)
+    _tracks[i].basicGraph();
 }
 
 TxSequencer::TxSequencer(uint32_t numTracks)
@@ -58,6 +55,8 @@ void TxSequencer::setLength(uint64_t length)
 void TxSequencer::setBPM(uint32_t bpm)
 {
   _bpm = bpm;
+  TxTime& time = TxTime::instance();
+  time.setBPM(_bpm);
 }
 
 void TxSequencer::setBeat(uint32_t trackIdx, uint64_t beatIdx, const Beat& beat)
@@ -85,31 +84,33 @@ const ImVec2& TxSequencer::size()
   return _size;
 }
 
+const Beat& TxSequencer::beat(uint32_t trackIdx, size_t beatIdx)
+{
+  return _tracks[trackIdx].beat(beatIdx);
+}
+
 TxTrack* TxSequencer::track(size_t index)
 {
   if (index < _tracks.size())return &_tracks[index];
   else return NULL;
 }
 
-Index TxSequencer::timeToIndex(float time)
-{
-  const float relativeTime = time / 60.f * (float)_bpm * TxSequencer::NumBits;
-  const int beatTime = (int)relativeTime;
-  const int bitTime = (int)((float)(relativeTime - beatTime) * TxSequencer::NumBits);
-  return {beatTime % _length, bitTime};
-}
-
 stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
-  const Index index = timeToIndex(TxTime::instance().get());
+  
   float sample = 0.f;
   //int nActiveTrack = 0;
+  _beats.resize(_tracks.size());
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i].active() && _tracks[i].graph()) {
       //nActiveTrack++;
-      const Beat* beat = &_tracks[i].beat(index.first);
+      const Index index = TxTime::instance().index(_tracks[i].length());
+      _beats[i] = _tracks[i].beat(index.first);
       sample += _tracks[i].graph()->tick();
       //sample += channel ? beat->second : BIT_CHECK(beat->first, index.second);
+    } else {
+      _beats[i].first = false;
+      _beats[i].second = 0.f;
     }
   }
   
@@ -120,7 +121,7 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
 {
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   
-  Index index = timeToIndex(TxTime::instance().get());
+  Index index = TxTime::instance().index(_tracks[0].length());
 
 /*
   for(auto& track: _tracks) {
@@ -186,7 +187,7 @@ void TxSequencer::draw()
   TxTime& time = TxTime::instance();
   float t = time.get();
 
-  Index index = timeToIndex(t);
+  Index index = TxTime::instance().index(_tracks[0].length());
 
   static float h = 0.f;
 

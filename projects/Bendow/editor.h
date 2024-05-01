@@ -14,7 +14,7 @@ public:
       CNT
     };
 
-  TxEditor(TxGraph* graph);
+  TxEditor(TxGraph* graph, bool navigatable=false);
   virtual ~TxEditor(){};
   void                    initSpliter();
   void                    setSplitterChannel(int channel);
@@ -46,6 +46,7 @@ protected:
   bool                      _drag;
   ImVec2                    _offset;
   float                     _scale;
+  bool                      _navigatable;
 
   TxGraph*                  _graph;
 

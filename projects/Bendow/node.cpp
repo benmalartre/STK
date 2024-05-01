@@ -1,6 +1,7 @@
 #include "common.h" 
 #include "node.h"
 #include "graph.h"
+#include "track.h"
 #include "editor.h"
 
 const int TxNode::Flags = 
@@ -30,6 +31,7 @@ TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t num
   , _nChannels(numChannels)
   , _name(name)
   , _dirty(true)
+  , _active(true)
   , _position(RANDOM_LO_HI(0,200), RANDOM_LO_HI(0,200))
   , _size(100,25)
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
@@ -110,7 +112,9 @@ TxNode* TxNode::parent()
 
 TxGraph* TxNode::graph()
 {
-  if(_parent)
+  if(_type == TxNode::GRAPH)return (TxGraph*)this;
+  else if(_type == TxNode::TRACK) return ((TxTrack*)this)->graph();
+  else if(_parent)
     if(_parent->type() == TxNode::GRAPH)return (TxGraph*)_parent;
     else return _parent->graph();
   else return NULL;
@@ -147,12 +151,13 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
-  TxParameter* param = parameter(name);
+  TxParameter* param = node->parameter(name);
   if(param) {
-    param->connect(node, channel);
-    std::cout << "connect : " << node->name() << " -> " << 
-      _name << ":" << name << "(channel=" << channel << ")" << std::endl;
-    TxConnexion* connexion = new TxConnexion({node->_params[OUTPUT], param, channel});
+    param->connect(this, channel);
+    std::cout << "connected : " << _name << " -> " << 
+      node->name() << ":" << name << "(channel=" << channel << ")" << std::endl;
+    TxConnexion* connexion = new TxConnexion({_params[OUTPUT], param, channel});
+    std::cout << "GRAPH : " << graph() << std::endl;
     graph()->addConnexion(connexion);
     return connexion;
   }

@@ -34,7 +34,6 @@ public:
   
   void start();
   void stop();
-  uint64_t timeToIndex(double time);
 
   void draw() override;
   void reset() override;

@@ -34,7 +34,6 @@ public:
 protected:            
   bool                    contains(const TxNode* node);
   int                     index(const TxNode* node);
-  void                    handleInput();
 
 private:
   void                      _createNodeByType(int type);

@@ -80,8 +80,13 @@ static ImU32 TX_PLUG_COLOR_SELECTED = IM_COL32(200,200,200,255);
 static ImU32 TX_CONTOUR_COLOR_SELECTED = IM_COL32(220,220,220,  255);
 static ImU32 TX_PLUG_COLOR_AVAILABLE = IM_COL32(255,200,100,255);
 
+using Beat = std::pair<short, float>;
+using Sequence = std::vector<Beat>;
+using Index = std::pair<uint32_t, uint32_t>;
 
- 
+static const uint32_t NumBits = 4;
+
+
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
 };
@@ -92,7 +97,7 @@ static float computeSampleRate() {
 
 class TxTime {
 public:
-  TxTime() : _time(0.f), _rate(computeSampleRate()) {};
+  TxTime() : _time(0.f), _rate(computeSampleRate()), _bpm(60) {};
   ~TxTime() {};
 
   TxTime(TxTime &other) = delete;
@@ -106,7 +111,9 @@ public:
   void incr100() {_time += 100.f;};
   double get() const {return _time;};
   void set(float t) {_time = t;};
+  void setBPM(size_t bpm){_bpm=bpm;};
   double rate() const {return _rate;};
+  Index index(size_t length);
   static TxTime& instance() {
     static TxTime instance;
     return instance;
@@ -115,10 +122,9 @@ public:
 protected:
   double _time;
   double _rate;
+  size_t _bpm;
 };
 
-using Beat = std::pair<short, float>;
-using Sequence = std::vector<Beat>;
-using Index = std::pair<uint32_t, uint32_t>;
+
 
 #endif // TX_COMMON_H

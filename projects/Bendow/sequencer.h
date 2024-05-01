@@ -14,8 +14,6 @@
 
 class TxSequencer : public TxNode {
 public:
-  static const uint32_t NumBits = 4;
-
   enum Parameters {
     TRIGGER = TxNode::LAST,
     BPM,
@@ -33,11 +31,12 @@ public:
   void setBeat(uint32_t trackIdx, uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
+
+  const Beat& beat(uint32_t trackIdx, size_t beatIdx);
   
   const ImVec2& size() override;
   void start();
   void stop();
-  Index timeToIndex(float time);
 
   bool drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
   void reset() override;
@@ -50,6 +49,7 @@ protected:
 
 private:
   std::vector<TxTrack>  _tracks;
+  std::vector<Beat>     _beats;
   int                   _bpm;
   int                   _length;
   bool                  _running;

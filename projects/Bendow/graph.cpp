@@ -52,20 +52,14 @@ void TxGraph::basic(TxNode* input)
 {
   TxOscillator* oscillator = new TxOscillator(this, "Oscillator");
   oscillator->setHarmonics(7);
-
   TxAdsr* adsr = new TxAdsr(this, "Adsr");
-  if(input) {
-    switch(input->type()) {
-      case TxNode::TRACK:
-      {
-        TxTrack* track = (TxTrack*)input;
-        adsr->connect(track, "Trigger");
-      }
-    }
+  if(input && input->type() == TxNode::TRACK) {
+    TxTrack* track = (TxTrack*)input;
+    track->connect(adsr, "Trigger", 0);
+    track->connect(oscillator, "Frequency", 1);
   }
+  adsr->connect(oscillator, "Envelope");
   
-
-  oscillator->connect(adsr, "Envelope");
   addNode(oscillator);
   addNode(adsr);
   setCurrent(oscillator);

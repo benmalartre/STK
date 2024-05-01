@@ -145,7 +145,7 @@ void draw(GLFWwindow* window)
   static float f = 0.0f;
   static bool show_test_window = true;
   static bool show_another_window = false;
-  static ImVec4 clear_color = ImColor(114, 144, 154);
+  static ImVec4 clear_color = ImColor(220, 220, 220);
 
   // Rendering
   int display_w, display_h;
@@ -238,7 +238,7 @@ int main()
   TxFactory::initialize();
   sequencer = new TxSequencer(1);
   sequencerEditor = new TxSequencerEditor(sequencer);
-  
+
   graphEditor = new TxGraphEditor(sequencer->track(0)->graph());
   sequencer->setLength(16);
   for (size_t t = 0; t < 16; ++t)

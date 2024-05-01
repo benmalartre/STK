@@ -9,9 +9,8 @@ class TxTrack : public TxNode {
 public:
   enum Parameters {
     VOLUME = TxNode::LAST,
-    MINIMUM,
-    MAXIMUM, 
-    SEED
+    TRIGGER,
+    VALUE
   };
   TxTrack();
   ~TxTrack();
@@ -19,12 +18,14 @@ public:
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
     
-  void setBasicGraph();
+  void basicGraph();
   void reset() override;
 
   bool active(){return _active;};
   TxGraph* graph(){return _graph;};
-  Beat& beat(size_t beatIdx){return _sequence[beatIdx];};
+  Beat& beat(size_t beatIdx){
+    return _sequence[beatIdx%_sequence.size()];
+};
   size_t length(){return _sequence.size();};
 
   void setLength(size_t length);
@@ -36,6 +37,9 @@ protected:
 private:
   TxGraph*  _graph;
   Sequence _sequence;
+  float    _volume;
+  bool     _trigger;
+  float    _value;
 };
 
 #endif // TX_VALUE_H
