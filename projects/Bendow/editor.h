@@ -1,0 +1,95 @@
+#include <vector>
+#include "common.h"
+#include "node.h"
+
+#ifndef TX_EDITOR_H
+#define TX_EDITOR_H
+
+class TxSequencer;
+class TxEditor {
+public:
+  enum Layer {
+      BACKGROUND,
+      FOREGROUND,
+      CNT
+    };
+
+  TxEditor(TxGraph* graph);
+  virtual ~TxEditor(){};
+  void                    initSpliter();
+  void                    setSplitterChannel(int channel);
+  void                    terminateSplitter();
+
+  TxConnexion*            startConnexion(TxParameter* param, int channel);
+  void                    updateConnexion(TxParameter* param, int channel, bool state);
+  void                    terminateConnexion();
+
+  const ImVec2&           offset();
+  const float&            scale();
+  TxNode*                 current();
+  TxConnexion*            connexion();
+
+  virtual void            draw() = 0;
+
+  TxNode*                 pick(const ImVec2& position);
+  void                    select(const ImVec2& position);
+  void                    handleInput();
+
+  void                    setCurrent(TxNode* node);
+  void                    setGraph(TxGraph* graph);
+
+
+protected:            
+  static const int        Flags;
+
+  ImDrawListSplitter        _splitter;
+  bool                      _drag;
+  ImVec2                    _offset;
+  float                     _scale;
+
+  TxGraph*                  _graph;
+
+  TxNode*                   _current;
+  TxConnexion*              _connexion;
+
+  TxNode*                   _hovered;
+  TxNode*                   _pick;
+
+};
+
+class TxGraphEditor : public TxEditor{
+public:
+  enum Pick {
+    NONE,
+    HEAD,
+    BODY
+  };
+
+  TxGraphEditor(TxGraph* graph);
+  virtual ~TxGraphEditor();
+
+  void                    draw() override;
+
+  bool                    contains(const TxNode* node);
+
+protected:
+  void                      _createNodeByType(int type);
+  void                      _drawNode(TxNode* node, bool* modified);
+  void                      _drawConnexion(TxConnexion* connexion);
+  void                      _drawPopup();
+  void                      _drawGrid();
+};
+
+class TxSequencerEditor : public TxEditor {
+public:
+  TxSequencerEditor(TxSequencer* sequencer);
+  virtual ~TxSequencerEditor();
+
+  void            draw() override;
+
+private:
+  TxSequencer*    _sequencer;
+};
+
+
+#endif // TX_EDITOR_H

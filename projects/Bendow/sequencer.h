@@ -7,22 +7,13 @@
 #include "common.h"
 #include "node.h"
 #include "graph.h"
+#include "track.h"
 
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
 
 class TxSequencer : public TxNode {
 public:
-  using Beat = std::pair<short, float>;
-  using Sequence = std::vector<Beat>;
-  using Index = std::pair<uint32_t, uint32_t>;
-
-  struct Track {
-    bool     _active;
-    TxGraph* _graph;
-    Sequence _sequence;
-  };
-
   static const uint32_t NumBits = 4;
 
   enum Parameters {
@@ -48,14 +39,17 @@ public:
   void stop();
   Index timeToIndex(float time);
 
-  bool drawBeat(Track* track, uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
+  bool drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
   void reset() override;
-  void draw(bool* modified) override;
+  void draw();
 
-  Track* getTrack(size_t index);
+  TxTrack* track(size_t index);
   
+protected:
+  static const int        Flags;
+
 private:
-  std::vector<Track>    _tracks;
+  std::vector<TxTrack>  _tracks;
   int                   _bpm;
   int                   _length;
   bool                  _running;

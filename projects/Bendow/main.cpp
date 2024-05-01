@@ -2,9 +2,12 @@
 #include "sequencer.h"
 #include "graph.h"
 #include "factory.h"
+#include "editor.h"
 
 #include <GLFW/glfw3.h>
 
+TxGraphEditor* graphEditor;
+TxSequencerEditor* sequencerEditor;
 TxSequencer* sequencer;
 stk::StkFrames frames;
 
@@ -172,7 +175,8 @@ void draw(GLFWwindow* window)
   //drawPlot(display_w, display_h);
   //ImGui::ShowDemoWindow();
 
-  sequencer->draw(&modified);
+  sequencerEditor->draw();
+  graphEditor->draw();
   
   
   //ImPlot::ShowDemoWindow();
@@ -187,7 +191,8 @@ void draw(GLFWwindow* window)
 int main()
 {
   // OpenGL window
-  glfwInit();
+  glfwInit(); 
+
   GLFWwindow* window = openWindow(1200, 800);
   glfwMakeContextCurrent(window);
 
@@ -229,13 +234,18 @@ int main()
     error.printMessage();
     return 0;
   }
+
   TxFactory::initialize();
   sequencer = new TxSequencer(1);
-
+  sequencerEditor = new TxSequencerEditor(sequencer);
+  
+  graphEditor = new TxGraphEditor(sequencer->track(0)->graph());
   sequencer->setLength(16);
   for (size_t t = 0; t < 16; ++t)
     sequencer->setBeat(0, t, { 1, BASS[t] });
   sequencer->start();
+
+  graphEditor->setGraph(sequencer->track(0)->graph());
 
   try {
     dac.startStream();

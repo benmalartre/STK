@@ -1,10 +1,11 @@
 #include "common.h"
 #include "lfo.h"
 #include "graph.h"
+#include "editor.h"
 
 
-TxLfo::TxLfo(TxGraph* parent, const std::string& name) 
-  : TxNode(parent, name)
+TxLfo::TxLfo(TxNode* parent, const std::string& name) 
+  : TxNode(parent, TxNode::LFO, name)
   , _frequency(0.2f)
   , _amplitude(6.f)
   , _offset(6.f)
@@ -48,24 +49,24 @@ stk::StkFrames& TxLfo::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxLfo::_drawImpl(bool* modified)
+void TxLfo::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128 * _parent->scale());
+  ImGui::SetNextItemWidth(128 * editor->scale());
   TxParameter* frequency = _params[TxLfo::FREQUENCY];
-  if(frequency->draw() && modified)*modified = true;
+  if(frequency->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* amplitude = _params[TxLfo::AMPLITUDE];
-  if(amplitude->draw() && modified)*modified = true;
+  if(amplitude->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* offset = _params[TxLfo::OFFSET];
-  if(offset->draw() && modified)*modified = true;
+  if(offset->draw(editor) && modified)*modified = true;
   ImGui::EndGroup();
 
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxLfo::reset()

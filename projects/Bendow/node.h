@@ -9,6 +9,7 @@
 
 class TxNode;
 class TxGraph;
+class TxTrack;
 
 extern ImFont* TX_FONT_BASE;
 extern ImFont* TX_FONT_TITLE;
@@ -33,21 +34,24 @@ public:
     VALUE,
     RANDOM,
     OSCILLATOR,
-    SEQUENCER,
     LFO,
     ADSR,
     ARYTHMETIC,
     FILTER,
     EFFECT,
-    MIXER
+    MIXER,
+    GRAPH,
+    TRACK,
+    SEQUENCER
   };
 
   enum Parameters {
+    ACTIVE,
     OUTPUT,
     LAST
   };
 
-  TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels=1);
+  TxNode(TxNode* parent, short type, const std::string& name, uint32_t numChannels=1);
   virtual ~TxNode();
   virtual stk::StkFloat tick(unsigned int=0) = 0;
   virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
@@ -55,12 +59,15 @@ public:
   int numChannels();
   
   bool selected();
+  short type();
   const std::string& name();
   const ImVec2& position();
   virtual const ImVec2& size() = 0;
   const ImU32 color();
   const ImU32 color(short colorIdx);
+  TxNode* parent();
   TxGraph* graph();
+  TxTrack* track();
   TxParameter* parameter(const std::string& name);
 
   void setDirty(bool state);
@@ -70,21 +77,23 @@ public:
   void disconnect(const std::string& name);
   
   int pick(const ImVec2& pos);
-  virtual void draw(bool* modified);
+  virtual void draw(TxEditor* editor, bool* modified);
   virtual void reset() = 0;
 
 protected:
-  void                      _drawPopup();
-  void                      _drawOutput();
-  void                      _drawAlignLeft();
-  void                      _drawAlignTop();
-  virtual void              _drawImpl(bool* modified) {};
-  TxGraph*                  _parent;
+  void                      _drawPopup(TxEditor* editor);
+  void                      _drawOutput(TxEditor* editor);
+  void                      _drawAlignLeft(TxEditor* editor);
+  void                      _drawAlignTop(TxEditor* editor);
+  virtual void              _drawImpl(TxEditor* editor, bool* modified) {};
+  TxNode*                   _parent;
   ImVec2                    _position;
   ImVec2                    _size;
   ImVec4                    _color;
+  short                     _type;
   int                       _expended;
   bool                      _selected;
+  bool                      _active;
 
   std::string               _name;
   int                       _nChannels;

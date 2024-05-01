@@ -43,12 +43,12 @@ void TxFactory::initialize()
 }
 
 
-TxNode* TxFactory::createNodeByType(TxGraph* graph, int type)
+TxNode* TxFactory::createNodeByType(TxNode* parent, int type)
 {
   std::string name = TxNode::NodeName[type];
   auto& nodeMap = get().__NodeMap;
   if (nodeMap.find(type) != nodeMap.end())
     name += std::to_string(nodeMap[type].second++);
-    return nodeMap[type].first(graph, name);
+    return nodeMap[type].first(parent, name);
   return NULL;
 }

@@ -115,8 +115,10 @@ SET(SOURCES
 	arythmetic.cpp
 	lfo.cpp
 	adsr.cpp
+	track.cpp
 	sequencer.cpp
 	graph.cpp
+	editor.cpp
 	factory.cpp
 	main.cpp
 )

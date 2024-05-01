@@ -1,6 +1,7 @@
 #include "common.h" 
 #include "node.h"
 #include "graph.h"
+#include "editor.h"
 
 const int TxNode::Flags = 
   ImGuiWindowFlags_NoBackground |
@@ -23,8 +24,9 @@ const char* TxNode::NodeName[TxNode::NumNode] = {
   "Mixer"
 };
 
-TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
+TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t numChannels)
   : _parent(parent)
+  , _type(type)
   , _nChannels(numChannels)
   , _name(name)
   , _dirty(true)
@@ -32,8 +34,9 @@ TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
   , _size(100,25)
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
 {
-  if(_parent)_parent->addNode(this);
+  if(_parent && _parent->type() == TxNode::GRAPH) ((TxGraph*)_parent)->addNode(this);
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
+  _params.push_back(new TxParameterBool(this, "Active", &_active));
   _params.push_back(new TxParameterSamples(this, "Output", true, _nChannels));
 }
 
@@ -57,6 +60,11 @@ int TxNode::pick(const ImVec2& pos)
 bool TxNode::selected()
 {
   return _selected;
+}
+
+short TxNode::type()
+{
+  return _type;
 }
 
 const std::string& TxNode::name()
@@ -95,9 +103,26 @@ const ImU32 TxNode::color(short colorIdx)
   return IM_COL32(100,100,100,255 );
 }
 
-TxGraph* TxNode::graph()
+TxNode* TxNode::parent()
 {
   return _parent;
+}
+
+TxGraph* TxNode::graph()
+{
+  if(_parent)
+    if(_parent->type() == TxNode::GRAPH)return (TxGraph*)_parent;
+    else return _parent->graph();
+  else return NULL;
+}
+
+TxTrack* TxNode::track()
+{
+  if(_parent)
+    if(_parent->type() == TxNode::TRACK)return (TxTrack*)_parent;
+    else return _parent->track();
+  else return NULL;
+  
 }
 
 void TxNode::setDirty(bool state) 
@@ -128,7 +153,7 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
     std::cout << "connect : " << node->name() << " -> " << 
       _name << ":" << name << "(channel=" << channel << ")" << std::endl;
     TxConnexion* connexion = new TxConnexion({node->_params[OUTPUT], param, channel});
-    _parent->addConnexion(connexion);
+    graph()->addConnexion(connexion);
     return connexion;
   }
   return NULL;
@@ -152,7 +177,7 @@ TxParameter* TxNode::parameter(const std::string& name)
   return NULL;
 }
 
-void TxNode::_drawPopup()
+void TxNode::_drawPopup(TxEditor* editor)
 {
 
   if (ImGui::BeginPopup((_name + "Popup").c_str())) {
@@ -199,32 +224,32 @@ void TxNode::_drawPopup()
   }
 }
 
-void TxNode::_drawOutput()
+void TxNode::_drawOutput(TxEditor* editor)
 {
-  _params[OUTPUT]->draw();
+  _params[OUTPUT]->draw(editor);
 }
 
-void TxNode::_drawAlignLeft()
+void TxNode::_drawAlignLeft(TxEditor* editor)
 {
-  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * _parent->scale() + _parent->offset()[0]);
+  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * editor->scale() + editor->offset()[0]);
 }
 
-void TxNode::_drawAlignTop()
+void TxNode::_drawAlignTop(TxEditor* editor)
 {
-  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * _parent->scale() + _parent->offset()[1]);
+  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * editor->scale() + editor->offset()[1]);
 }
 
-void TxNode::draw(bool* modified)
+void TxNode::draw(TxEditor* editor, bool* modified)
 {
-  const float scale = _parent->scale();
-  const ImVec2 position = _position * scale + _parent->offset();
+  const float scale = editor->scale();
+  const ImVec2 position = _position * scale + editor->offset();
 
   ImGui::SetCursorPos(position + ImVec2(TX_PADDING_X, TX_PADDING_Y) * scale);
-  _parent->setSplitterChannel(TxGraph::FOREGROUND);
-  _drawAlignLeft();
-  _drawImpl(modified);
+  editor->setSplitterChannel(TxEditor::FOREGROUND);
+  _drawAlignLeft(editor);
+  _drawImpl(editor, modified);
 
-  _parent->setSplitterChannel(TxGraph::BACKGROUND);
+  editor->setSplitterChannel(TxEditor::BACKGROUND);
   
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImGui::PushFont(TX_FONT_TITLE);
@@ -246,6 +271,6 @@ void TxNode::draw(bool* modified)
     ImColor(_color), 
     TX_NODE_ROUNDING * scale);
     
-  _drawPopup();
+  _drawPopup(editor);
  
 }

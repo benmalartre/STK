@@ -61,8 +61,8 @@
 
 // macros
 #define REGISTER_NODE(CLASS, ID) \
-TxNode* create##CLASS(TxGraph* graph, const std::string& name) { \
-  return new CLASS(graph, name);\
+TxNode* create##CLASS(TxNode* parent, const std::string& name) { \
+  return new CLASS(parent, name);\
 };
 
 #define DEFINE_NODE(CLASS) \
@@ -116,5 +116,9 @@ protected:
   double _time;
   double _rate;
 };
+
+using Beat = std::pair<short, float>;
+using Sequence = std::vector<Beat>;
+using Index = std::pair<uint32_t, uint32_t>;
 
 #endif // TX_COMMON_H

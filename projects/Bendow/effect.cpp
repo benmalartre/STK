@@ -6,8 +6,8 @@
 
 const ImVec2 TxEffect::Size(300, 250);
 
-TxEffect::TxEffect(TxGraph* parent, const std::string& name) 
-  : TxNode(parent, name)
+TxEffect::TxEffect(TxNode* parent, const std::string& name) 
+  : TxNode(parent, TxNode::EFFECT, name)
   , _effect(NULL)
   , _effectIdx(-1)
   , _modDepth(0.5)
@@ -59,7 +59,7 @@ stk::StkFrames& TxEffect::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxEffect::_drawImpl(bool* modified)
+void TxEffect::_drawImpl(TxEditor* editor, bool* modified)
 {
 
   ImGui::BeginGroup();
@@ -67,20 +67,20 @@ void TxEffect::_drawImpl(bool* modified)
     case CHORUS:
     {
       TxParameter* modDepth = _params[TxEffect::MODDEPTH];
-      if (modDepth->draw() && modified)*modified = true;
+      if (modDepth->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
       TxParameter* modFreq = _params[TxEffect::MODFREQUENCY];
-      if (modFreq->draw() && modified)*modified = true;
+      if (modFreq->draw(editor) && modified)*modified = true;
       break;
     }
 
     case ECHO:
     {
       TxParameter* delay = _params[TxEffect::DELAY];
-      if (delay->draw() && modified)*modified = true;
+      if (delay->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
       TxParameter* maxDelay = _params[TxEffect::MAXIMUMDELAY];
-      if (maxDelay->draw() && modified)*modified = true;
+      if (maxDelay->draw(editor) && modified)*modified = true;
       break;
     }
 
@@ -93,7 +93,7 @@ void TxEffect::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 
 }
 

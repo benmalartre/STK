@@ -2,8 +2,8 @@
 #include "adsr.h"
 
 
-TxAdsr::TxAdsr(TxGraph* parent, const std::string& name) 
-  : TxNode(parent, name)
+TxAdsr::TxAdsr(TxNode* parent, const std::string& name) 
+  : TxNode(parent, TxNode::ADSR, name)
   , _attack(0.05f)
   , _decay(0.025f)
   , _sustain(0.9f)
@@ -83,26 +83,26 @@ void TxAdsr::setRelease(stk::StkFloat release)
   _adsr.setReleaseRate(_release);
 }
 
-void TxAdsr::_drawImpl(bool* modified)
+void TxAdsr::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
   TxParameter* trigger = _params[TxAdsr::TRIGGER];
-  trigger->draw();
+  trigger->draw(editor);
   
   TxParameter* attack = _params[TxAdsr::ATTACK];
-  if (attack->draw() && modified)*modified = true;
+  if (attack->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* decay = _params[TxAdsr::DECAY];
-  if (decay->draw() && modified)*modified = true;
+  if (decay->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* sustain = _params[TxAdsr::SUSTAIN];
-  if (sustain->draw() && modified)*modified = true;
+  if (sustain->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* release = _params[TxAdsr::RELEASE];
-  if (release->draw() && modified)*modified = true;
+  if (release->draw(editor) && modified)*modified = true;
   
   ImGui::EndGroup();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxAdsr::reset()

@@ -1,0 +1,374 @@
+#include "common.h"
+#include "graph.h"
+#include "factory.h"
+#include "editor.h"
+#include "sequencer.h"
+
+
+static int CNT = 0;
+const int TxEditor::Flags =
+ImGuiWindowFlags_NoResize |
+ImGuiWindowFlags_NoCollapse |
+ImGuiWindowFlags_NoMove |
+ImGuiWindowFlags_NoNav |
+ImGuiWindowFlags_NoBackground |
+ImGuiWindowFlags_NoTitleBar;
+/*|ImGuiWindowFlags_NoInputs;*/
+
+TxEditor::TxEditor(TxGraph* graph)
+  : _current(NULL)
+  , _connexion(NULL)
+  , _pick(NULL)
+  , _graph(graph)
+  , _offset(ImVec2(100,100))
+  , _scale(1.f)
+
+{};
+
+
+
+TxNode* TxEditor::current()
+{
+  return _current;
+}
+
+const ImVec2& TxEditor::offset()
+{
+  return _offset;
+}
+
+const float& TxEditor::scale()
+{
+  return _scale;
+}
+
+TxConnexion* TxEditor::startConnexion(TxParameter* param, int channel)
+{
+  if(!_connexion)_connexion = new TxConnexion({ param, NULL, channel, 0 });
+  return _connexion;
+}
+
+void TxEditor::updateConnexion(TxParameter* param, int channel, bool status)
+{
+  if (!_connexion) return;
+  if (status) {
+    _connexion->target = param;
+    _connexion->targetChannel = channel;
+  }
+  else if (param == _connexion->target) {
+    _connexion->target = NULL;
+    _connexion->targetChannel = 0;
+  }
+}
+
+void TxEditor::terminateConnexion()
+{
+  if (!_connexion) return;
+
+  if (_connexion->target) {
+    _graph->addConnexion(_connexion);
+  }
+  else {
+    delete _connexion;
+  }
+  _connexion = NULL;
+}
+
+TxConnexion* TxEditor::connexion()
+{
+  return _connexion;
+}
+
+static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
+{
+  return point[0] >= bmin[0] && point[0] <= bmax[0] &&
+    point[1] >= bmin[1] && point[1] <= bmax[1];
+}
+
+TxNode* TxEditor::pick(const ImVec2& pos)
+{
+  std::vector<TxNode*>& nodes = _graph->nodes();
+  int nodeIdx = nodes.size() - 1;
+  _hovered = NULL;
+  for (; nodeIdx >= 0; --nodeIdx) {
+    TxNode* node = nodes[nodeIdx];
+    if (inside(pos, node->position() * _scale + _offset,
+      (node->position() + node->size()) * _scale + _offset))
+    {
+      _hovered = node;
+      break;
+    }
+  }
+  
+  return _hovered;
+}
+
+void TxEditor::select(const ImVec2& pos)
+{
+  std::vector<TxNode*>& nodes = _graph->nodes();
+  int nodeIdx = nodes.size() - 1;
+  ImGuiIO& io = ImGui::GetIO();
+  if (!io.KeyMods)for (auto& node : nodes)node->setSelected(false);
+
+  for (; nodeIdx >= 0; --nodeIdx) {
+    TxNode* node = nodes[nodeIdx];
+    if (inside(pos, node->position() * _scale + _offset,
+      (node->position() + node->size()) * _scale + _offset))
+    {
+      if (io.KeyCtrl) {
+        nodes[nodeIdx]->setSelected(1 - nodes[nodeIdx]->selected());
+      } else {
+        nodes[nodeIdx]->setSelected(true);
+      }
+      break;
+    }
+  }
+}
+
+void TxEditor::initSpliter()
+{
+  _splitter.Split(ImGui::GetWindowDrawList(), TxEditor::CNT);
+}
+
+void TxEditor::setSplitterChannel(int channel)
+{
+  _splitter.SetCurrentChannel(ImGui::GetWindowDrawList(), channel);
+}
+
+void TxEditor::terminateSplitter()
+{
+  _splitter.Merge(ImGui::GetWindowDrawList());
+}
+
+void TxEditor::handleInput()
+{
+  static float time = 0.f;
+  ImGuiIO& io = ImGui::GetIO();
+  if (io.MouseWheel) {
+    _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
+  }
+  if (!io.MouseDown[0]) {
+    _pick = pick(ImGui::GetMousePos());
+  }
+  io.FontGlobalScale = _scale;
+
+  if (io.MouseClicked[0]) {
+    select(ImGui::GetMousePos());
+    _drag = 1 - ImGui::IsAnyItemHovered();
+  } else if (io.MouseReleased[0]) {
+    _drag = false;
+    terminateConnexion();
+  } else if (io.MouseDown[2]) {
+    _offset += io.MouseDelta;
+  }
+
+  time += 0.01f;
+
+  if (!_drag)return;
+
+  if (io.MouseDown[0] && !ImGui::IsDragDropActive()) {
+    std::vector<TxNode*>& nodes = _graph->nodes();
+    for (size_t n = 0; n < nodes.size(); ++n) {
+      if (!nodes[n]->selected())continue;
+      nodes[n]->setPosition(nodes[n]->position() + io.MouseDelta * 1.f / _scale);
+    }
+  }
+}
+
+void TxEditor::setCurrent(TxNode* node)
+{
+  _current = node;
+}
+
+void TxEditor::setGraph(TxGraph* graph)
+{
+  _graph = graph;
+}
+
+TxGraphEditor::TxGraphEditor(TxGraph* graph)
+  : TxEditor(graph)
+{};
+
+TxGraphEditor::~TxGraphEditor()
+{
+};
+
+bool TxGraphEditor::contains(const TxNode* node)
+{
+  if(_graph)
+    for(auto& n: _graph->nodes())
+      if(node == n)return true;
+  
+  return false;
+}
+
+void TxGraphEditor::_createNodeByType(int type)
+{
+  TxNode* node = TxFactory::createNodeByType(_graph, type);
+}
+
+void TxGraphEditor::_drawGrid()
+{
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImU32 GRID_COLOR = IM_COL32(200, 200, 200, 40);
+  float GRID_SZ = 64.0f * _scale;
+  ImVec2 win_pos = ImGui::GetCursorScreenPos();
+  ImVec2 canvas_sz = ImGui::GetWindowSize();
+  for (float x = fmodf(_offset.x, GRID_SZ); x < canvas_sz.x; x += GRID_SZ)
+    drawList->AddLine(ImVec2(x, 0.0f) + win_pos, ImVec2(x, canvas_sz.y) + win_pos, GRID_COLOR);
+  for (float y = fmodf(_offset.y, GRID_SZ); y < canvas_sz.y; y += GRID_SZ)
+    drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
+}
+
+void TxGraphEditor::_drawPopup()
+{
+  static const char* name = "GraphNodesMenu";
+  if (ImGui::Button("Show popup")) {
+    ImGui::OpenPopup(name);
+  }
+
+  if (ImGui::BeginPopup(name)) {
+    for (size_t i = 0; i < TxNode::NumNode; ++i) {
+      //ImGui::TextColored({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1 }, TxNode::NodeName[i]);
+      if (ImGui::Selectable(TxNode::NodeName[i])) {
+        _createNodeByType(i);
+      }
+    }
+    ImGui::EndPopup();
+  }
+}
+
+void TxGraphEditor::_drawNode(TxNode* node, bool* modified)
+{
+  ImGuiIO& io = ImGui::GetIO();
+  ImGui::PushID(node->name().c_str());
+  if (node == _pick && io.MouseClicked[1]) {
+    ImGui::OpenPopup((_pick->name() + "Popup").c_str());
+  }
+  node->draw(this, modified);
+  ImGui::PopID();
+}
+
+void TxGraphEditor::_drawConnexion(TxConnexion* connexion)
+{
+  bool inverse = connexion->source->type() == TxParameter::SAMPLES && 
+    !((TxParameterSamples*)connexion->source)->io();
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImVec2 p0, p1, p2, p3;
+  if (!inverse) {
+    p0 = connexion->source->plug(connexion->sourceChannel);
+    if (connexion->target) {
+      p3 = connexion->target->plug(connexion->targetChannel);
+    } else {
+      p3 = ImGui::GetMousePos();
+    }
+    p1 = p0 + ImVec2(100 * _scale, 0);
+    p2 = p3 - ImVec2(100 * _scale, 0);
+  }
+  else {
+    p3 = connexion->source->plug(connexion->sourceChannel);
+    if (connexion->target) {
+      p0 = connexion->target->plug(connexion->targetChannel);
+    }
+    else {
+      p0 = ImGui::GetMousePos();
+    }
+    p1 = p0 + ImVec2(100 * _scale, 0);
+    p2 = p3 - ImVec2(100 * _scale, 0);
+  }
+  
+  drawList->AddBezierCubic(
+    p0, p1, p2, p3,
+    TX_CONTOUR_COLOR_DEFAULT,
+    8.f * _scale
+  );
+
+  drawList->AddBezierCubic(
+    p0, p1, p2, p3,
+    ImColor(ImGui::GetStyle().Colors[ImGuiCol_PlotHistogram]),
+    (8.f - TX_CONTOUR_WIDTH) * _scale
+  );
+
+  const ImVec2 plugSize(TX_PLUG_WIDTH * _scale * 0.5, (TX_PLUG_HEIGHT + TX_PLUG_DETAIL) * 0.5 * _scale);
+  const ImVec2 plugOffset(-TX_PLUG_WIDTH * 0.75 * _scale, 0);
+  if (connexion->source->type() == TxParameter::SAMPLES) {
+    drawList->AddRect(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddRectFilled(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
+  }
+  else {
+    drawList->AddCircle(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddCircleFilled(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
+  }
+  if (connexion->target && connexion->target->type() == TxParameter::SAMPLES) {
+    drawList->AddRect(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddRectFilled(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
+  }
+  else {
+    drawList->AddCircle(p3, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
+    drawList->AddCircleFilled(p3, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
+  }
+}
+
+void TxGraphEditor::draw()
+{
+  static float h = 250.f;
+  std::vector<TxNode*>& nodes = _graph->nodes();
+  std::vector<TxConnexion*>& connexions = _graph->connexions();
+  ImGuiIO& io = ImGui::GetIO();
+  ImGuiStyle& style = ImGui::GetStyle();
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing * _scale);
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing * _scale);
+  const ImVec2 pos(0, h);
+  const ImVec2 size = io.DisplaySize - pos;
+  ImGui::SetNextWindowPos(pos);
+  ImGui::SetNextWindowSize(size);
+  ImGui::Begin("editor", NULL, TxEditor::Flags);
+
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  initSpliter();
+  handleInput();
+
+  _drawGrid();
+  _drawPopup();
+  
+  bool modified = false;
+  for (size_t n = 0; n < nodes.size(); ++n) {
+    _drawNode(nodes[n], &modified);
+  }
+
+  setSplitterChannel(TxEditor::FOREGROUND);
+  if (_connexion && io.MouseDown[0] && ImGui::IsDragDropActive()) {
+    _drawConnexion(_connexion);
+  }
+
+  for (auto& connexion : connexions) {
+    _drawConnexion(connexion);
+  }
+
+  setSplitterChannel(TxEditor::BACKGROUND);
+  if (ImGui::IsDragDropActive()) {
+    drawList->AddRectFilled(pos, pos + size, IM_COL32(0,0,0,100));
+  }
+ 
+  terminateSplitter();
+
+
+  ImGui::End();
+  ImGui::PopStyleVar(2);
+}
+
+ TxSequencerEditor::TxSequencerEditor(TxSequencer* sequencer)
+  : TxEditor(NULL),
+  _sequencer(sequencer)
+ {
+ }
+
+ TxSequencerEditor::~TxSequencerEditor()
+{
+};
+
+ void TxSequencerEditor::draw()
+{
+  if(_sequencer)_sequencer->draw();
+}

@@ -53,8 +53,8 @@ const char* TxFilter::FilterName[TxFilter::NumFilter] = {
   };
 
 
-TxFilter::TxFilter(TxGraph* parent, const std::string& name) 
-  : TxNode(parent, name)
+TxFilter::TxFilter(TxNode* parent, const std::string& name) 
+  : TxNode(parent, TxNode::FILTER, name)
   , _filter(NULL)
   , _filterIdx(-1)
   , _gain(0.9f)
@@ -349,46 +349,46 @@ stk::StkFrames& TxFilter::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-void TxFilter::_drawImpl(bool* modified)
+void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
 
   ImGui::SetNextItemWidth(128);
   TxParameter* filter = _params[TxFilter::FILTER];
-  if(filter->draw()&&modified)*modified=true;
+  if(filter->draw(editor)&&modified)*modified=true;
 
   TxParameter* gain = _params[TxFilter::GAIN];
-  if (gain->draw() && modified)*modified = true;
+  if (gain->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
 
   switch(_filterIdx) {
     case BIQUAD:
-      if(_params[TxFilter::FLOAT1]->draw() && modified)*modified=true;
+      if(_params[TxFilter::FLOAT1]->draw(editor) && modified)*modified=true;
       ImGui::SameLine();
-      if(_params[TxFilter::FLOAT2]->draw() && modified)* modified = true;
-      if(_params[TxFilter::BOOL1]->draw() && modified)* modified = true;
+      if(_params[TxFilter::FLOAT2]->draw(editor) && modified)* modified = true;
+      if(_params[TxFilter::BOOL1]->draw(editor) && modified)* modified = true;
       break;
 
     case ONEPOLE:
-      if(_params[TxFilter::FLOAT1]->draw() && modified)*modified = true;
+      if(_params[TxFilter::FLOAT1]->draw(editor) && modified)*modified = true;
       break;
   
     case DELAY:
     case DELAYA:
     case DELAYL:
-      if(_params[TxFilter::INT1]->draw() && modified)*modified = true;
+      if(_params[TxFilter::INT1]->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
-      if(_params[TxFilter::INT2]->draw() && modified)*modified = true;
+      if(_params[TxFilter::INT2]->draw(editor) && modified)*modified = true;
       break;
 
     case FIR:
-      if(_params[TxFilter::INT1]->draw() && modified)*modified = true;
+      if(_params[TxFilter::INT1]->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
-      if(_params[TxFilter::FLOAT1]->draw() && modified)*modified = true;
+      if(_params[TxFilter::FLOAT1]->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
-      if(_params[TxFilter::FLOAT2]->draw() && modified)*modified = true;
+      if(_params[TxFilter::FLOAT2]->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
-      if(_params[TxFilter::INT2]->draw() && modified)*modified = true;
+      if(_params[TxFilter::INT2]->draw(editor) && modified)*modified = true;
       break;
       
     default:
@@ -400,7 +400,7 @@ void TxFilter::_drawImpl(bool* modified)
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxFilter::reset()

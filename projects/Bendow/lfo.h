@@ -14,7 +14,7 @@ public:
     OFFSET, 
     LAST
   };
-  TxLfo(TxGraph* parent, const std::string& name);
+  TxLfo(TxNode* parent, const std::string& name);
   ~TxLfo();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
@@ -23,7 +23,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor* editor, bool*) override;
 
 private:
   stk::SineWave   _sine;

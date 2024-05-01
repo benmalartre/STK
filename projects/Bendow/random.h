@@ -11,7 +11,7 @@ public:
     MAXIMUM, 
     SEED
   };
-  TxRandom(TxGraph* parent, const std::string& name);
+  TxRandom(TxNode* parent, const std::string& name);
   ~TxRandom();
   const ImVec2& size();
   stk::StkFloat tick(unsigned int) override;
@@ -24,7 +24,7 @@ public:
   void updateBounds();
 
 protected:
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor*, bool*) override;
 
 private:
   stk::StkFloat  _value;

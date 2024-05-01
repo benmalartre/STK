@@ -27,7 +27,7 @@ public:
     LAST
   };
 
-  TxOscillator(TxGraph* parent, const std::string& name);
+  TxOscillator(TxNode* parent, const std::string& name);
   ~TxOscillator();
   stk::StkFloat tick(unsigned int) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
@@ -40,7 +40,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor*, bool*) override;
 
 private:
   stk::Generator* _generator;

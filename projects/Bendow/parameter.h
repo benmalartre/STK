@@ -7,6 +7,7 @@
 
 
 class TxNode;
+class TxEditor;
 
 struct TxParameterPreset {
   const char*   name;
@@ -49,11 +50,11 @@ public:
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;
   virtual stk::StkFloat tick(unsigned int channel) { return 0.f; };
-  virtual bool draw() = 0;
+  virtual bool draw(TxEditor* editor) = 0;
   void setCallback(TxCallback* callback);
 
 protected:
-  void              _drawPlug(short channel);
+  void              _drawPlug(TxEditor* editor, short channel);
 
   short             _type;
   int               _flags;
@@ -74,7 +75,7 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  bool draw() override;
+  bool draw(TxEditor*) override;
 };
 
 class TxParameterInt : public TxParameter {
@@ -86,7 +87,7 @@ public:
   void setMinimum(int value);
   void setMaximum(int value);
   stk::StkFloat tick() override;
-  bool draw() override;
+  bool draw(TxEditor*) override;
 
 private:
   int     _minimum;
@@ -99,7 +100,7 @@ public:
 
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  bool draw() override;
+  bool draw(TxEditor*) override;
 
 private:
   const char**  _names;
@@ -115,7 +116,7 @@ public:
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);
   stk::StkFloat tick() override;
-  bool draw() override;
+  bool draw(TxEditor*) override;
 
 private:
   stk::StkFloat     _minimum;
@@ -129,7 +130,7 @@ public:
   void set(stk::StkFloat value) override;
   const std::string& get();
   stk::StkFloat tick() override;
-  bool draw() override;
+  bool draw(TxEditor*) override;
 
 private:
   std::string       _value;
@@ -143,7 +144,7 @@ public:
   bool io();
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
-  bool draw() override;
+  bool draw(TxEditor*) override;
 
 private:
   stk::StkFrames*    _frames;

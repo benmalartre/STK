@@ -2,6 +2,7 @@
 #include "parameter.h"
 #include "node.h"
 #include "graph.h"
+#include "editor.h"
 
 static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
 {
@@ -95,10 +96,9 @@ void TxParameter::setCallback(TxCallback* callback)
   _callback = callback;
 }
 
-void TxParameter::_drawPlug(short channel)
+void TxParameter::_drawPlug(TxEditor* editor, short channel)
 {
-  TxGraph* graph = _node->graph();
-  const float& scale = graph->scale();
+  const float scale = editor->scale();
   ImVec2 center;
   float radius;
   bool horizontal = (_type == TxParameter::BOOL) || _flags & TxParameter::HORIZONTAL;
@@ -120,22 +120,22 @@ void TxParameter::_drawPlug(short channel)
     ImGui::Text("This is a drag and drop source");
     ImGui::EndDragDropSource();
   } else if (ImGui::IsDragDropActive()) {
-    if (_checkCompatibility(this, graph->connexion()) && ImGui::BeginDragDropTarget()) {
-      _node->graph()->updateConnexion(this, channel, true);
+    if (_checkCompatibility(this, editor->connexion()) && ImGui::BeginDragDropTarget()) {
+      editor->updateConnexion(this, channel, true);
       plugColor = TX_PLUG_COLOR_SELECTED;
       ImGui::EndDragDropTarget();
     } else {
-      _node->graph()->updateConnexion(this, 0, false);
+      editor->updateConnexion(this, 0, false);
     }
   }
 
-  TxConnexion* connexion = _node->graph()->connexion();
+  TxConnexion* connexion = editor->connexion();
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   drawList->AddCircle(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * scale);
   drawList->AddCircleFilled(center, radius, TX_PLUG_COLOR_DEFAULT, 32);
   drawList->AddCircleFilled(center, radius * 0.6, TX_CONTOUR_COLOR_DEFAULT, 32);
 
-  if (connexion && _checkCompatibility(this, graph->connexion())) {
+  if (connexion && _checkCompatibility(this, editor->connexion())) {
     ImDrawList* foregroundList = ImGui::GetForegroundDrawList();
     foregroundList->AddCircle(center, radius, TX_PLUG_COLOR_AVAILABLE, 32, 2 * TX_CONTOUR_WIDTH * scale);
   }
@@ -164,10 +164,10 @@ stk::StkFloat TxParameterBool::tick()
   return *(stk::StkFloat*)_data;
 }
 
-bool TxParameterBool::draw()
+bool TxParameterBool::draw(TxEditor* editor)
 {
   ImGui::BeginGroup();
-  _drawPlug(0);
+  _drawPlug(editor, 0);
 
   ImGui::SameLine();
   bool modified = ImGui::Checkbox(_label.c_str(), (bool*)_data);
@@ -209,22 +209,22 @@ stk::StkFloat TxParameterInt::tick()
   return (stk::StkFloat)*(int*)_data;
 }
 
-bool TxParameterInt::draw()
+bool TxParameterInt::draw(TxEditor* editor)
 {
   bool modified = false;
   ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
-    _drawPlug(0);
+    _drawPlug(editor, 0);
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(100 * _node->graph()->scale());
+    ImGui::SetNextItemWidth(100 * editor->scale());
     modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * _node->graph()->scale(), (int*)_data, _minimum, _maximum);
-    _drawPlug(0);
+    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * editor->scale(), (int*)_data, _minimum, _maximum);
+    _drawPlug(editor, 0);
   } else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE);
-    _drawPlug(0);
+    _drawPlug(editor, 0);
   }
   
   ImGui::EndGroup();
@@ -255,7 +255,7 @@ stk::StkFloat TxParameterEnum::tick()
   return (stk::StkFloat)*(int*)_data;
 }
 
-bool TxParameterEnum::draw()
+bool TxParameterEnum::draw(TxEditor* editor)
 {
   int value = *(int*)_data;
   bool modified = false;
@@ -313,25 +313,25 @@ stk::StkFloat TxParameterFloat::tick()
   return *(stk::StkFloat*)_data;
 }
 
-bool TxParameterFloat::draw()
+bool TxParameterFloat::draw(TxEditor* editor)
 {
   bool modified = false;
   ImGui::BeginGroup();
 
   if (_flags & TxParameter::HORIZONTAL) {
-    _drawPlug(0);
+    _drawPlug(editor, 0);
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(100 * _node->graph()->scale());
+    ImGui::SetNextItemWidth(100 * editor->scale());
     modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * _node->graph()->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
-    _drawPlug(0);
+    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
+    _drawPlug(editor, 0);
   }
   else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE);
-    _drawPlug(0);
+    _drawPlug(editor, 0);
   }
   
 
@@ -357,7 +357,7 @@ stk::StkFloat TxParameterString::tick()
   return 0.f;
 }
 
-bool TxParameterString::draw()
+bool TxParameterString::draw(TxEditor* editor)
 {
   bool modified = false;
   /*
@@ -413,15 +413,15 @@ stk::StkFloat TxParameterSamples::tick()
   return 0.f;
 }
 
-bool TxParameterSamples::draw()
+bool TxParameterSamples::draw(TxEditor* editor)
 {
   ImGuiIO& io = ImGui::GetIO();
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   TxGraph* graph = _node->graph();
   ImVec2 pMin, pMax;
   float plugOffsetY = 3 * TX_PLUG_HEIGHT;
-  const float& scale = graph->scale();
-  const ImVec2& offset = graph->offset();
+  const float& scale = editor->scale();
+  const ImVec2& offset = editor->offset();
 
   for (size_t c = 0; c < _nChannels; ++c) {
     if (!_io) {
@@ -437,7 +437,7 @@ bool TxParameterSamples::draw()
     ImGui::InvisibleButton(("##plug" + std::to_string(c+_io*64+_index)).c_str(), 
       ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
     if (ImGui::BeginDragDropSource()) {
-      _node->graph()->startConnexion(this, c);
+      editor->startConnexion(this, c);
       ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
       ImGui::Text("This is a drag and drop source");
       ImGui::EndDragDropSource();
@@ -445,15 +445,15 @@ bool TxParameterSamples::draw()
     else if (ImGui::IsDragDropActive()) {
       if (ImGui::BeginDragDropTarget()) {
         ImGui::Text("This is a drag and drop target");
-        _node->graph()->updateConnexion(this, c, true);
+        editor->updateConnexion(this, c, true);
         ImGui::EndDragDropTarget();
       } else {
-        _node->graph()->updateConnexion(this, 0, false);
+        editor->updateConnexion(this, 0, false);
       }
     }
 
     ImColor plugColor = _node->color(TX_COLOR_PLUG_ID);
-    if (ImGui::IsDragDropActive() && _checkCompatibility(this, _node->graph()->connexion() )) {
+    if (ImGui::IsDragDropActive() && _checkCompatibility(this, editor->connexion() )) {
       plugColor = TX_PLUG_COLOR_AVAILABLE;
     }
 
@@ -461,13 +461,13 @@ bool TxParameterSamples::draw()
     if (!_io) {
       drawList->AddRect(
         pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
-        pMax + ImVec2(0, TX_PLUG_DETAIL) * graph->scale(),
+        pMax + ImVec2(0, TX_PLUG_DETAIL) * editor->scale(),
         _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0,
         TX_CONTOUR_WIDTH * scale);
     }
     else {
       drawList->AddRect(
-        pMin + ImVec2(0, -TX_PLUG_DETAIL) * graph->scale(),
+        pMin + ImVec2(0, -TX_PLUG_DETAIL) * editor->scale(),
         pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
         _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0,
         TX_CONTOUR_WIDTH * scale);
@@ -477,13 +477,13 @@ bool TxParameterSamples::draw()
     if (!_io) {
       drawList->AddRectFilled(
         pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
-        pMax + ImVec2(0, TX_PLUG_DETAIL) * graph->scale(),
+        pMax + ImVec2(0, TX_PLUG_DETAIL) * editor->scale(),
         plugColor,
         TX_NODE_ROUNDING * scale);
     }
     else {
       drawList->AddRectFilled(
-        pMin + ImVec2(0, -TX_PLUG_DETAIL) * graph->scale(),
+        pMin + ImVec2(0, -TX_PLUG_DETAIL) * editor->scale(),
         pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
         plugColor,
         TX_NODE_ROUNDING * scale);
