@@ -104,7 +104,6 @@ struct TxConnexion {
   int sourceChannel;
   int targetChannel;
 
-  bool track(){return source->type() == TxNode::TRACK;};
 };
 
 
