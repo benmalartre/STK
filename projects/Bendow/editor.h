@@ -5,6 +5,9 @@
 #ifndef TX_EDITOR_H
 #define TX_EDITOR_H
 
+
+static size_t SplitterHeight = 250;
+
 class TxSequencer;
 class TxEditor {
 public:
@@ -24,6 +27,7 @@ public:
   void                    updateConnexion(TxParameter* param, int channel, bool state);
   void                    terminateConnexion();
 
+  const ImVec2&           pos();
   const ImVec2&           offset();
   const float&            scale();
   TxNode*                 current();
@@ -31,8 +35,8 @@ public:
 
   virtual void            draw() = 0;
 
-  TxNode*                 pick(const ImVec2& position);
-  void                    select(const ImVec2& position);
+  TxNode*                 pick(const ImVec2& p);
+  void                    select(const ImVec2& p);
   void                    handleInput();
 
   void                    setCurrent(TxNode* node);
@@ -42,8 +46,11 @@ public:
 protected:            
   static const int        Flags;
 
+  ImVec2                    _pos;
+  ImVec2                    _size;
   ImDrawListSplitter        _splitter;
   bool                      _drag;
+  bool                      _pan;
   ImVec2                    _offset;
   float                     _scale;
   bool                      _navigatable;
@@ -79,6 +86,7 @@ protected:
   void                      _drawConnexion(TxConnexion* connexion);
   void                      _drawPopup();
   void                      _drawGrid();
+  void                      _drawFrame();
 };
 
 class TxSequencerEditor : public TxEditor {

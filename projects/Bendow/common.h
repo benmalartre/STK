@@ -53,7 +53,8 @@
 #define TX_PLUG_WIDTH 12.f
 #define TX_PLUG_HEIGHT 12.f
 #define TX_PLUG_DETAIL 6.f
-#define TX_CONTOUR_WIDTH 3.333f
+#define TX_CONTOUR_WIDTH 6.f
+#define TX_CONNEXION_WIDTH 4.f
 #define TX_NODE_ROUNDING 2.f
 #define TX_PLUG_SIZE 8.f
 #define TX_KNOB_SIZE 52.f
@@ -77,7 +78,7 @@ enum TX_COLOR_INDEX {
 static ImU32 TX_PLUG_COLOR_DEFAULT = IM_COL32(180,180,180,255);
 static ImU32 TX_CONTOUR_COLOR_DEFAULT = IM_COL32(50,50,50, 255);
 static ImU32 TX_PLUG_COLOR_SELECTED = IM_COL32(200,200,200,255);
-static ImU32 TX_CONTOUR_COLOR_SELECTED = IM_COL32(220,220,220,  255);
+static ImU32 TX_CONTOUR_COLOR_SELECTED = IM_COL32(255,200,100,  255);
 static ImU32 TX_PLUG_COLOR_AVAILABLE = IM_COL32(255,200,100,255);
 
 using Beat = std::pair<short, float>;
@@ -111,8 +112,10 @@ public:
   void incr100() {_time += 100.f;};
   double get() const {return _time;};
   void set(float t) {_time = t;};
-  void setBPM(size_t bpm){_bpm=bpm;};
+  void setBPM(int bpm){_bpm=bpm;};
   double rate() const {return _rate;};
+  int bpm() const {return _bpm;};
+
   Index index(size_t length);
   static TxTime& instance() {
     static TxTime instance;
@@ -122,7 +125,7 @@ public:
 protected:
   double _time;
   double _rate;
-  size_t _bpm;
+  int _bpm;
 };
 
 

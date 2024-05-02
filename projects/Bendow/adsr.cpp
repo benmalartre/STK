@@ -30,6 +30,11 @@ const ImVec2& TxAdsr::size()
 
 stk::StkFloat TxAdsr::tick(unsigned int)
 {
+  _params[TxAdsr::ATTACK]->tick();
+  _params[TxAdsr::DECAY]->tick();
+  _params[TxAdsr::SUSTAIN]->tick();
+  _params[TxAdsr::RELEASE]->tick();
+  
   _trigger = _params[TxAdsr::TRIGGER]->tick();
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
 

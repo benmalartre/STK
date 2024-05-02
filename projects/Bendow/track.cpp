@@ -22,7 +22,7 @@ stk::StkFloat TxTrack::tick(unsigned int channel)
   Index index = TxTime::instance().index(_sequence.size());
 
   const Beat& beat = _sequence[index.first];
-  if(channel == 0)return beat.first;
+  if(channel == 0)return BIT_CHECK(beat.first, index.second);
   else if(channel == 1) return beat.second;
 }
 
@@ -48,7 +48,6 @@ void TxTrack::_drawImpl(TxEditor* editor, bool* modified)
 
 void TxTrack::reset()
 {
-  
 }
 
 void TxTrack::basicGraph()

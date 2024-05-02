@@ -11,6 +11,12 @@ ImGuiWindowFlags_NoNav |
 ImGuiWindowFlags_NoBackground |
 ImGuiWindowFlags_NoTitleBar;
 
+void updateBPM(TxSequencer* sequencer)
+{
+  TxTime& time = TxTime::instance();
+  time.setBPM(sequencer->bpm());
+}
+
 TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   : TxNode(NULL, TxNode::SEQUENCER, "TxSequencer", TX_NUM_CHANNELS)
   , _bpm(bpm)
@@ -23,6 +29,7 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   setLength(length);
   _params.push_back(new TxParameterBool(this, "Running", &_running));
   _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
+  _params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateBPM, this));
   _params.push_back(new TxParameterFloat(this, "Volume", 0.f, 2.f, &_volume));
   _params.push_back(new TxParameterFloat(this, "Time", -10000.f, 10000.f, &_time, TxParameter::FLOAT));
 
@@ -84,7 +91,7 @@ const ImVec2& TxSequencer::size()
   return _size;
 }
 
-const Beat& TxSequencer::beat(uint32_t trackIdx, size_t beatIdx)
+Beat* TxSequencer::beat(uint32_t trackIdx, size_t beatIdx)
 {
   return _tracks[trackIdx].beat(beatIdx);
 }
@@ -100,17 +107,12 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
   
   float sample = 0.f;
   //int nActiveTrack = 0;
-  _beats.resize(_tracks.size());
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i].active() && _tracks[i].graph()) {
       //nActiveTrack++;
       const Index index = TxTime::instance().index(_tracks[i].length());
-      _beats[i] = _tracks[i].beat(index.first);
-      sample += _tracks[i].graph()->tick();
+      sample += _tracks[i].graph()->tick() * _volume;
       //sample += channel ? beat->second : BIT_CHECK(beat->first, index.second);
-    } else {
-      _beats[i].first = false;
-      _beats[i].second = 0.f;
     }
   }
   
@@ -142,31 +144,31 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
   return frames;
 }
 
-bool TxSequencer::drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool current, float scale)
+bool TxSequencer::drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool current)
 {
   const size_t beatWidth = _size.x / track->length();
   const size_t bitWidth = beatWidth / NumBits;
   bool modified = false;
   const std::string hiddenPrefix = "##" + std::to_string(beatIdx);
   
-  Beat& beat = track->beat(beatIdx);
+  Beat* beat = track->beat(beatIdx);
   ImGui::BeginGroup();
-  if (ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(beatWidth, 120) * scale,
-    &beat.second, 0, 255))modified = true;
+  if (ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(beatWidth, 120),
+    &beat->second, 0, 255))modified = true;
 
   ImGui::BeginGroup();
   
   const ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1, 1));
   for(size_t i = 0; i < 4; ++i) {
-    bool bit = BIT_CHECK(beat.first, i);
+    bool bit = BIT_CHECK(beat->first, i);
     const ImVec4 btnColor = (current && (i == bitIdx))? 
       (bit ? ImVec4(1, 0, 0, 1): ImVec4(1, 0.75, 0, 1)) 
       : (bit ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
 
     ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(bitWidth, 12) * scale)) {
-      BIT_FLIP(beat.first, i);
+    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(bitWidth, 12))) {
+      BIT_FLIP(beat->first, i);
       modified = true;
     }
     ImGui::PopStyleColor();
@@ -203,53 +205,36 @@ void TxSequencer::draw()
 
   ImGui::SetWindowFontScale(1.f);
   
-  bool modified = false;
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
-  // 
-  //TxNode::_drawAlignLeft();
+  
   if (ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm",
-    ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal))modified = true;
+    ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal))
+      updateBPM(this);
   
   ImGui::SameLine();
 
-  if (ImGuiKnobs::Knob("Volume", &_volume, 0.f, 2.f, 0.f, 0,
-    ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal))modified = true;
+  ImGuiKnobs::Knob("Volume", &_volume, 0.f, 2.f, 0.f, 0,
+    ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal);
 
   ImGui::SameLine();
 
   ImGui::BeginGroup();
   
   if (ImGui::Button("Reset Time")) time.reset();
-  //ImGui::SameLine();
-  //if(ImGui::Button("Incr Time")) time.incr100();
-  //ImGui::SameLine();
   ImGui::SetNextItemWidth(100);
   ImGui::Text("Time : %fs", t);
 
-  //ImGui::SameLine();
   ImGui::Text("Rate : %fs", time.rate());
-  //ImGui::SameLine();
   ImGui::Text("Index : %i", index.first);
   ImGui::EndGroup();
 
   for (size_t i = 0; i < _tracks.size(); ++i) {
     for (size_t j = 0; j < _tracks[i].length(); ++j) {
-      if (drawBeat(&_tracks[i], j, index.second, (j == index.first), 1.f))modified = true;
+      drawBeat(&_tracks[i], j, index.second, (j == index.first));
       if (i < _tracks[i].length() - 1)  ImGui::SameLine();
     }
   }
-
-  /*
-  for(size_t i = 0; i < _sequence.size(); ++i) {
-    if (drawBeat(i, index.second, (i == index.first), _parent->scale()))*modified = true;
-    if (i < _sequence.size() - 1)  ImGui::SameLine();
-  }
-  */
-  //_params[TIME]->draw();
-  //TxNode::_drawOutput();
-
- 
 
   ImGui::End();
   ImGui::PopStyleVar(2);

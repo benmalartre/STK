@@ -32,13 +32,15 @@ public:
   stk::StkFloat tick(unsigned int channel) override;
   stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
-  const Beat& beat(uint32_t trackIdx, size_t beatIdx);
+  Beat* beat(uint32_t trackIdx, size_t beatIdx);
   
   const ImVec2& size() override;
+  int bpm(){return _bpm;};
+  bool running(){return _running;};
   void start();
   void stop();
 
-  bool drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
+  bool drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool current);
   void reset() override;
   void draw();
 
@@ -49,7 +51,7 @@ protected:
 
 private:
   std::vector<TxTrack>  _tracks;
-  std::vector<Beat>     _beats;
+  TxTrack*              _current;
   int                   _bpm;
   int                   _length;
   bool                  _running;

@@ -19,8 +19,10 @@ TxEditor::TxEditor(TxGraph* graph, bool navigatable)
   : _current(NULL)
   , _connexion(NULL)
   , _pick(NULL)
+  , _drag(false)
+  , _pan(false)
   , _graph(graph)
-  , _offset(ImVec2(100,100))
+  , _offset(ImVec2(0,0))
   , _scale(1.f)
   , _navigatable(navigatable)
 
@@ -29,6 +31,11 @@ TxEditor::TxEditor(TxGraph* graph, bool navigatable)
 TxNode* TxEditor::current()
 {
   return _current;
+}
+
+const ImVec2& TxEditor::pos()
+{
+  return ImGui::GetWindowPos();
 }
 
 const ImVec2& TxEditor::offset()
@@ -84,15 +91,14 @@ static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
     point[1] >= bmin[1] && point[1] <= bmax[1];
 }
 
-TxNode* TxEditor::pick(const ImVec2& pos)
+TxNode* TxEditor::pick(const ImVec2& p)
 {
   std::vector<TxNode*>& nodes = _graph->nodes();
   int nodeIdx = nodes.size() - 1;
   _hovered = NULL;
   for (; nodeIdx >= 0; --nodeIdx) {
     TxNode* node = nodes[nodeIdx];
-    if (inside(pos, node->position() * _scale + _offset,
-      (node->position() + node->size()) * _scale + _offset))
+    if (inside(p, node->position(), node->position() + node->size()))
     {
       _hovered = node;
       break;
@@ -102,7 +108,7 @@ TxNode* TxEditor::pick(const ImVec2& pos)
   return _hovered;
 }
 
-void TxEditor::select(const ImVec2& pos)
+void TxEditor::select(const ImVec2& p)
 {
   std::vector<TxNode*>& nodes = _graph->nodes();
   int nodeIdx = nodes.size() - 1;
@@ -111,8 +117,7 @@ void TxEditor::select(const ImVec2& pos)
 
   for (; nodeIdx >= 0; --nodeIdx) {
     TxNode* node = nodes[nodeIdx];
-    if (inside(pos, node->position() * _scale + _offset,
-      (node->position() + node->size()) * _scale + _offset))
+    if (inside(p, node->position(), node->position() + node->size()))
     {
       if (io.KeyCtrl) {
         nodes[nodeIdx]->setSelected(1 - nodes[nodeIdx]->selected());
@@ -141,26 +146,25 @@ void TxEditor::terminateSplitter()
 
 void TxEditor::handleInput()
 {
-  static float time = 0.f;
   ImGuiIO& io = ImGui::GetIO();
+
   if (io.MouseWheel && _navigatable) {
     _scale = ImClamp(_scale + io.MouseWheel * 0.1f, 0.1f, 4.f);
   }
   if (!io.MouseDown[0]) {
-    _pick = pick(ImGui::GetMousePos());
+    _pick = pick(ImGui::GetMousePos() * _scale - _offset);
   }
 
   if (io.MouseClicked[0]) {
-    select(ImGui::GetMousePos());
+    select(ImGui::GetMousePos() * _scale - _offset);
     _drag = 1 - ImGui::IsAnyItemHovered();
+    if(io.KeySuper) _pan = true;
   } else if (io.MouseReleased[0]) {
     _drag = false;
+    _pan = false;
     terminateConnexion();
-  } else if (io.MouseDown[2]) {
-    _offset += io.MouseDelta;
   }
-
-  time += 0.01f;
+  if (_pan) _offset += io.MouseDelta;
 
   if (!_drag)return;
 
@@ -205,17 +209,38 @@ void TxGraphEditor::_createNodeByType(int type)
   TxNode* node = TxFactory::createNodeByType(_graph, type);
 }
 
+void TxGraphEditor::_drawFrame()
+{
+  ImVec2 s = ImGui::GetWindowSize();
+  ImVec2 p = ImGui::GetWindowPos();
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+  ImU32 CANVAS_COLOR = IM_COL32(200,200,200, 40);
+  drawList->AddRectFilled(ImVec2(p.x+32, p.y+24), 
+    ImVec2(p.x+s.x-32, p.y+s.y-10), CANVAS_COLOR, 4.f);
+
+}
+
+
 void TxGraphEditor::_drawGrid()
 {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
-  ImU32 GRID_COLOR = IM_COL32(200, 200, 200, 40);
-  float GRID_SZ = 64.0f * _scale;
-  ImVec2 win_pos = ImGui::GetCursorScreenPos();
-  ImVec2 canvas_sz = ImGui::GetWindowSize();
-  for (float x = fmodf(_offset.x, GRID_SZ); x < canvas_sz.x; x += GRID_SZ)
-    drawList->AddLine(ImVec2(x, 0.0f) + win_pos, ImVec2(x, canvas_sz.y) + win_pos, GRID_COLOR);
-  for (float y = fmodf(_offset.y, GRID_SZ); y < canvas_sz.y; y += GRID_SZ)
-    drawList->AddLine(ImVec2(0.0f, y) + win_pos, ImVec2(canvas_sz.x, y) + win_pos, GRID_COLOR);
+  ImVec2 p = ImGui::GetWindowPos() + _offset;
+  size_t scl = _scale * 100;
+  size_t px = static_cast<int>(p.x) % scl;
+  size_t py = static_cast<int>(p.y) % scl;
+
+  p = ImVec2(px, py);
+
+  ImVec2 s = ImGui::GetWindowSize();
+  ImU32 GRID_COLOR = IM_COL32(120, 120, 120, 60);
+  float GRID_SZ = 100.f * _scale;
+  ImVec2 c(s.x / GRID_SZ, s.y / GRID_SZ);
+  
+  for (float x = 0; x < s.x; x += GRID_SZ)
+    drawList->AddLine(ImVec2(x, 0.0f) + p, ImVec2(x, s.y) + p, GRID_COLOR);
+  for (float y = 0; y < s.y; y += GRID_SZ)
+    drawList->AddLine(ImVec2(0.0f, y) + p, ImVec2(s.x, y) + p, GRID_COLOR);
+
 }
 
 void TxGraphEditor::_drawPopup()
@@ -285,17 +310,15 @@ void TxGraphEditor::_drawConnexion(TxConnexion* connexion)
   drawList->AddBezierCubic(
     p0, p1, p2, p3,
     ImColor(ImGui::GetStyle().Colors[ImGuiCol_PlotHistogram]),
-    (8.f - TX_CONTOUR_WIDTH) * _scale
+    TX_CONNEXION_WIDTH * _scale
   );
 
   const ImVec2 plugSize(TX_PLUG_WIDTH * _scale * 0.5, (TX_PLUG_HEIGHT + TX_PLUG_DETAIL) * 0.5 * _scale);
   const ImVec2 plugOffset(-TX_PLUG_WIDTH * 0.75 * _scale, 0);
   if (connexion->source->type() == TxParameter::SAMPLES) {
-    drawList->AddRect(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_CONTOUR_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale, 0, TX_CONTOUR_WIDTH * _scale);
     drawList->AddRectFilled(p0 - plugSize - plugOffset, p0 + plugSize - plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
   }
   else {
-    drawList->AddCircle(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
     drawList->AddCircleFilled(p0, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
   }
   if (connexion->target && connexion->target->type() == TxParameter::SAMPLES) {
@@ -303,36 +326,37 @@ void TxGraphEditor::_drawConnexion(TxConnexion* connexion)
     drawList->AddRectFilled(p3 - plugSize + plugOffset, p3 + plugSize + plugOffset, TX_PLUG_COLOR_DEFAULT, TX_NODE_ROUNDING * _scale);
   }
   else {
-    drawList->AddCircle(p3, TX_PLUG_WIDTH * _scale * 0.5, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * _scale);
     drawList->AddCircleFilled(p3, TX_PLUG_WIDTH * _scale * 0.5, TX_PLUG_COLOR_DEFAULT, 32);
   }
 }
 
 void TxGraphEditor::draw()
 {
-  static float h = 250.f;
+
   std::vector<TxNode*>& nodes = _graph->nodes();
   std::vector<TxConnexion*>& connexions = _graph->connexions();
   ImGuiIO& io = ImGui::GetIO();
   ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing * _scale);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing * _scale);
-  const ImVec2 pos(0, h);
-  const ImVec2 size = io.DisplaySize - pos;
-  ImGui::SetNextWindowPos(pos);
-  ImGui::SetNextWindowSize(size);
+  _pos =  ImVec2(0, SplitterHeight);
+  _size = io.DisplaySize - _pos;
+  ImGui::SetNextWindowPos(_pos);
+  ImGui::SetNextWindowSize(_size);
   ImGui::Begin("editor", NULL, TxEditor::Flags);
 
   ImGui::SetWindowFontScale(_scale);
 
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   initSpliter();
-  handleInput();
+  if(inside(io.MousePos, _pos, _pos + _size))handleInput();
 
+  _drawFrame();
   _drawGrid();
   _drawPopup();
   
   bool modified = false;
+
   for (size_t n = 0; n < nodes.size(); ++n) {
     _drawNode(nodes[n], &modified);
   }
@@ -348,7 +372,7 @@ void TxGraphEditor::draw()
 
   setSplitterChannel(TxEditor::BACKGROUND);
   if (ImGui::IsDragDropActive()) {
-    drawList->AddRectFilled(pos, pos + size, IM_COL32(0,0,0,100));
+    drawList->AddRectFilled(_pos, _pos + _size, IM_COL32(0,0,0,100));
   }
  
   terminateSplitter();

@@ -56,7 +56,7 @@ stk::StkFloat TxOscillator::tick(unsigned int)
   if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
     setWaveForm(_waveFormIdx);
   }
-  _envelope = 0.5f;//_params[ENVELOPE]->tick();
+  _envelope = _params[ENVELOPE]->tick();
   setFrequency(_params[FREQUENCY]->tick());
   setHarmonics(_params[HARMONICS]->tick());
   float sample = 0.f;
@@ -218,9 +218,7 @@ void TxOscillator::setHarmonics(int harmonics)
 }
 
 void TxOscillator::_drawImpl(TxEditor* editor, bool* modified)
-{
-  TxNode::_drawAlignTop(editor);
-  
+{  
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128 * editor->scale());
   TxParameter* waveform = _params[TxOscillator::WAVEFORM];

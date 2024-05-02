@@ -23,8 +23,8 @@ public:
 
   bool active(){return _active;};
   TxGraph* graph(){return _graph;};
-  Beat& beat(size_t beatIdx){
-    return _sequence[beatIdx%_sequence.size()];
+  Beat* beat(size_t beatIdx){
+    return &_sequence[beatIdx%_sequence.size()];
 };
   size_t length(){return _sequence.size();};
 

@@ -236,46 +236,55 @@ void TxNode::_drawOutput(TxEditor* editor)
 
 void TxNode::_drawAlignLeft(TxEditor* editor)
 {
-  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * editor->scale() + editor->offset()[0]);
+  const ImVec2& pos = editor->pos();
+  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * editor->scale() + editor->offset()[0] - pos.y);
 }
 
 void TxNode::_drawAlignTop(TxEditor* editor)
 {
-  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * editor->scale() + editor->offset()[1]);
+  const ImVec2& pos = editor->pos();
+  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * editor->scale() + editor->offset()[1] - pos.x);
 }
 
 void TxNode::draw(TxEditor* editor, bool* modified)
 {
   const float scale = editor->scale();
-  const ImVec2 position = _position * scale + editor->offset();
 
-  ImGui::SetCursorPos(position + ImVec2(TX_PADDING_X, TX_PADDING_Y) * scale);
+  const ImVec2 offset = editor->pos();
+  const ImVec2 position = (_position)* scale + editor->offset();
+
   editor->setSplitterChannel(TxEditor::FOREGROUND);
-  _drawAlignLeft(editor);
+  ImGui::SetCursorPos(position);
   _drawImpl(editor, modified);
 
   editor->setSplitterChannel(TxEditor::BACKGROUND);
   
   ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  // draw node name
   ImGui::PushFont(TX_FONT_TITLE);
   drawList->AddText(
-    position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, 
+    offset + position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, 
     TX_CONTOUR_COLOR_SELECTED, 
     _name.c_str());
   ImGui::PopFont();
 
+  // draw node contour
   drawList->AddRect(
-    position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
-    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
+    offset +position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
+    offset + position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
     color(TX_COLOR_CONTOUR_ID), 
     TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
   
+  // draw node background
   drawList->AddRectFilled(
-    position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
-    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
+    offset + position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
+    offset + position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
     ImColor(_color), 
     TX_NODE_ROUNDING * scale);
     
   _drawPopup(editor);
+
+  editor->setSplitterChannel(TxEditor::FOREGROUND);
  
 }

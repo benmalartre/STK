@@ -21,10 +21,15 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 
   TxTime& time = TxTime::instance();
   for (unsigned int i = 0; i < nBufferFrames; ++i) {
-    const float sample = sequencer->tick(0);
-    *samples++ = sample;
-    *samples++ = sample;
-    time.increment();
+    if(sequencer->running()) {
+      const float sample = sequencer->tick(0);
+      *samples++ = sample;
+      *samples++ = sample;
+      time.increment();
+    } else {
+      *samples++ = 0.f;
+      *samples++ = 0.f;
+    }
   }
 
   /*
