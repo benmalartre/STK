@@ -417,6 +417,71 @@ stk::StkFloat TxParameterSamples::tick()
   return 0.f;
 }
 
+bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2& pMax, float scale, short channel)
+{
+  ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
+  ImGui::InvisibleButton(("##plug" + std::to_string(channel+_io*64+_index)).c_str(), 
+    ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
+  if (ImGui::BeginDragDropSource()) {
+    editor->startConnexion(this, channel);
+    ImGui::SetDragDropPayload("samples", NULL, 0);
+    ImGui::Text("This is a drag and drop source");
+    ImGui::EndDragDropSource();
+  }
+  else if (ImGui::IsDragDropActive()) {
+    if (ImGui::BeginDragDropTarget()) {
+      ImGui::Text("This is a drag and drop target");
+      editor->updateConnexion(this, channel, true);
+      ImGui::EndDragDropTarget();
+    } else {
+      editor->updateConnexion(this, 0, false);
+    }
+  }
+
+  ImColor plugColor = _node->color(TX_COLOR_PLUG_ID);
+  if (ImGui::IsDragDropActive() && _checkCompatibility(this, editor->connexion() )) {
+    plugColor = TX_PLUG_COLOR_AVAILABLE;
+  }
+
+  drawList->AddRect(pMin, pMax, _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
+  if (!_io) {
+    drawList->AddRect(
+      pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
+      pMax + ImVec2(0, TX_PLUG_DETAIL) * editor->scale(),
+      _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0,
+      TX_CONTOUR_WIDTH * scale);
+  }
+  else {
+    drawList->AddRect(
+      pMin + ImVec2(0, -TX_PLUG_DETAIL) * editor->scale(),
+      pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
+      _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0,
+      TX_CONTOUR_WIDTH * scale);
+  }
+
+  drawList->AddRectFilled(pMin, pMax, plugColor, TX_NODE_ROUNDING * scale);
+  if (!_io) {
+    drawList->AddRectFilled(
+      pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
+      pMax + ImVec2(0, TX_PLUG_DETAIL) * editor->scale(),
+      plugColor,
+      TX_NODE_ROUNDING * scale);
+  }
+  else {
+    drawList->AddRectFilled(
+      pMin + ImVec2(0, -TX_PLUG_DETAIL) * editor->scale(),
+      pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
+      plugColor,
+      TX_NODE_ROUNDING * scale);
+  }
+  _plug[channel] = (pMin + pMax) * 0.5;
+  _radius[channel] = sqrtf(ImLengthSqr(pMax - pMin));
+  return false;
+}
+
+
 bool TxParameterSamples::draw(TxEditor* editor)
 {
   ImGuiIO& io = ImGui::GetIO();
@@ -426,74 +491,20 @@ bool TxParameterSamples::draw(TxEditor* editor)
   float plugOffsetY = 3 * TX_PLUG_HEIGHT;
   const float& scale = editor->scale();
   const ImVec2& offset = editor->offset();
+  const ImVec2 ep = editor->pos();
 
-  for (size_t c = 0; c < _nChannels; ++c) {
+  for (size_t channel = 0; channel < _nChannels; ++channel) {
     if (!_io) {
-      pMin = (_node->position() + ImVec2(0.f, TX_TITLE_HEIGHT + plugOffsetY * (c + _index))) * scale + offset;
+      pMin = ep + (_node->position() + ImVec2(0.f, TX_TITLE_HEIGHT + plugOffsetY * (channel + _index))) * scale + offset;
       pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
     else {
-      pMin = (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, TX_TITLE_HEIGHT + plugOffsetY * (c + _index))) * scale + offset;
+      pMin = ep + (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, TX_TITLE_HEIGHT + plugOffsetY * (channel + _index))) * scale + offset;
       pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
 
-    ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
-    ImGui::InvisibleButton(("##plug" + std::to_string(c+_io*64+_index)).c_str(), 
-      ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
-    if (ImGui::BeginDragDropSource()) {
-      editor->startConnexion(this, c);
-      ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
-      ImGui::Text("This is a drag and drop source");
-      ImGui::EndDragDropSource();
-    }
-    else if (ImGui::IsDragDropActive()) {
-      if (ImGui::BeginDragDropTarget()) {
-        ImGui::Text("This is a drag and drop target");
-        editor->updateConnexion(this, c, true);
-        ImGui::EndDragDropTarget();
-      } else {
-        editor->updateConnexion(this, 0, false);
-      }
-    }
+    draw(editor, pMin, pMax, scale, channel);
 
-    ImColor plugColor = _node->color(TX_COLOR_PLUG_ID);
-    if (ImGui::IsDragDropActive() && _checkCompatibility(this, editor->connexion() )) {
-      plugColor = TX_PLUG_COLOR_AVAILABLE;
-    }
-
-    drawList->AddRect(pMin, pMax, _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
-    if (!_io) {
-      drawList->AddRect(
-        pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
-        pMax + ImVec2(0, TX_PLUG_DETAIL) * editor->scale(),
-        _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0,
-        TX_CONTOUR_WIDTH * scale);
-    }
-    else {
-      drawList->AddRect(
-        pMin + ImVec2(0, -TX_PLUG_DETAIL) * editor->scale(),
-        pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
-        _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0,
-        TX_CONTOUR_WIDTH * scale);
-    }
-
-    drawList->AddRectFilled(pMin, pMax, plugColor, TX_NODE_ROUNDING * scale);
-    if (!_io) {
-      drawList->AddRectFilled(
-        pMin + ImVec2(TX_PLUG_WIDTH - TX_PLUG_DETAIL, -TX_PLUG_DETAIL) * scale,
-        pMax + ImVec2(0, TX_PLUG_DETAIL) * editor->scale(),
-        plugColor,
-        TX_NODE_ROUNDING * scale);
-    }
-    else {
-      drawList->AddRectFilled(
-        pMin + ImVec2(0, -TX_PLUG_DETAIL) * editor->scale(),
-        pMax + ImVec2(-TX_PLUG_WIDTH + TX_PLUG_DETAIL, TX_PLUG_DETAIL) * scale,
-        plugColor,
-        TX_NODE_ROUNDING * scale);
-    }
-    _plug[c] = (pMin + pMax) * 0.5;
-    _radius[c] = sqrtf(ImLengthSqr(pMax - pMin));
   }
   return false;
 }

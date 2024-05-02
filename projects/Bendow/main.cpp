@@ -20,6 +20,9 @@ ImFont* TX_FONT_TITLE = NULL;
 void 
 SizeCallback(GLFWwindow* window, int width, int height)
 {  
+  ImGuiIO& io = ImGui::GetIO();
+  io.DisplaySize.x = width;
+  io.DisplaySize.y = height;
   graphEditor->resize(SplitterHeight);
   sequencerEditor->resize(SplitterHeight);
 }
@@ -28,8 +31,7 @@ SizeCallback(GLFWwindow* window, int width, int height)
 void 
 MouseMoveCallback(GLFWwindow* window, double x, double y)
 {
-  bool touchSplitter = std::abs(y - SplitterHeight) < 8;
-  ImGui::SetMouseCursor(touchSplitter ? ImGuiMouseCursor_ResizeNS : ImGuiMouseCursor_Arrow);
+  splitterHovered = std::abs(y - SplitterHeight) < 8;
 
   if(dragSplitter) {
     SplitterHeight = y;
@@ -230,10 +232,12 @@ int main()
 
   // create the sequencer
   TxFactory::initialize();
-  sequencer = new TxSequencer(3);
+  sequencer = new TxSequencer(2);
   sequencer->setLength(16);
-  for (size_t t = 0; t < 16; ++t)
+  for (size_t t = 0; t < 16; ++t) {
     sequencer->setBeat(0, t, { 1, BASS[t] });
+    sequencer->setBeat(1, t, { 4, DRUM[t] });
+  }
   sequencer->start();
 
   // setup the editors
@@ -243,8 +247,11 @@ int main()
   sequencerEditor->resize(SplitterHeight);
   graphEditor->resize(SplitterHeight);
 
+  graphEditor->setCurrent(sequencer->track(0));
+  sequencerEditor->setCurrent(0);
 
-  // start teh audio stream
+
+  // start the audio backkground stream
   try {
     dac.startStream();
   }
@@ -258,7 +265,10 @@ int main()
 
     // Rendering
     int display_w, display_h;
-  
+  glfwGetWindowSize(window, &display_w, &display_h);
+  SizeCallback(window, display_w, display_h);
+
+  // main loop audio rendering in background
   while (!glfwWindowShouldClose(window)) {
     stk::Stk::sleep( 10 );
 
@@ -272,10 +282,11 @@ int main()
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    ImGui::SetMouseCursor(splitterHovered ? ImGuiMouseCursor_ResizeNS : ImGuiMouseCursor_Arrow);
+
     sequencerEditor->draw();
     graphEditor->draw();
     
-    //ImPlot::ShowDemoWindow();
     ImGui::Render();
 
     glViewport(0, 0, display_w, display_h);

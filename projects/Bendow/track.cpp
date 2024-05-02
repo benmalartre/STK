@@ -3,13 +3,11 @@
 #include "sequencer.h"
 #include "graph.h"
 
-TxTrack::TxTrack()
-  : TxNode(NULL, TxNode::TRACK, "track")
+TxTrack::TxTrack(const std::string& name)
+  : TxNode(NULL, TxNode::TRACK, name, 2)
   , _graph(NULL)
 {
   _params.push_back(new TxParameterFloat(this, "Volume", 20.f, 3000.f, &_volume, TxParameter::KNOB));
-  _params.push_back(new TxParameterBool(this, "Trigger", &_trigger));
-  _params.push_back(new TxParameterFloat(this, "Value", 0.f, 2.f, &_value));
 }
 
 TxTrack::~TxTrack()

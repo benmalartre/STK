@@ -28,8 +28,10 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   _size = ImVec2(200, 200);
 
   _tracks.resize(numTracks);
-  for (size_t i = 0; i < numTracks; ++i)
-    _tracks[i].basicGraph();
+  for (size_t i = 0; i < numTracks; ++i) {
+    _tracks[i] = new TxTrack("track"+std::to_string(i));
+    _tracks[i]->basicGraph();
+  }
 }
 
 TxSequencer::TxSequencer(uint32_t numTracks)
@@ -47,7 +49,7 @@ void TxSequencer::setLength(uint64_t length)
   _length = length;
   for (size_t i = 0; i < _tracks.size(); ++i) {
     std::cout << "resize track sequence " << i << std::endl;
-    _tracks[i].setLength(_length);
+    _tracks[i]->setLength(_length);
   }
 }
 
@@ -65,7 +67,7 @@ void TxSequencer::setBeat(uint32_t trackIdx, uint64_t beatIdx, const Beat& beat)
     " (max = " << (_length - 1) << ")" << std::endl;
     return;
   }
-  _tracks[trackIdx].setBeat(beatIdx, beat);
+  _tracks[trackIdx]->setBeat(beatIdx, beat);
 }
 
 void TxSequencer::start()
@@ -85,12 +87,12 @@ const ImVec2& TxSequencer::size()
 
 Beat* TxSequencer::beat(uint32_t trackIdx, size_t beatIdx)
 {
-  return _tracks[trackIdx].beat(beatIdx);
+  return _tracks[trackIdx]->beat(beatIdx);
 }
 
 TxTrack* TxSequencer::track(size_t index)
 {
-  if (index < _tracks.size())return &_tracks[index];
+  if (index < _tracks.size())return _tracks[index];
   else return NULL;
 }
 
@@ -100,10 +102,10 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
   float sample = 0.f;
   //int nActiveTrack = 0;
   for (size_t i = 0; i < _tracks.size(); ++i) {
-    if (_tracks[i].active() && _tracks[i].graph()) {
+    if (_tracks[i]->active() && _tracks[i]->graph()) {
       //nActiveTrack++;
-      const Index index = TxTime::instance().index(_tracks[i].length());
-      sample += _tracks[i].graph()->tick() * _volume;
+      const Index index = TxTime::instance().index(_tracks[i]->length());
+      sample += _tracks[i]->graph()->tick() * _volume;
       //sample += channel ? beat->second : BIT_CHECK(beat->first, index.second);
     }
   }
@@ -115,7 +117,7 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
 {
   memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
   
-  Index index = TxTime::instance().index(_tracks[0].length());
+  Index index = TxTime::instance().index(_tracks[0]->length());
 
 /*
   for(auto& track: _tracks) {
@@ -135,46 +137,6 @@ stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
 
   return frames;
 }
-
-bool TxSequencer::drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool current)
-{
-  const size_t beatWidth = _size.x / track->length();
-  const size_t bitWidth = beatWidth / NumBits;
-  bool modified = false;
-  const std::string hiddenPrefix = "##" + std::to_string(beatIdx);
-  
-  Beat* beat = track->beat(beatIdx);
-  ImGui::BeginGroup();
-  if (ImGui::VSliderFloat((hiddenPrefix + "Slider").c_str(), ImVec2(beatWidth, 120),
-    &beat->second, 0, 255))modified = true;
-
-  ImGui::BeginGroup();
-  
-  const ImGuiStyle& style = ImGui::GetStyle();
-  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1, 1));
-  for(size_t i = 0; i < 4; ++i) {
-    bool bit = BIT_CHECK(beat->first, i);
-    const ImVec4 btnColor = (current && (i == bitIdx))? 
-      (bit ? ImVec4(1, 0, 0, 1): ImVec4(1, 0.75, 0, 1)) 
-      : (bit ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
-
-    ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(bitWidth, 12))) {
-      BIT_FLIP(beat->first, i);
-      modified = true;
-    }
-    ImGui::PopStyleColor();
-    if(i < 3)ImGui::SameLine();
-  }
-  ImGui::PopStyleVar();
-
-  ImGui::EndGroup();
-
-  ImGui::EndGroup();
-  
-  return modified;
-}
-
 
 void TxSequencer::draw(TxEditor* editor)
 {  

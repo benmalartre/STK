@@ -14,12 +14,7 @@ class TxTrack;
 extern ImFont* TX_FONT_BASE;
 extern ImFont* TX_FONT_TITLE;
 
-struct TxConnexion {
-  TxParameter* source;
-  TxParameter* target;
-  int sourceChannel;
-  int targetChannel;
-};
+struct TxConnexion;
 
 class TxNode {
 
@@ -101,6 +96,15 @@ protected:
   bool                      _dirty;
   stk::StkFrames            _frames;
   std::vector<TxParameter*> _params;
+};
+
+struct TxConnexion {
+  TxParameter* source;
+  TxParameter* target;
+  int sourceChannel;
+  int targetChannel;
+
+  bool track(){return source->type() == TxNode::TRACK;};
 };
 
 

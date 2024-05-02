@@ -156,6 +156,7 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
     param->connect(this, channel);
     std::cout << "connected : " << _name << " -> " << 
       node->name() << ":" << name << "(channel=" << channel << ")" << std::endl;
+    
     TxConnexion* connexion = new TxConnexion({_params[OUTPUT], param, channel});
     std::cout << "GRAPH : " << graph() << std::endl;
     graph()->addConnexion(connexion);

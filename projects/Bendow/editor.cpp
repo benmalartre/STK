@@ -232,6 +232,16 @@ void TxGraphEditor::_drawFrame()
 
   ImGui::RenderRectFilledWithHole(drawList, outer, inner, color, 0.f);
 
+  TxParameterSamples* output = (TxParameterSamples*)_current->parameter("Output");
+  ImVec2 pMin = _pos + ImVec2(24, 100);
+  ImVec2 pMax = pMin + ImVec2(8, 10);
+
+  output->draw(this, pMin, pMax, 1.f, 0);
+
+  pMin += ImVec2(0, 32);
+  pMax += ImVec2(0, 32);
+  output->draw(this, pMin, pMax, 1.f, 1);
+
 }
 
 
@@ -293,32 +303,16 @@ void TxGraphEditor::_drawNode(TxNode* node, bool* modified)
 
 void TxGraphEditor::_drawConnexion(TxConnexion* connexion)
 {
-  bool inverse = connexion->source->type() == TxParameter::SAMPLES && 
-    !((TxParameterSamples*)connexion->source)->io();
-
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 p0, p1, p2, p3;
-  if (!inverse) {
-    p0 = connexion->source->plug(connexion->sourceChannel);
-    if (connexion->target) {
-      p3 = connexion->target->plug(connexion->targetChannel);
-    } else {
-      p3 = ImGui::GetMousePos();
-    }
-    p1 = p0 + ImVec2(100 * _scale, 0);
-    p2 = p3 - ImVec2(100 * _scale, 0);
+  p0 = connexion->source->plug(connexion->sourceChannel);
+  if (connexion->target) {
+    p3 = connexion->target->plug(connexion->targetChannel);
+  } else {
+    p3 = ImGui::GetMousePos();
   }
-  else {
-    p3 = connexion->source->plug(connexion->sourceChannel);
-    if (connexion->target) {
-      p0 = connexion->target->plug(connexion->targetChannel);
-    }
-    else {
-      p0 = ImGui::GetMousePos();
-    }
-    p1 = p0 + ImVec2(100 * _scale, 0);
-    p2 = p3 - ImVec2(100 * _scale, 0);
-  }
+  p1 = p0 + ImVec2(100 * _scale, 0);
+  p2 = p3 - ImVec2(100 * _scale, 0);
   
   drawList->AddBezierCubic(
     p0, p1, p2, p3,
@@ -447,19 +441,24 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   
   _sequencer->draw(this);
 
-  std::vector<TxTrack>& tracks = _sequencer->tracks();
-  Index index = TxTime::instance().index(tracks[0].length());
+  std::vector<TxTrack*>& tracks = _sequencer->tracks();
+  Index index = TxTime::instance().index(tracks[0]->length());
 
   size_t cursorY = ImGui::GetCursorPosY();
   for (size_t i = 0; i < tracks.size(); ++i) {
-    ImGui::SetCursorPosX(0);
+     ImGui::SetCursorPosX(20);
     ImGui::SetCursorPosY(cursorY);
-    bool expended = &tracks[i] == _current;
-    for (size_t j = 0; j < tracks[i].length(); ++j) {
-      _drawBeat(&tracks[i], expended, j, index.second, (j == index.first));
-      if (i < tracks[i].length() - 1)  ImGui::SameLine();
+    bool expended = tracks[i] == _current;
+   ImGui::BeginGroup();
+    ImGui::Text(tracks[i]->name().c_str());
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(60);
+    for (size_t j = 0; j < tracks[i]->length(); ++j) {
+      _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
+      if (i < tracks[i]->length() - 1)  ImGui::SameLine();
     }
-    cursorY += (&tracks[i] == _current) ? 250 : 24;
+    ImGui::EndGroup();
+    cursorY += (tracks[i] == _current) ? 250 : 24;
   }
 
   ImGui::End();
@@ -468,7 +467,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
 
 bool TxSequencerEditor::_drawBeat(TxTrack* track, bool expended, uint32_t beatIdx, uint32_t bitIdx, bool current)
 {
-  const size_t beatWidth = _size.x / track->length();
+  const size_t beatWidth = (_size.x - 120) / (track->length() + 1);
   const size_t bitWidth = beatWidth / NumBits;
   bool modified = false;
   const std::string hiddenPrefix = "##" + std::to_string(beatIdx);

@@ -145,6 +145,8 @@ public:
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;
   bool draw(TxEditor*) override;
+  bool draw(TxEditor* editor, const ImVec2& pMin, const ImVec2& pMax, float scale, short channel);
+
 
 private:
   stk::StkFrames*    _frames;

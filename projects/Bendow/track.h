@@ -8,11 +8,9 @@ class TxSequencer;
 class TxTrack : public TxNode {
 public:
   enum Parameters {
-    VOLUME = TxNode::LAST,
-    TRIGGER,
-    VALUE
+    VOLUME = TxNode::LAST
   };
-  TxTrack();
+  TxTrack(const std::string& name);
   ~TxTrack();
   const ImVec2& size() override{return ImVec2();};
   stk::StkFloat tick(unsigned int) override;
