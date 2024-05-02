@@ -42,14 +42,17 @@ public:
 
   bool drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bool current);
   void reset() override;
-  void draw();
+  void draw(TxEditor* editor);
 
   TxTrack* track(size_t index);
+  std::vector<TxTrack>& tracks(){return _tracks;};
   
 protected:
   static const int        Flags;
 
 private:
+  void _drawImpl(TxEditor* editor, bool* modified){};
+
   std::vector<TxTrack>  _tracks;
   TxTrack*              _current;
   int                   _bpm;

@@ -85,7 +85,8 @@ protected:
   void                      _drawOutput(TxEditor* editor);
   void                      _drawAlignLeft(TxEditor* editor);
   void                      _drawAlignTop(TxEditor* editor);
-  virtual void              _drawImpl(TxEditor* editor, bool* modified) {};
+  virtual void              _drawImpl(TxEditor* editor, bool* modified) = 0;
+
   TxNode*                   _parent;
   ImVec2                    _position;
   ImVec2                    _size;

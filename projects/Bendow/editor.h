@@ -33,13 +33,14 @@ public:
   TxNode*                 current();
   TxConnexion*            connexion();
 
+  virtual void            resize(size_t splitterHeight) = 0;
   virtual void            draw() = 0;
 
   TxNode*                 pick(const ImVec2& p);
   void                    select(const ImVec2& p);
   void                    handleInput();
 
-  void                    setCurrent(TxNode* node);
+  void                    setCurrent(TxTrack* track);
   void                    setGraph(TxGraph* graph);
 
 
@@ -53,11 +54,12 @@ protected:
   bool                      _pan;
   ImVec2                    _offset;
   float                     _scale;
+  float                     _invScale;
   bool                      _navigatable;
 
   TxGraph*                  _graph;
 
-  TxNode*                   _current;
+  TxTrack*                   _current;
   TxConnexion*              _connexion;
 
   TxNode*                   _hovered;
@@ -74,8 +76,9 @@ public:
   };
 
   TxGraphEditor(TxGraph* graph);
-  virtual ~TxGraphEditor();
+  ~TxGraphEditor();
 
+  void                    resize(size_t splitterHeight) override;
   void                    draw() override;
 
   bool                    contains(const TxNode* node);
@@ -87,14 +90,19 @@ protected:
   void                      _drawPopup();
   void                      _drawGrid();
   void                      _drawFrame();
+  void                      _drawPlugs();
 };
 
 class TxSequencerEditor : public TxEditor {
 public:
   TxSequencerEditor(TxSequencer* sequencer);
-  virtual ~TxSequencerEditor();
+  ~TxSequencerEditor();
 
+  void            resize(size_t splitterHeight) override;
   void            draw() override;
+
+protected:
+  bool _drawBeat(TxTrack* track, bool expended, uint32_t beatIdx, uint32_t bitIdx, bool current);
 
 private:
   TxSequencer*    _sequencer;

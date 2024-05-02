@@ -37,10 +37,7 @@ protected:
 
 private:
   void                      _createNodeByType(int type);
-  void                      _drawNode(TxNode* node, bool* modified);
-  void                      _drawConnexion(TxConnexion* connexion);
-  void                      _drawPopup();
-  void                      _drawGrid();
+  void                      _drawImpl(TxEditor* editor, bool* modified){};
 
   std::string               _name;
   std::vector<TxNode*>      _nodes;

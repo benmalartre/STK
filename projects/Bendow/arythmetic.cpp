@@ -17,6 +17,7 @@ TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name)
   : TxNode(parent, TxNode::ARYTHMETIC, name)
   , _mode(ADD)
 {
+  std::cout << "arythmetic constructor" << std::endl;
   _params.push_back(new TxParameterEnum(this, "Mode", &TxArythmetic::ModeName[0], 
     TxArythmetic::NumMode, &_mode));  
   _params.push_back(new TxParameterSamples(this, "Input1", false, 1));
@@ -24,6 +25,7 @@ TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name)
   ((TxParameterSamples*)_params.back())->setIndex(1);
   _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
+  std::cout << "arythmetic constructor ok" << std::endl;
 }
 
 TxArythmetic::~TxArythmetic() 

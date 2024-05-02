@@ -3,14 +3,6 @@
 #include "graph.h"
 #include "factory.h"
 
-const int TxSequencer::Flags =
-ImGuiWindowFlags_NoResize |
-ImGuiWindowFlags_NoCollapse |
-ImGuiWindowFlags_NoMove |
-ImGuiWindowFlags_NoNav |
-ImGuiWindowFlags_NoBackground |
-ImGuiWindowFlags_NoTitleBar;
-
 void updateBPM(TxSequencer* sequencer)
 {
   TxTime& time = TxTime::instance();
@@ -184,27 +176,9 @@ bool TxSequencer::drawBeat(TxTrack* track, uint32_t beatIdx, uint32_t bitIdx, bo
 }
 
 
-void TxSequencer::draw()
+void TxSequencer::draw(TxEditor* editor)
 {  
   TxTime& time = TxTime::instance();
-  float t = time.get();
-
-  Index index = TxTime::instance().index(_tracks[0].length());
-
-  static float h = 0.f;
-
-  ImGuiIO& io = ImGui::GetIO();
-  ImGuiStyle& style = ImGui::GetStyle();
-  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing);
-  ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing);
-  const ImVec2 pos(0, h);
-  _size = io.DisplaySize - pos;
-  ImGui::SetNextWindowPos(pos);
-  ImGui::SetNextWindowSize(_size);
-  ImGui::Begin(_name.c_str(), NULL, Flags);
-
-  ImGui::SetWindowFontScale(1.f);
-  
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
   
@@ -223,21 +197,12 @@ void TxSequencer::draw()
   
   if (ImGui::Button("Reset Time")) time.reset();
   ImGui::SetNextItemWidth(100);
-  ImGui::Text("Time : %fs", t);
+  ImGui::Text("Time : %fs", time.get());
 
   ImGui::Text("Rate : %fs", time.rate());
-  ImGui::Text("Index : %i", index.first);
+  ImGui::Text("Index : %i", time.index(_length).first);
   ImGui::EndGroup();
 
-  for (size_t i = 0; i < _tracks.size(); ++i) {
-    for (size_t j = 0; j < _tracks[i].length(); ++j) {
-      drawBeat(&_tracks[i], j, index.second, (j == index.first));
-      if (i < _tracks[i].length() - 1)  ImGui::SameLine();
-    }
-  }
-
-  ImGui::End();
-  ImGui::PopStyleVar(2);
 }
 
 void TxSequencer::reset()

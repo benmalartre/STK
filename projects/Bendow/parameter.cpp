@@ -118,6 +118,7 @@ void TxParameter::_drawPlug(TxEditor* editor, short channel)
   if (ImGui::BeginDragDropSource()) {
     ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
     ImGui::Text("This is a drag and drop source");
+    editor->startConnexion(this, channel);
     ImGui::EndDragDropSource();
   } else if (ImGui::IsDragDropActive()) {
     if (_checkCompatibility(this, editor->connexion()) && ImGui::BeginDragDropTarget()) {
@@ -220,10 +221,12 @@ bool TxParameterInt::draw(TxEditor* editor)
     modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * editor->scale(), (int*)_data, _minimum, _maximum);
+    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * editor->scale(), 
+      (int*)_data, _minimum, _maximum);
     _drawPlug(editor, 0);
   } else if (_flags & TxParameter::KNOB) {
-    modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE);
+    modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, 
+      _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE * editor->scale());
     _drawPlug(editor, 0);
   }
   
@@ -234,7 +237,8 @@ bool TxParameterInt::draw(TxEditor* editor)
 
 // TxParameterEnum
 // ---------------------------------------------------------------
-TxParameterEnum::TxParameterEnum(TxNode* node, const std::string& name, const char** names, int num, int* data)
+TxParameterEnum::TxParameterEnum(TxNode* node, const std::string& name, 
+  const char** names, int num, int* data)
   : TxParameter(node, name, (void*)data, TxParameter::ENUM)
   , _names(names)
   , _num(num)
@@ -330,7 +334,7 @@ bool TxParameterFloat::draw(TxEditor* editor)
   }
   else if (_flags & TxParameter::KNOB) {
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
-      0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE);
+      0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE * editor->scale());
     _drawPlug(editor, 0);
   }
   

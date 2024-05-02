@@ -237,13 +237,13 @@ void TxNode::_drawOutput(TxEditor* editor)
 void TxNode::_drawAlignLeft(TxEditor* editor)
 {
   const ImVec2& pos = editor->pos();
-  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * editor->scale() + editor->offset()[0] - pos.y);
+  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * editor->scale() + editor->offset()[0]);
 }
 
 void TxNode::_drawAlignTop(TxEditor* editor)
 {
   const ImVec2& pos = editor->pos();
-  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * editor->scale() + editor->offset()[1] - pos.x);
+  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * editor->scale() + editor->offset()[1]);
 }
 
 void TxNode::draw(TxEditor* editor, bool* modified)
@@ -254,7 +254,9 @@ void TxNode::draw(TxEditor* editor, bool* modified)
   const ImVec2 position = (_position)* scale + editor->offset();
 
   editor->setSplitterChannel(TxEditor::FOREGROUND);
-  ImGui::SetCursorPos(position);
+  //ImGui::SetCursorPos(position);
+  _drawAlignLeft(editor);
+  _drawAlignTop(editor);
   _drawImpl(editor, modified);
 
   editor->setSplitterChannel(TxEditor::BACKGROUND);
@@ -283,8 +285,5 @@ void TxNode::draw(TxEditor* editor, bool* modified)
     ImColor(_color), 
     TX_NODE_ROUNDING * scale);
     
-  _drawPopup(editor);
-
-  editor->setSplitterChannel(TxEditor::FOREGROUND);
- 
+  _drawPopup(editor); 
 }

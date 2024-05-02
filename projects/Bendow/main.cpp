@@ -6,6 +6,8 @@
 
 #include <GLFW/glfw3.h>
 
+bool dragSplitter = false;
+bool splitterHovered = false;
 TxGraphEditor* graphEditor;
 TxSequencerEditor* sequencerEditor;
 TxSequencer* sequencer;
@@ -13,6 +15,44 @@ stk::StkFrames frames;
 
 ImFont* TX_FONT_BASE = NULL;
 ImFont* TX_FONT_TITLE = NULL;
+
+
+void 
+SizeCallback(GLFWwindow* window, int width, int height)
+{  
+  graphEditor->resize(SplitterHeight);
+  sequencerEditor->resize(SplitterHeight);
+}
+
+
+void 
+MouseMoveCallback(GLFWwindow* window, double x, double y)
+{
+  bool touchSplitter = std::abs(y - SplitterHeight) < 8;
+  ImGui::SetMouseCursor(touchSplitter ? ImGuiMouseCursor_ResizeNS : ImGuiMouseCursor_Arrow);
+
+  if(dragSplitter) {
+    SplitterHeight = y;
+    graphEditor->resize(SplitterHeight);
+    sequencerEditor->resize(SplitterHeight);
+  }
+}
+ 
+void 
+ClickCallback(GLFWwindow* window, int button, int action, int mods)
+{ 
+  //ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+  if(action == GLFW_PRESS) {
+    if(button == GLFW_MOUSE_BUTTON_LEFT) {
+      double x, y;
+      glfwGetCursorPos(window, &x, &y);
+      if(std::abs(y - SplitterHeight) < 4)dragSplitter=true;
+    }
+  } else if(action == GLFW_RELEASE) {
+    dragSplitter = false;
+  } 
+}
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
@@ -81,6 +121,10 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
 
+  glfwSetWindowSizeCallback(window, SizeCallback);
+  glfwSetMouseButtonCallback(window, ClickCallback);
+  glfwSetCursorPosCallback(window, MouseMoveCallback);
+
   return window;
 }
 
@@ -139,60 +183,6 @@ void setupStyle()
  
 }
 
-
-void draw(GLFWwindow* window)
-{
-  // start the imgui frame
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
-  bool modified = false;
-  static float f = 0.0f;
-  static bool show_test_window = true;
-  static bool show_another_window = false;
-  static ImVec4 clear_color = ImColor(220, 220, 220);
-
-  // Rendering
-  int display_w, display_h;
-  glfwGetFramebufferSize(window, &display_w, &display_h);
-  glViewport(0, 0, display_w, display_h);
-  glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  //ImGui::SetNextWindowPos(ImVec2(0, 0));
-  //ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
-
-  /*
-  ImGui::Text("Hello, world!");
-  
-  ImGui::SetNextWindowPos(ImVec2(0, 0));
-  ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
-  ImGui::Begin("window");
-  ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-  ImGui::ColorEdit3("clear color", (float*)&clear_color);
-  if (ImGui::Button("Test Window")) show_test_window ^= 1;
-  if (ImGui::Button("Another Window")) show_another_window ^= 1;
-  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-  
-  ImGui::End();
-  */
-
-  //drawPlot(display_w, display_h);
-  //ImGui::ShowDemoWindow();
-
-  sequencerEditor->draw();
-  graphEditor->draw();
-  
-  
-  //ImPlot::ShowDemoWindow();
-  ImGui::Render();
-
-  glViewport(0, 0, display_w, display_h);
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-  glfwSwapBuffers(window);
-  glfwPollEvents();
-}
-
 int main()
 {
   // OpenGL window
@@ -216,13 +206,11 @@ int main()
 
   setupStyle();
 
-  // Set the global sample rate and rawwave path before creating class instances.
+  // start an audio stream
   stk::Stk::setSampleRate( 44100.0 );
   stk::Stk::setRawwavePath( "../../rawwaves/" );
 
   RtAudio dac;
-
-  // Figure out how many bytes in an StkFloat and setup the RtAudio stream.
   RtAudio::StreamParameters parameters;
   parameters.deviceId = dac.getDefaultOutputDevice();
   parameters.nChannels = TX_NUM_CHANNELS;
@@ -240,18 +228,23 @@ int main()
     return 0;
   }
 
+  // create the sequencer
   TxFactory::initialize();
-  sequencer = new TxSequencer(1);
-  sequencerEditor = new TxSequencerEditor(sequencer);
-
-  graphEditor = new TxGraphEditor(sequencer->track(0)->graph());
+  sequencer = new TxSequencer(3);
   sequencer->setLength(16);
   for (size_t t = 0; t < 16; ++t)
     sequencer->setBeat(0, t, { 1, BASS[t] });
   sequencer->start();
 
-  graphEditor->setGraph(sequencer->track(0)->graph());
+  // setup the editors
+  sequencerEditor = new TxSequencerEditor(sequencer);
+  graphEditor = new TxGraphEditor(sequencer->track(0)->graph());
 
+  sequencerEditor->resize(SplitterHeight);
+  graphEditor->resize(SplitterHeight);
+
+
+  // start teh audio stream
   try {
     dac.startStream();
   }
@@ -259,10 +252,36 @@ int main()
     error.printMessage();
     return 0;
   }
+
+
+  static ImVec4 clear_color = ImColor(220, 220, 220);
+
+    // Rendering
+    int display_w, display_h;
   
   while (!glfwWindowShouldClose(window)) {
     stk::Stk::sleep( 10 );
-    draw(window);
+
+     // start the imgui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    
+    glfwGetFramebufferSize(window, &display_w, &display_h);
+    glViewport(0, 0, display_w, display_h);
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    sequencerEditor->draw();
+    graphEditor->draw();
+    
+    //ImPlot::ShowDemoWindow();
+    ImGui::Render();
+
+    glViewport(0, 0, display_w, display_h);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    glfwSwapBuffers(window);
+    glfwPollEvents();
   }
     
   // Shut down the callback and output stream.
