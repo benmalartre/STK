@@ -220,9 +220,7 @@ void TxOscillator::setHarmonics(int harmonics)
 void TxOscillator::_drawImpl(TxEditor* editor, bool* modified)
 {  
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128 * editor->scale());
-  TxParameter* waveform = _params[TxOscillator::WAVEFORM];
-  if(waveform->draw(editor) && modified)*modified = true;
+  
   TxNode::_drawAlignLeft(editor);
   TxParameter* frequency = _params[TxOscillator::FREQUENCY];
   if(frequency->draw(editor) && modified)*modified = true;
@@ -232,6 +230,11 @@ void TxOscillator::_drawImpl(TxEditor* editor, bool* modified)
   ImGui::SameLine();
   TxParameter* envelope = _params[TxOscillator::ENVELOPE];
   if(envelope->draw(editor) && modified)*modified = true;
+
+  ImGui::SetNextItemWidth(128 * editor->scale());
+  TxParameter* waveform = _params[TxOscillator::WAVEFORM];
+  if(waveform->draw(editor) && modified)*modified = true;
+  
   ImGui::EndGroup();
   TxNode::_drawOutput(editor);
 }

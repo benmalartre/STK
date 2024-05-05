@@ -22,7 +22,8 @@ public:
   static const int Flags;
   static const int PortSize;
 
-  static const int NumNode = 10;
+  static const int NumNode = 11;
+  static const int NumExposedNode = 8;
   static const char* NodeName[NumNode];
 
   enum Type {
@@ -34,7 +35,6 @@ public:
     ARYTHMETIC,
     FILTER,
     EFFECT,
-    MIXER,
     GRAPH,
     TRACK,
     SEQUENCER
@@ -101,9 +101,7 @@ protected:
 struct TxConnexion {
   TxParameter* source;
   TxParameter* target;
-  int sourceChannel;
-  int targetChannel;
-
+  int channel;
 };
 
 

@@ -116,17 +116,15 @@ void TxParameter::_drawPlug(TxEditor* editor, short channel)
   ImColor plugColor = TX_PLUG_COLOR_DEFAULT;
   
   if (ImGui::BeginDragDropSource()) {
-    ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+    ImGui::SetDragDropPayload("samples", NULL, 0);
     ImGui::Text("This is a drag and drop source");
     editor->startConnexion(this, channel);
     ImGui::EndDragDropSource();
   } else if (ImGui::IsDragDropActive()) {
     if (_checkCompatibility(this, editor->connexion()) && ImGui::BeginDragDropTarget()) {
-      editor->updateConnexion(this, channel, true);
+      editor->updateConnexion(this, channel);
       plugColor = TX_PLUG_COLOR_SELECTED;
       ImGui::EndDragDropTarget();
-    } else {
-      editor->updateConnexion(this, 0, false);
     }
   }
 
@@ -221,13 +219,13 @@ bool TxParameterInt::draw(TxEditor* editor)
     modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
+    _drawPlug(editor, 0);
     modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * editor->scale(), 
       (int*)_data, _minimum, _maximum);
-    _drawPlug(editor, 0);
   } else if (_flags & TxParameter::KNOB) {
+    _drawPlug(editor, 0);
     modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, 
       _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE * editor->scale());
-    _drawPlug(editor, 0);
   }
   
   ImGui::EndGroup();
@@ -329,13 +327,13 @@ bool TxParameterFloat::draw(TxEditor* editor)
     modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
     _drawPlug(editor, 0);
+    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::KNOB) {
+    _drawPlug(editor, 0);
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE * editor->scale());
-    _drawPlug(editor, 0);
   }
   
 
@@ -433,10 +431,8 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
   else if (ImGui::IsDragDropActive()) {
     if (ImGui::BeginDragDropTarget()) {
       ImGui::Text("This is a drag and drop target");
-      editor->updateConnexion(this, channel, true);
+      editor->updateConnexion(this, channel);
       ImGui::EndDragDropTarget();
-    } else {
-      editor->updateConnexion(this, 0, false);
     }
   }
 

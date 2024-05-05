@@ -54,21 +54,17 @@ const float& TxEditor::scale()
 
 TxConnexion* TxEditor::startConnexion(TxParameter* param, int channel)
 {
-  if(!_connexion)_connexion = new TxConnexion({ param, NULL, channel, 0 });
+  if(!_connexion)_connexion = new TxConnexion({ param, NULL, channel });
   return _connexion;
 }
 
-void TxEditor::updateConnexion(TxParameter* param, int channel, bool status)
+void TxEditor::updateConnexion(TxParameter* param, int channel)
 {
   if (!_connexion) return;
-  if (status) {
-    _connexion->target = param;
-    _connexion->targetChannel = channel;
-  }
-  else if (param == _connexion->target) {
-    _connexion->target = NULL;
-    _connexion->targetChannel = 0;
-  }
+
+  _connexion->target = param;
+  _connexion->channel = channel;
+
 }
 
 void TxEditor::terminateConnexion()
@@ -76,14 +72,11 @@ void TxEditor::terminateConnexion()
   if (!_connexion) return;
 
   if (_connexion->target) {
-    _connexion->source->connect(
-      _connexion->target->node(), _connexion->sourceChannel);
-    _graph->addConnexion(_connexion);
+    _connexion->source->node()->connect(_connexion->target->node(), 
+    _connexion->target->name(), _connexion->channel);
+  }
 
-  }
-  else {
-    delete _connexion;
-  }
+  delete _connexion;
   _connexion = NULL;
 }
 
@@ -232,6 +225,7 @@ void TxGraphEditor::_drawFrame()
 
   ImGui::RenderRectFilledWithHole(drawList, outer, inner, color, 0.f);
 
+  std::cout << "current track " << _current->name() << std::endl;
   TxParameterSamples* output = (TxParameterSamples*)_current->parameter("Output");
   ImVec2 pMin = _pos + ImVec2(24, 100);
   ImVec2 pMax = pMin + ImVec2(8, 10);
@@ -274,7 +268,7 @@ void TxGraphEditor::_drawPopup()
   }
 
   if (ImGui::BeginPopup(name)) {
-    for (size_t i = 0; i < TxNode::NumNode; ++i) {
+    for (size_t i = 0; i < TxNode::NumExposedNode; ++i) {
       //ImGui::TextColored({ RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1 }, TxNode::NodeName[i]);
       if (ImGui::Selectable(TxNode::NodeName[i])) {
         _createNodeByType(i);
@@ -282,11 +276,6 @@ void TxGraphEditor::_drawPopup()
     }
     ImGui::EndPopup();
   }
-}
-
-void TxGraphEditor::_drawPlugs()
-{
- 
 }
 
 
@@ -305,9 +294,9 @@ void TxGraphEditor::_drawConnexion(TxConnexion* connexion)
 {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   ImVec2 p0, p1, p2, p3;
-  p0 = connexion->source->plug(connexion->sourceChannel);
+  p0 = connexion->source->plug(connexion->channel);
   if (connexion->target) {
-    p3 = connexion->target->plug(connexion->targetChannel);
+    p3 = connexion->target->plug(0);
   } else {
     p3 = ImGui::GetMousePos();
   }
@@ -388,9 +377,10 @@ void TxGraphEditor::draw()
     _drawConnexion(connexion);
   }
 
+  if(_graph->current())_graph->current()->draw(this, &modified);
   setSplitterChannel(TxEditor::BACKGROUND);
   if (ImGui::IsDragDropActive()) {
-    drawList->AddRectFilled(_pos, _pos + _size, IM_COL32(0,0,0,100));
+    drawList->AddRectFilled(_pos, _pos + _size, IM_COL32(0,0,0,60));
   }
  
   terminateSplitter();
@@ -398,7 +388,6 @@ void TxGraphEditor::draw()
   ImGui::SetWindowFontScale(1.f);
   _drawFrame();
   _drawPopup();
-  _drawPlugs();
 
 
   ImGui::End();
@@ -446,12 +435,15 @@ void TxSequencerEditor::resize(size_t splitterHeight)
 
   size_t cursorY = ImGui::GetCursorPosY();
   for (size_t i = 0; i < tracks.size(); ++i) {
-     ImGui::SetCursorPosX(20);
+    ImGui::SetCursorPosX(20);
     ImGui::SetCursorPosY(cursorY);
     bool expended = tracks[i] == _current;
-   ImGui::BeginGroup();
-    ImGui::Text(tracks[i]->name().c_str());
+    const bool selected = (tracks[i] == _current);
+    ImGui::BeginGroup();
+    if(ImGui::Selectable(tracks[i]->name().c_str(), selected))
+      _current = tracks[i];
     ImGui::SameLine();
+
     ImGui::SetCursorPosX(60);
     for (size_t j = 0; j < tracks[i]->length(); ++j) {
       _drawBeat(tracks[i], expended, j, index.second, (j == index.first));

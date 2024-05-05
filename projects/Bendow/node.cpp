@@ -16,13 +16,14 @@ const char* TxNode::NodeName[TxNode::NumNode] = {
   "Value",
   "Random",
   "Oscillator",
-  "Sequencer",
   "Lfo",
   "Adsr",
   "Arythmetic",
   "Filter",
   "Effect",
-  "Mixer"
+  "Graph",
+  "Track",
+  "Sequencer"
 };
 
 TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t numChannels)
@@ -158,7 +159,6 @@ TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channe
       node->name() << ":" << name << "(channel=" << channel << ")" << std::endl;
     
     TxConnexion* connexion = new TxConnexion({_params[OUTPUT], param, channel});
-    std::cout << "GRAPH : " << graph() << std::endl;
     graph()->addConnexion(connexion);
     return connexion;
   }
@@ -260,7 +260,7 @@ void TxNode::draw(TxEditor* editor, bool* modified)
   _drawAlignTop(editor);
   _drawImpl(editor, modified);
 
-  editor->setSplitterChannel(TxEditor::BACKGROUND);
+  editor->setSplitterChannel( TxEditor::BACKGROUND);
   
   ImDrawList* drawList = ImGui::GetWindowDrawList();
 

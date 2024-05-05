@@ -34,7 +34,7 @@ stk::StkFloat TxAdsr::tick(unsigned int)
   _params[TxAdsr::DECAY]->tick();
   _params[TxAdsr::SUSTAIN]->tick();
   _params[TxAdsr::RELEASE]->tick();
-  
+
   _trigger = _params[TxAdsr::TRIGGER]->tick();
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
 
@@ -91,8 +91,6 @@ void TxAdsr::setRelease(stk::StkFloat release)
 void TxAdsr::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
-  TxParameter* trigger = _params[TxAdsr::TRIGGER];
-  trigger->draw(editor);
   
   TxParameter* attack = _params[TxAdsr::ATTACK];
   if (attack->draw(editor) && modified)*modified = true;
@@ -105,6 +103,9 @@ void TxAdsr::_drawImpl(TxEditor* editor, bool* modified)
   ImGui::SameLine();
   TxParameter* release = _params[TxAdsr::RELEASE];
   if (release->draw(editor) && modified)*modified = true;
+
+  TxParameter* trigger = _params[TxAdsr::TRIGGER];
+  trigger->draw(editor);
   
   ImGui::EndGroup();
   TxNode::_drawOutput(editor);

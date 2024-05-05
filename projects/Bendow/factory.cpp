@@ -13,16 +13,14 @@
 #include "effect.h"
 #include "filter.h"
 
-REGISTER_NODE(TxAdsr, TxNode::ADSR)
-REGISTER_NODE(TxLfo, TxNode::LFO)
-REGISTER_NODE(TxArythmetic, TxNode::ARYTHMETIC)
 REGISTER_NODE(TxValue, TxNode::VALUE)
-REGISTER_NODE(TxOscillator, TxNode::OSCILLATOR)
 REGISTER_NODE(TxRandom, TxNode::RANDOM)
-//REGISTER_NODE(TxSequencer, TxNode::SEQUENCER)
-//REGISTER_NODE(TxMixer, TxNode::MIXER)
-REGISTER_NODE(TxEffect, TxNode::EFFECT)
+REGISTER_NODE(TxOscillator, TxNode::OSCILLATOR)
+REGISTER_NODE(TxLfo, TxNode::LFO)
+REGISTER_NODE(TxAdsr, TxNode::ADSR)
+REGISTER_NODE(TxArythmetic, TxNode::ARYTHMETIC)
 REGISTER_NODE(TxFilter, TxNode::FILTER)
+REGISTER_NODE(TxEffect, TxNode::EFFECT)
 
 
 TxFactory& TxFactory::get() {
@@ -33,12 +31,14 @@ TxFactory& TxFactory::get() {
 void TxFactory::initialize()
 {
   auto& constructorMap = get().__NodeMap;
-  constructorMap[TxNode::ADSR] = { &(DEFINE_NODE(TxAdsr)), 0 };
-  constructorMap[TxNode::LFO] = { &(DEFINE_NODE(TxLfo)), 0 };
-  constructorMap[TxNode::ARYTHMETIC] = { &(DEFINE_NODE(TxArythmetic)), 0 };
   constructorMap[TxNode::VALUE] = { &(DEFINE_NODE(TxValue)), 0 };
-  constructorMap[TxNode::OSCILLATOR] = { &(DEFINE_NODE(TxOscillator)), 0 };
   constructorMap[TxNode::RANDOM] = { &(DEFINE_NODE(TxRandom)), 0 };
+  constructorMap[TxNode::OSCILLATOR] = { &(DEFINE_NODE(TxOscillator)), 0 };
+  constructorMap[TxNode::LFO] = { &(DEFINE_NODE(TxLfo)), 0 };
+  constructorMap[TxNode::ADSR] = { &(DEFINE_NODE(TxAdsr)), 0 };
+  constructorMap[TxNode::ARYTHMETIC] = { &(DEFINE_NODE(TxArythmetic)), 0 };
+  constructorMap[TxNode::FILTER] = { &(DEFINE_NODE(TxFilter)), 0 };
+  constructorMap[TxNode::EFFECT] = { &(DEFINE_NODE(TxEffect)), 0 };
   //constructorMap[TxNode::SEQUENCER] = { &(DEFINE_NODE(TxSequencer)), 0 };
 }
 

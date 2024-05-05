@@ -24,7 +24,7 @@ public:
   void                    terminateSplitter();
 
   TxConnexion*            startConnexion(TxParameter* param, int channel);
-  void                    updateConnexion(TxParameter* param, int channel, bool state);
+  void                    updateConnexion(TxParameter* param, int channel);
   void                    terminateConnexion();
 
   const ImVec2&           pos();
@@ -59,7 +59,7 @@ protected:
 
   TxGraph*                  _graph;
 
-  TxTrack*                   _current;
+  TxTrack*                  _current;
   TxConnexion*              _connexion;
 
   TxNode*                   _hovered;
@@ -90,7 +90,6 @@ protected:
   void                      _drawPopup();
   void                      _drawGrid();
   void                      _drawFrame();
-  void                      _drawPlugs();
 };
 
 class TxSequencerEditor : public TxEditor {
