@@ -45,6 +45,11 @@ TxNode* TxParameter::node()
   return _node;
 }
 
+TxNode* TxParameter::input()
+{
+  return _input;
+}
+
 short TxParameter::type()
 {
   return _type;
@@ -102,30 +107,39 @@ void TxParameter::_drawPlug(TxEditor* editor, short channel)
   ImVec2 center;
   float radius;
   bool horizontal = (_type == TxParameter::BOOL) || _flags & TxParameter::HORIZONTAL;
+  std::string name = ("##plug" + node()->name() +":"+_name + std::to_string(channel));
   if (horizontal) {
     radius = TX_PLUG_SIZE * scale;
     center = ImGui::GetCursorScreenPos() + ImVec2(radius, radius);
-    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
+    ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
   } else {
     center = ImGui::GetCursorScreenPos() + ImVec2(TX_KNOB_SIZE * 0.5, TX_PLUG_SIZE * 2) * scale;
     radius = TX_PLUG_SIZE * scale;
     ImGui::SetCursorScreenPos(center - ImVec2(TX_PLUG_SIZE, TX_PLUG_SIZE * 0.5) * scale);
-    ImGui::Button("##plug", ImVec2(2 * radius, 2 * radius));
+    ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
   }
 
   ImColor plugColor = TX_PLUG_COLOR_DEFAULT;
   
-  if (ImGui::BeginDragDropSource()) {
-    ImGui::SetDragDropPayload("samples", NULL, 0);
-    ImGui::Text("This is a drag and drop source");
-    editor->startConnexion(this, channel);
-    ImGui::EndDragDropSource();
-  } else if (ImGui::IsDragDropActive()) {
+  if (ImGui::IsDragDropActive()) {
     if (_checkCompatibility(this, editor->connexion()) && ImGui::BeginDragDropTarget()) {
       editor->updateConnexion(this, channel);
       plugColor = TX_PLUG_COLOR_SELECTED;
       ImGui::EndDragDropTarget();
     }
+  } else if(_input && ImGui::BeginDragDropSource()) {
+    TxConnexion* connexion = _input->connexion(this);
+    TxParameter* source = connexion->source;
+    size_t channel = connexion->channel;
+    
+    node()->graph()->removeConnexion(connexion);
+    
+    _input = NULL;
+
+    editor->startConnexion(source, channel);
+    ImGui::SetDragDropPayload("disconnect", NULL, 0);
+    ImGui::Text(("disconnect "+node()->name()+":"+_name).c_str());
+    ImGui::EndDragDropSource();
   }
 
   TxConnexion* connexion = editor->connexion();
@@ -418,28 +432,24 @@ stk::StkFloat TxParameterSamples::tick()
 bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2& pMax, float scale, short channel)
 {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
-
+  bool connected = false;
   ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
-  ImGui::InvisibleButton(("##plug" + std::to_string(channel+_io*64+_index)).c_str(), 
+  ImGui::InvisibleButton(("##plug" + node()->name() + std::to_string(channel+_io*64+_index)).c_str(), 
     ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
-  if (ImGui::BeginDragDropSource()) {
+  if (!ImGui::IsDragDropActive() && ImGui::BeginDragDropSource()) {
+    std::cout << "start connexion : " << _node->name() << ":" << _name << std::endl;
     editor->startConnexion(this, channel);
-    ImGui::SetDragDropPayload("samples", NULL, 0);
-    ImGui::Text("This is a drag and drop source");
+    ImGui::SetDragDropPayload("connect", NULL, 0);
     ImGui::EndDragDropSource();
-  }
-  else if (ImGui::IsDragDropActive()) {
-    if (ImGui::BeginDragDropTarget()) {
-      ImGui::Text("This is a drag and drop target");
+  } else {
+    if (_checkCompatibility(this, editor->connexion()) && ImGui::BeginDragDropTarget()) {
       editor->updateConnexion(this, channel);
       ImGui::EndDragDropTarget();
+      connected = true;
     }
   }
 
   ImColor plugColor = _node->color(TX_COLOR_PLUG_ID);
-  if (ImGui::IsDragDropActive() && _checkCompatibility(this, editor->connexion() )) {
-    plugColor = TX_PLUG_COLOR_AVAILABLE;
-  }
 
   drawList->AddRect(pMin, pMax, _node->color(TX_COLOR_CONTOUR_ID), TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
   if (!_io) {
@@ -474,7 +484,7 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
   }
   _plug[channel] = (pMin + pMax) * 0.5;
   _radius[channel] = sqrtf(ImLengthSqr(pMax - pMin));
-  return false;
+  return connected;
 }
 
 

@@ -14,7 +14,10 @@
 TxGraph::TxGraph(TxNode* parent, const std::string& name)
   : TxNode(parent, TxNode::GRAPH, name)
   , _current(NULL)
-{};
+{
+  _params.push_back(new TxParameterSamples(this, "Samples", false, 1));
+
+};
 
 TxGraph::~TxGraph()
 {
@@ -40,6 +43,7 @@ int TxGraph::index(const TxNode* node)
 
 void TxGraph::setCurrent(TxNode* node)
 {
+  std::cout << "set current : " << node->name() << std::endl;
   _current = node;
 }
 
@@ -92,12 +96,22 @@ void TxGraph::removeConnexion(TxConnexion* connexion)
 {
   for (size_t c = 0; c < _connexions.size(); ++c) {
     if (_connexions[c] == connexion) {
+      _connexions[c]->target->disconnect();
       _connexions.erase(_connexions.begin() + c);
       delete connexion;
       return;
     }
   }
 }
+
+TxConnexion* TxGraph::connexion(TxParameter* dst)
+{
+  for(auto& connexion: _connexions)
+    if(connexion->target == dst)return connexion;
+  return NULL;
+}
+
+
 
 void TxGraph::_createNodeByType(int type)
 {

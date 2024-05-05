@@ -23,7 +23,7 @@ public:
   void                    setSplitterChannel(int channel);
   void                    terminateSplitter();
 
-  TxConnexion*            startConnexion(TxParameter* param, int channel);
+  void                    startConnexion(TxParameter* param, int channel);
   void                    updateConnexion(TxParameter* param, int channel);
   void                    terminateConnexion();
 

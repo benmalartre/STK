@@ -61,6 +61,7 @@ public:
   const ImU32 color();
   const ImU32 color(short colorIdx);
   TxNode* parent();
+  TxConnexion* connexion(TxParameter* dst);
   TxGraph* graph();
   TxTrack* track();
   TxParameter* parameter(const std::string& name);

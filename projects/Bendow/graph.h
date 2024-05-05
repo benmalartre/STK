@@ -9,7 +9,9 @@ class TxSequencer;
 class TxTrack;
 class TxGraph : public TxNode {
 public:
-
+  enum Parameters {
+    SAMPLES = TxNode::LAST
+  };
   TxGraph(TxNode* parent, const std::string& name);
   ~TxGraph();
 
@@ -18,7 +20,8 @@ public:
   void                    removeNode(TxNode* node);
   void                    addConnexion(TxConnexion* connexion);
   void                    removeConnexion(TxConnexion* connexion);
-
+  TxConnexion*            connexion(TxParameter* dst);
+  
   stk::StkFloat           tick(unsigned int=0) override;
   stk::StkFrames&         tick(stk::StkFrames& frames, unsigned int channel) override;
 

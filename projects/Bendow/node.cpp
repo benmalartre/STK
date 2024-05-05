@@ -111,6 +111,16 @@ TxNode* TxNode::parent()
   return _parent;
 }
 
+TxConnexion* TxNode::connexion(TxParameter* dst)
+{
+  TxConnexion* connexion;
+  for(auto& param: _params){
+    connexion = graph()->connexion(dst);
+    if(connexion)return connexion;
+  }
+  return NULL;
+}
+
 TxGraph* TxNode::graph()
 {
   if(_type == TxNode::GRAPH)return (TxGraph*)this;
@@ -152,17 +162,25 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
+  std::cout << "connect node " << _name  << " to" << node->name() << ":" << name << std::endl;
   TxParameter* param = node->parameter(name);
-  if(param) {
-    param->connect(this, channel);
-    std::cout << "connected : " << _name << " -> " << 
-      node->name() << ":" << name << "(channel=" << channel << ")" << std::endl;
-    
-    TxConnexion* connexion = new TxConnexion({_params[OUTPUT], param, channel});
-    graph()->addConnexion(connexion);
-    return connexion;
+  if(!param)return NULL;
+
+  if(param->input()) {
+    std::cout << "input : " << param->input()->name() << std::endl;
+    TxConnexion* connexion = graph()->connexion(param);
+    std::cout << "connexion : " << connexion << std::endl;
+    if(connexion)graph()->removeConnexion(connexion);
+  } else {
+    std::cout << "no input ! " << std::endl;
+
   }
-  return NULL;
+  param->connect(this, channel);
+  
+  TxConnexion* connexion = new TxConnexion({_params[OUTPUT], param, channel});
+  graph()->addConnexion(connexion);
+  return connexion;
+
 }
 
 void TxNode::disconnect(const std::string& name) 

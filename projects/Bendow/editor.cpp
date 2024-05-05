@@ -52,10 +52,9 @@ const float& TxEditor::scale()
   return _scale;
 }
 
-TxConnexion* TxEditor::startConnexion(TxParameter* param, int channel)
+void TxEditor::startConnexion(TxParameter* param, int channel)
 {
-  if(!_connexion)_connexion = new TxConnexion({ param, NULL, channel });
-  return _connexion;
+  _connexion = new TxConnexion({ param, NULL, channel });
 }
 
 void TxEditor::updateConnexion(TxParameter* param, int channel)
@@ -63,8 +62,6 @@ void TxEditor::updateConnexion(TxParameter* param, int channel)
   if (!_connexion) return;
 
   _connexion->target = param;
-  _connexion->channel = channel;
-
 }
 
 void TxEditor::terminateConnexion()
@@ -74,6 +71,10 @@ void TxEditor::terminateConnexion()
   if (_connexion->target) {
     _connexion->source->node()->connect(_connexion->target->node(), 
     _connexion->target->name(), _connexion->channel);
+
+    if(_connexion->target->node()->type() == TxNode::GRAPH) {
+      ((TxGraph*)_connexion->target->node())->setCurrent(_connexion->source->node());
+    }
   }
 
   delete _connexion;
@@ -225,16 +226,24 @@ void TxGraphEditor::_drawFrame()
 
   ImGui::RenderRectFilledWithHole(drawList, outer, inner, color, 0.f);
 
-  std::cout << "current track " << _current->name() << std::endl;
-  TxParameterSamples* output = (TxParameterSamples*)_current->parameter("Output");
-  ImVec2 pMin = _pos + ImVec2(24, 100);
-  ImVec2 pMax = pMin + ImVec2(8, 10);
+  ImVec2 pMin, pMax;
 
-  output->draw(this, pMin, pMax, 1.f, 0);
+  TxParameterSamples* inputs = (TxParameterSamples*)_current->parameter("Output");
+  pMin = _pos + ImVec2(24, 100);
+  pMax = pMin + ImVec2(8, 10);
+
+  inputs->draw(this, pMin, pMax, 1.f, 0);
 
   pMin += ImVec2(0, 32);
   pMax += ImVec2(0, 32);
-  output->draw(this, pMin, pMax, 1.f, 1);
+  inputs->draw(this, pMin, pMax, 1.f, 1);
+
+
+  TxParameterSamples* output = (TxParameterSamples*)_current->graph()->parameter("Samples");
+  pMin = _pos + ImVec2(_size.x - 24, 100);
+  pMax = pMin + ImVec2(8, 10);
+
+  output->draw(this, pMin, pMax, 1.f, 0);
 
 }
 

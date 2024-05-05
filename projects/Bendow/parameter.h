@@ -37,6 +37,7 @@ public:
     short type=NONE, int flags=HORIZONTAL);
   virtual ~TxParameter();
   TxNode* node();
+  TxNode* input();
   short type();
   const int& flags();
   const std::string& name();
