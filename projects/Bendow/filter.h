@@ -45,7 +45,6 @@ public:
   ~TxFilter();
   void setFilter(int filterIdx);
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
   const ImVec2& size() override;
   void reset() override;

@@ -66,8 +66,7 @@ TxFilter::TxFilter(TxGraph* parent, const std::string& name)
   , _int3(0)
 {
   _params.push_back(new TxParameterSamples(this, "Input", false, 1));
-  _params.push_back(new TxParameterEnum(this, "Filter", &TxFilter::FilterName[0],
-    TxFilter::NumFilter, &_filterIdx));
+  _params.push_back(new TxParameterEnum(this, "Filter", &TxFilter::FilterName[0], TxFilter::NumFilter, &_filterIdx));
   _params.push_back(new TxParameterFloat(this, "Gain", 0.f, 1.f, &_gain, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Float1", -1.f, 1.f, &_float1, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Float2", -1.f, 1.f, &_float2, TxParameter::KNOB));
@@ -341,11 +340,6 @@ stk::StkFloat TxFilter::tick(unsigned int)
 
   //_buffer.write(sample);
   return sample;
-}
-
-stk::StkFrames& TxFilter::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  return frames;
 }
 
 void TxFilter::_drawImpl(bool* modified)

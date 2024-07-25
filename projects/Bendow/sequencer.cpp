@@ -3,6 +3,15 @@
 #include "graph.h"
 #include "factory.h"
 
+const int TxSequencer::Flags =
+ImGuiWindowFlags_NoResize |
+ImGuiWindowFlags_NoCollapse |
+ImGuiWindowFlags_NoMove |
+ImGuiWindowFlags_NoNav |
+ImGuiWindowFlags_NoBackground |
+ImGuiWindowFlags_NoTitleBar;
+/*|ImGuiWindowFlags_NoInputs;*/
+
 TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   : TxNode(NULL, "TxSequencer", TX_NUM_CHANNELS)
   , _bpm(bpm)
@@ -10,20 +19,21 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   , _volume(1.f)
   , _running(false)
 {
-  _tracks.resize(numTracks);
-  for (size_t i = 0; i < numTracks; ++i) {
-    _tracks[i]._graph = new TxGraph("Graph_Track"+std::to_string(i));
-    _tracks[i]._graph->default(this, i);
-    _tracks[i]._active = true;
-
-  }
-  setLength(length);
   _params.push_back(new TxParameterBool(this, "Running", &_running));
   _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Volume", 0.f, 2.f, &_volume));
   _params.push_back(new TxParameterFloat(this, "Time", -10000.f, 10000.f, &_time, TxParameter::FLOAT));
 
   _size = ImVec2(200, 200);
+
+  _tracks.resize(numTracks);
+  for (size_t i = 0; i < numTracks; ++i) {
+    _tracks[i]._graph = new TxGraph("Graph_Track_" + std::to_string(i));
+    _tracks[i]._graph->default(this, i);
+    _tracks[i]._active = true;
+
+  }
+  setLength(length);
 }
 
 TxSequencer::TxSequencer(uint32_t numTracks)
@@ -33,14 +43,12 @@ TxSequencer::TxSequencer(uint32_t numTracks)
 
 TxSequencer::~TxSequencer()
 {
-
 }
 
 void TxSequencer::setLength(uint64_t length)
 {
   _length = length;
   for (size_t i = 0; i < _tracks.size(); ++i) {
-    std::cout << "resize track sequence " << i << std::endl;
     _tracks[i]._sequence.resize(_length);
   }
 }
@@ -89,45 +97,24 @@ TxSequencer::Index TxSequencer::timeToIndex(float time)
   return {beatTime % _length, bitTime};
 }
 
-stk::StkFloat TxSequencer::tick(unsigned int channel)
+stk::StkFloat TxSequencer::tick()
 {
-  const TxSequencer::Index index = timeToIndex(TxTime::instance().get());
   float sample = 0.f;
-  //int nActiveTrack = 0;
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i]._active && _tracks[i]._graph) {
-      //nActiveTrack++;
-      const Beat* beat = &_tracks[i]._sequence[index.first];
-      sample += channel ? beat->second : BIT_CHECK(beat->first, index.second);
+      sample += _tracks[i]._graph->tick();
     }
   }
   
   return sample;
 }
 
-stk::StkFrames& TxSequencer::tick(stk::StkFrames& frames, unsigned int channel)
+stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
-  memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
-  
-  TxSequencer::Index index = timeToIndex(TxTime::instance().get());
+  const TxSequencer::Index index = timeToIndex(TxTime::instance().get());
 
-/*
-  for(auto& track: _tracks) {
-    stk::StkFloat* samples = &frames[0];
-    stk::StkFloat channelWeights[TX_NUM_CHANNELS];
-    for(size_t n = 0; n < TX_NUM_CHANNELS; ++n) {
-      channelWeights[n] = track->getNode()->stereoWeight(n);
-    }
-    //const stk::StkFloat sample = track->tick(timeIdx % _length);
-    for(size_t frameIdx = 0; frameIdx < stk::RT_BUFFER_SIZE;  ++frameIdx) {
-      for(size_t channelIdx = 0; channelIdx < TX_NUM_CHANNELS; ++channelIdx) {
-        *samples++ += track->tick(timeIdx % _length) * channelWeights[channelIdx];
-      }
-    }
-  }
-  */
-
-  return frames;
+  const Beat* beat = &_tracks[channel]._sequence[index.first];
+  return BIT_CHECK(beat->first, index.second) ? beat->second : 0.f;
 }
 
 bool TxSequencer::drawBeat(Track* track, uint32_t beatIdx, uint32_t bitIdx, bool current, float scale)
@@ -178,15 +165,15 @@ void TxSequencer::draw(bool* modified)
   static float h = 0.f;
 
   ImGuiIO& io = ImGui::GetIO();
+
   ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing);
   const ImVec2 pos(0, h);
-  const ImVec2 size = io.DisplaySize - pos;
+  const ImVec2 size = ImVec2(io.DisplaySize.x, 250.f);
   ImGui::SetNextWindowPos(pos);
   ImGui::SetNextWindowSize(size);
-  ImGui::Begin(_name.c_str(), NULL, 0);
-  
+  ImGui::Begin(_name.c_str(), NULL, TxSequencer::Flags);
  
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
@@ -232,8 +219,6 @@ void TxSequencer::draw(bool* modified)
   */
   //_params[TIME]->draw();
   //TxNode::_drawOutput();
-
- 
 
   ImGui::End();
   ImGui::PopStyleVar(2);

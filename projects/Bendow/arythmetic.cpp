@@ -64,19 +64,6 @@ stk::StkFloat TxArythmetic::tick(unsigned int)
   return sample;
 }
 
-stk::StkFrames& TxArythmetic::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  if(_dirty) {
-    stk::StkFloat* samples = &frames[0];
-    for(size_t f = 0; f < frames.size(); ++f) {
-        //*samples *= _amplitude;
-        //*samples++ += _offset;
-    }
-    //_dirty = false;
-  }
-  return frames;
-}
-
 void TxArythmetic::setMode(int mode)
 {
   _mode = mode;

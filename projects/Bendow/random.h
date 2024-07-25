@@ -15,7 +15,6 @@ public:
   ~TxRandom();
   const ImVec2& size();
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);
   void setSeed(int seed);

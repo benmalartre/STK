@@ -72,18 +72,6 @@ stk::StkFloat TxRandom::tick(unsigned int)
   return _frames[0];
 }
 
-stk::StkFrames& TxRandom::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  for(size_t i = 0; i < frames.size(); ++i) {
-    if(_cnt++ > _rate) {
-      _cnt = 0;
-      _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
-    }
-    frames[i] = _frames[0];
-  }
-  return frames;
-}
-
 void TxRandom::_drawImpl(bool* modified)
 {
   ImGui::BeginGroup();

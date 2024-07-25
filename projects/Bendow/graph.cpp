@@ -72,8 +72,6 @@ const float& TxGraph::scale()
 
 void TxGraph::default(TxSequencer* sequencer, uint32_t trackIdx)
 {
-
-  
   TxOscillator* oscillator = new TxOscillator(this, "Oscillator");
   oscillator->setHarmonics(7);
 
@@ -235,7 +233,6 @@ void TxGraph::removeConnexion(TxConnexion* connexion)
 
 stk::StkFloat TxGraph::tick()
 {
-  std::cout << "graph tick " << _current << std::endl;
   if(_current) return _current->tick();
   return 0.f;
 }
@@ -348,7 +345,7 @@ void TxGraph::handleInput()
   if (!io.MouseDown[0]) {
     _pick = pick(ImGui::GetMousePos());
   }
-  io.FontGlobalScale = _scale;
+  //io.FontGlobalScale = _scale;
 
   if (io.MouseClicked[0]) {
     select(ImGui::GetMousePos());

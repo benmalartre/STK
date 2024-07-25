@@ -22,7 +22,6 @@ TxEffect::TxEffect(TxGraph* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "ModFrequency", 1.f, 220.f, &_modFrequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt(this, "Delay", 0, 1000, &_delay, TxParameter::KNOB));
   _params.push_back(new TxParameterInt(this, "MaximumDelay", 0, 1000, &_maximumDelay, TxParameter::KNOB));
-
 }
 
 TxEffect::~TxEffect() 
@@ -51,12 +50,6 @@ stk::StkFloat TxEffect::tick(unsigned int)
     default:
       return 0.f;
   }
-  
-}
-
-stk::StkFrames& TxEffect::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  return frames;
 }
 
 void TxEffect::_drawImpl(bool* modified)

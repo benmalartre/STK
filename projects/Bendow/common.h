@@ -42,7 +42,6 @@
 #define BITMASK_FLIP(x,y) ((x) ^= (y))
 #define BITMASK_CHECK(x,y) (((x) & (y)) == (y))
 
-
 // commons
 #define TX_TITLE_HEIGHT 32.f
 #define TX_TITLE_X 64.f
@@ -80,8 +79,6 @@ static ImColor TX_PLUG_COLOR_SELECTED = ImColor({ 200,200,200,255 });
 static ImColor TX_CONTOUR_COLOR_SELECTED = ImColor({ 220,220,220,  255 });
 static ImColor TX_PLUG_COLOR_AVAILABLE = ImColor({ 255,200,100,255 });
 
-
- 
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
 };

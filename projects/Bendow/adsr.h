@@ -20,7 +20,6 @@ public:
   TxAdsr(TxGraph* parent, const std::string& name);
   ~TxAdsr();
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setAttack(stk::StkFloat attack);
   void setDecay(stk::StkFloat decay);
   void setSustain(stk::StkFloat sustain);

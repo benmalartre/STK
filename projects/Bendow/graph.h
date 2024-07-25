@@ -6,6 +6,8 @@
 #define TX_GRAPH_H
 
 class TxSequencer;
+
+
 class TxGraph {
 public:
   enum Pick {
@@ -58,6 +60,7 @@ private:
   void                      _drawConnexion(TxConnexion* connexion);
   void                      _drawPopup();
   void                      _drawGrid();
+
   std::string               _name;
   std::vector<TxNode*>      _nodes;
   std::vector<TxConnexion*> _connexions;

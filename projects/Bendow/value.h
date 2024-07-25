@@ -12,7 +12,6 @@ public:
   TxValue(TxGraph* parent, const std::string& name);
   ~TxValue();
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
   void setValue(const stk::StkFloat& value);
   void reset() override;
 

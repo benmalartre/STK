@@ -50,7 +50,6 @@ public:
   TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels=1);
   virtual ~TxNode();
   virtual stk::StkFloat tick(unsigned int=0) = 0;
-  virtual stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) = 0;
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
   

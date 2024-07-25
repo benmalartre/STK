@@ -27,7 +27,6 @@ public:
   TxArythmetic(TxGraph* parent, const std::string& name);
   ~TxArythmetic();
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
   void setMode(int mode);
   const ImVec2& size();
   void reset() override;

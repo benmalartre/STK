@@ -88,30 +88,8 @@ stk::StkFloat TxOscillator::tick(unsigned int)
   return sample;
 }
 
-stk::StkFrames& TxOscillator::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  if(!_generator || !_dirty) {
-    return frames;
-  }
-
-  //_dirty = false;
-  if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
-    setWaveForm(_waveFormIdx);
-  }
-  
-  for(size_t f = 0; f < frames.size(); ++f) {
-    setFrequency(_params[FREQUENCY]->tick());
-    setHarmonics(_params[HARMONICS]->tick());
-    frames[f] = tick(channel);
-    frames[f] *= _envelope;
-  }
-
-  return frames;
-}
-
 void TxOscillator::setWaveForm(short index)
 {
-  std::cout << index << "," << NumWaveForm << std::endl;
   _waveFormIdx = index % NumWaveForm;
   if(_generator) delete _generator;
 

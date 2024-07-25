@@ -41,7 +41,7 @@ public:
   
   void setBeat(uint32_t trackIdx, uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
-  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
+  stk::StkFloat tick();
   
   const ImVec2& size() override;
   void start();
@@ -54,6 +54,9 @@ public:
 
   Track* getTrack(size_t index);
   
+protected:
+  static const int      Flags;
+
 private:
   std::vector<Track>    _tracks;
   int                   _bpm;

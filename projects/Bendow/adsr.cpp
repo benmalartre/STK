@@ -31,16 +31,6 @@ const ImVec2& TxAdsr::size()
 stk::StkFloat TxAdsr::tick(unsigned int)
 {
   _trigger = _params[TxAdsr::TRIGGER]->tick();
-  _adsr.setAllTimes(_attack, _decay, _sustain, _release);
-
-  if(_trigger) _adsr.keyOn();
-  else _adsr.keyOff();
-  
-  return _adsr.tick();
-}
-
-stk::StkFrames& TxAdsr::tick(stk::StkFrames& frames, unsigned int channel)
-{
   _params[TxAdsr::ATTACK]->tick();
   _params[TxAdsr::DECAY]->tick();
   _params[TxAdsr::SUSTAIN]->tick();
@@ -48,15 +38,10 @@ stk::StkFrames& TxAdsr::tick(stk::StkFrames& frames, unsigned int channel)
 
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
 
-  stk::StkFloat* samples = &frames[0];
-  for(size_t f = 0; f < frames.size(); ++f) {
-    _trigger = _params[TxAdsr::TRIGGER]->tick();
-    if(_trigger) _adsr.keyOn();
-    else _adsr.keyOff();
-
-    *samples++ *= _adsr.tick();
-  }
-  return frames;
+  if(_trigger) _adsr.keyOn();
+  else _adsr.keyOff();
+  
+  return _adsr.tick();
 }
 
 void TxAdsr::setAttack(stk::StkFloat attack)

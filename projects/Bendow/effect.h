@@ -31,7 +31,6 @@ public:
   TxEffect(TxGraph* parent, const std::string& name);
   ~TxEffect();
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
   const ImVec2& size();
   void reset() override;

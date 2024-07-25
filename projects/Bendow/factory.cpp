@@ -42,7 +42,6 @@ void TxFactory::initialize()
   //constructorMap[TxNode::SEQUENCER] = { &(DEFINE_NODE(TxSequencer)), 0 };
 }
 
-
 TxNode* TxFactory::createNodeByType(TxGraph* graph, int type)
 {
   std::string name = TxNode::NodeName[type];
