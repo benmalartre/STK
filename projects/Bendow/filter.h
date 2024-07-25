@@ -41,7 +41,7 @@ public:
     LAST
   };
   
-  TxFilter(TxGraph* parent, const std::string& name);
+  TxFilter(TxNode* parent, const std::string& name);
   ~TxFilter();
   void setFilter(int filterIdx);
   stk::StkFloat tick(unsigned int) override;
@@ -50,7 +50,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor*, bool*) override;
 
 private:
   static ImVec2 Size;

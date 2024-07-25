@@ -28,7 +28,7 @@ public:
     LAST
   };
   
-  TxEffect(TxGraph* parent, const std::string& name);
+  TxEffect(TxNode* parent, const std::string& name);
   ~TxEffect();
   stk::StkFloat tick(unsigned int) override;
 
@@ -36,7 +36,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor* editor, bool*) override;
 
 private:
   static const ImVec2 Size;

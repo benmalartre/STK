@@ -1,6 +1,8 @@
 #include "common.h" 
 #include "node.h"
 #include "graph.h"
+#include "track.h"
+#include "editor.h"
 
 const int TxNode::Flags = 
   ImGuiWindowFlags_NoBackground |
@@ -14,26 +16,30 @@ const char* TxNode::NodeName[TxNode::NumNode] = {
   "Value",
   "Random",
   "Oscillator",
-  "Sequencer",
   "Lfo",
   "Adsr",
   "Arythmetic",
   "Filter",
   "Effect",
-  "Mixer"
+  "Graph",
+  "Track",
+  "Sequencer"
 };
 
-TxNode::TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels)
+TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t numChannels)
   : _parent(parent)
+  , _type(type)
   , _nChannels(numChannels)
   , _name(name)
   , _dirty(true)
+  , _active(true)
   , _position(RANDOM_LO_HI(0,200), RANDOM_LO_HI(0,200))
   , _size(100,25)
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
 {
-  if(_parent)_parent->addNode(this);
+  if(_parent && _parent->type() == TxNode::GRAPH) ((TxGraph*)_parent)->addNode(this);
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
+  _params.push_back(new TxParameterBool(this, "Active", &_active));
   _params.push_back(new TxParameterSamples(this, "Output", true, _nChannels));
 }
 
@@ -59,6 +65,11 @@ bool TxNode::selected()
   return _selected;
 }
 
+short TxNode::type()
+{
+  return _type;
+}
+
 const std::string& TxNode::name()
 {
   return _name;
@@ -69,12 +80,12 @@ const ImVec2& TxNode::position()
   return _position;
 }
 
-const ImVec4& TxNode::color()
+const ImU32 TxNode::color()
 {
-  return _color;
+  return IM_COL32(_color.x, _color.y, _color.z, _color.w);
 }
 
-const ImColor& TxNode::color(short colorIdx)
+const ImU32 TxNode::color(short colorIdx)
 {
   if (_selected) {
     switch (colorIdx) {
@@ -92,12 +103,41 @@ const ImColor& TxNode::color(short colorIdx)
       return TX_CONTOUR_COLOR_DEFAULT;
     }
   }
-  return ImColor({ 100,100,100,255 });
+  return IM_COL32(100,100,100,255 );
+}
+
+TxNode* TxNode::parent()
+{
+  return _parent;
+}
+
+TxConnexion* TxNode::connexion(TxParameter* dst)
+{
+  TxConnexion* connexion;
+  for(auto& param: _params){
+    connexion = graph()->connexion(dst);
+    if(connexion)return connexion;
+  }
+  return NULL;
 }
 
 TxGraph* TxNode::graph()
 {
-  return _parent;
+  if(_type == TxNode::GRAPH)return (TxGraph*)this;
+  else if(_type == TxNode::TRACK) return ((TxTrack*)this)->graph();
+  else if(_parent)
+    if(_parent->type() == TxNode::GRAPH)return (TxGraph*)_parent;
+    else return _parent->graph();
+  else return NULL;
+}
+
+TxTrack* TxNode::track()
+{
+  if(_parent)
+    if(_parent->type() == TxNode::TRACK)return (TxTrack*)_parent;
+    else return _parent->track();
+  else return NULL;
+  
 }
 
 void TxNode::setDirty(bool state) 
@@ -122,16 +162,25 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
-  TxParameter* param = parameter(name);
-  if(param) {
-    param->connect(node, channel);
-    std::cout << "connect : " << node->name() << " -> " << 
-      _name << ":" << name << "(channel=" << channel << ")" << std::endl;
-    TxConnexion* connexion = new TxConnexion({node->_params[OUTPUT], param, channel});
-    _parent->addConnexion(connexion);
-    return connexion;
+  std::cout << "connect node " << _name  << " to" << node->name() << ":" << name << std::endl;
+  TxParameter* param = node->parameter(name);
+  if(!param)return NULL;
+
+  if(param->input()) {
+    std::cout << "input : " << param->input()->name() << std::endl;
+    TxConnexion* connexion = graph()->connexion(param);
+    std::cout << "connexion : " << connexion << std::endl;
+    if(connexion)graph()->removeConnexion(connexion);
+  } else {
+    std::cout << "no input ! " << std::endl;
+
   }
-  return NULL;
+  param->connect(this, channel);
+  
+  TxConnexion* connexion = new TxConnexion({_params[OUTPUT], param, channel});
+  graph()->addConnexion(connexion);
+  return connexion;
+
 }
 
 void TxNode::disconnect(const std::string& name) 
@@ -152,7 +201,7 @@ TxParameter* TxNode::parameter(const std::string& name)
   return NULL;
 }
 
-void TxNode::_drawPopup()
+void TxNode::_drawPopup(TxEditor* editor)
 {
 
   if (ImGui::BeginPopup((_name + "Popup").c_str())) {
@@ -199,53 +248,61 @@ void TxNode::_drawPopup()
   }
 }
 
-void TxNode::_drawOutput()
+void TxNode::_drawOutput(TxEditor* editor)
 {
-  _params[OUTPUT]->draw();
+  _params[OUTPUT]->draw(editor);
 }
 
-void TxNode::_drawAlignLeft()
+void TxNode::_drawAlignLeft(TxEditor* editor)
 {
-  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * _parent->scale() + _parent->offset()[0]);
+  const ImVec2& pos = editor->pos();
+  ImGui::SetCursorPosX((_position.x + TX_PLUG_WIDTH + TX_PADDING_X) * editor->scale() + editor->offset()[0]);
 }
 
-void TxNode::_drawAlignTop()
+void TxNode::_drawAlignTop(TxEditor* editor)
 {
-  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * _parent->scale() + _parent->offset()[1]);
+  const ImVec2& pos = editor->pos();
+  ImGui::SetCursorPosY((_position.y + TX_PADDING_Y) * editor->scale() + editor->offset()[1]);
 }
 
-void TxNode::draw(bool* modified)
+void TxNode::draw(TxEditor* editor, bool* modified)
 {
-  const float scale = _parent->scale();
-  const ImVec2 position = _position * scale + _parent->offset();
+  const float scale = editor->scale();
 
-  ImGui::SetCursorPos(position + ImVec2(TX_PADDING_X, TX_PADDING_Y) * scale);
-  _parent->setSplitterChannel(TxGraph::FOREGROUND);
-  _drawAlignLeft();
-  _drawImpl(modified);
+  const ImVec2 offset = editor->pos();
+  const ImVec2 position = (_position)* scale + editor->offset();
 
-  _parent->setSplitterChannel(TxGraph::BACKGROUND);
+  editor->setSplitterChannel(TxEditor::FOREGROUND);
+  //ImGui::SetCursorPos(position);
+  _drawAlignLeft(editor);
+  _drawAlignTop(editor);
+  _drawImpl(editor, modified);
+
+  editor->setSplitterChannel( TxEditor::BACKGROUND);
   
   ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+  // draw node name
   ImGui::PushFont(TX_FONT_TITLE);
   drawList->AddText(
-    position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, 
+    offset + position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, 
     TX_CONTOUR_COLOR_SELECTED, 
     _name.c_str());
   ImGui::PopFont();
 
+  // draw node contour
   drawList->AddRect(
-    position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
-    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
+    offset +position + ImVec2(TX_PLUG_WIDTH, 0) * scale,
+    offset + position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
     color(TX_COLOR_CONTOUR_ID), 
     TX_NODE_ROUNDING * scale, 0, TX_CONTOUR_WIDTH * scale);
   
+  // draw node background
   drawList->AddRectFilled(
-    position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
-    position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
+    offset + position + ImVec2(TX_PLUG_WIDTH, 0) * scale, 
+    offset + position + (size() - ImVec2(TX_PLUG_WIDTH, 0)) * scale, 
     ImColor(_color), 
     TX_NODE_ROUNDING * scale);
     
-  _drawPopup();
- 
+  _drawPopup(editor); 
 }

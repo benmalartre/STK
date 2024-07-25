@@ -9,7 +9,7 @@ public:
     VALUE = TxNode::LAST,
     LAST
   };
-  TxValue(TxGraph* parent, const std::string& name);
+  TxValue(TxNode* parent, const std::string& name);
   ~TxValue();
   stk::StkFloat tick(unsigned int) override;
   void setValue(const stk::StkFloat& value);
@@ -19,7 +19,7 @@ public:
 
 protected:
 
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor*, bool*) override;
 
 private:
   static ImVec2  Size;

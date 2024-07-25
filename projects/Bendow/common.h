@@ -52,7 +52,8 @@
 #define TX_PLUG_WIDTH 12.f
 #define TX_PLUG_HEIGHT 12.f
 #define TX_PLUG_DETAIL 6.f
-#define TX_CONTOUR_WIDTH 3.333f
+#define TX_CONTOUR_WIDTH 6.f
+#define TX_CONNEXION_WIDTH 4.f
 #define TX_NODE_ROUNDING 2.f
 #define TX_PLUG_SIZE 8.f
 #define TX_KNOB_SIZE 52.f
@@ -60,8 +61,8 @@
 
 // macros
 #define REGISTER_NODE(CLASS, ID) \
-TxNode* create##CLASS(TxGraph* graph, const std::string& name) { \
-  return new CLASS(graph, name);\
+TxNode* create##CLASS(TxNode* parent, const std::string& name) { \
+  return new CLASS(parent, name);\
 };
 
 #define DEFINE_NODE(CLASS) \
@@ -73,11 +74,18 @@ enum TX_COLOR_INDEX {
   TX_COLOR_PLUG_ID
 };
 
-static ImColor TX_PLUG_COLOR_DEFAULT = ImColor({ 180,180,180,255 });
-static ImColor TX_CONTOUR_COLOR_DEFAULT = ImColor({ 50,50,50,  255 });
-static ImColor TX_PLUG_COLOR_SELECTED = ImColor({ 200,200,200,255 });
-static ImColor TX_CONTOUR_COLOR_SELECTED = ImColor({ 220,220,220,  255 });
-static ImColor TX_PLUG_COLOR_AVAILABLE = ImColor({ 255,200,100,255 });
+static ImU32 TX_PLUG_COLOR_DEFAULT = IM_COL32(180,180,180,255);
+static ImU32 TX_CONTOUR_COLOR_DEFAULT = IM_COL32(50,50,50, 255);
+static ImU32 TX_PLUG_COLOR_SELECTED = IM_COL32(200,200,200,255);
+static ImU32 TX_CONTOUR_COLOR_SELECTED = IM_COL32(255,200,100,  255);
+static ImU32 TX_PLUG_COLOR_AVAILABLE = IM_COL32(255,200,100,255);
+
+using Beat = std::pair<short, float>;
+using Sequence = std::vector<Beat>;
+using Index = std::pair<uint32_t, uint32_t>;
+
+static const uint32_t NumBits = 4;
+
 
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
@@ -89,7 +97,7 @@ static float computeSampleRate() {
 
 class TxTime {
 public:
-  TxTime() : _time(0.f), _rate(computeSampleRate()) {};
+  TxTime() : _time(0.f), _rate(computeSampleRate()), _bpm(60) {};
   ~TxTime() {};
 
   TxTime(TxTime &other) = delete;
@@ -103,7 +111,11 @@ public:
   void incr100() {_time += 100.f;};
   double get() const {return _time;};
   void set(float t) {_time = t;};
+  void setBPM(int bpm){_bpm=bpm;};
   double rate() const {return _rate;};
+  int bpm() const {return _bpm;};
+
+  Index index(size_t length);
   static TxTime& instance() {
     static TxTime instance;
     return instance;
@@ -112,6 +124,9 @@ public:
 protected:
   double _time;
   double _rate;
+  int _bpm;
 };
+
+
 
 #endif // TX_COMMON_H

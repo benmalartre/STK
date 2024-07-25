@@ -7,24 +7,13 @@
 #include "common.h"
 #include "node.h"
 #include "graph.h"
+#include "track.h"
 
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
 
 class TxSequencer : public TxNode {
 public:
-  using Beat = std::pair<short, float>;
-  using Sequence = std::vector<Beat>;
-  using Index = std::pair<uint32_t, uint32_t>;
-
-  struct Track {
-    bool     _active;
-    TxGraph* _graph;
-    Sequence _sequence;
-  };
-
-  static const uint32_t NumBits = 4;
-
   enum Parameters {
     TRIGGER = TxNode::LAST,
     BPM,
@@ -41,24 +30,30 @@ public:
   
   void setBeat(uint32_t trackIdx, uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
-  stk::StkFloat tick();
+  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
+
+  Beat* beat(uint32_t trackIdx, size_t beatIdx);
   
   const ImVec2& size() override;
+  int bpm(){return _bpm;};
+  bool running(){return _running;};
   void start();
   void stop();
-  Index timeToIndex(float time);
 
-  bool drawBeat(Track* track, uint32_t beatIdx, uint32_t bitIdx, bool active, float scale);
   void reset() override;
-  void draw(bool* modified) override;
+  void draw(TxEditor* editor);
 
-  Track* getTrack(size_t index);
+  TxTrack* track(size_t index);
+  std::vector<TxTrack*>& tracks(){return _tracks;};
   
 protected:
-  static const int      Flags;
+  static const int        Flags;
 
 private:
-  std::vector<Track>    _tracks;
+  void _drawImpl(TxEditor* editor, bool* modified){};
+
+  std::vector<TxTrack*> _tracks;
+  TxTrack*              _current;
   int                   _bpm;
   int                   _length;
   bool                  _running;

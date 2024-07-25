@@ -1,6 +1,7 @@
 #include "common.h"
 #include "arythmetic.h"
 #include "graph.h"
+#include "editor.h"
 
 ImVec2 TxArythmetic::Size(300, 100);
 
@@ -12,10 +13,11 @@ const char* TxArythmetic::ModeName[TxArythmetic::NumMode] = {
   "Mix"
 };
 
-TxArythmetic::TxArythmetic(TxGraph* parent, const std::string& name) 
-  : TxNode(parent, name)
+TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name) 
+  : TxNode(parent, TxNode::ARYTHMETIC, name)
   , _mode(ADD)
 {
+  std::cout << "arythmetic constructor" << std::endl;
   _params.push_back(new TxParameterEnum(this, "Mode", &TxArythmetic::ModeName[0], 
     TxArythmetic::NumMode, &_mode));  
   _params.push_back(new TxParameterSamples(this, "Input1", false, 1));
@@ -23,6 +25,7 @@ TxArythmetic::TxArythmetic(TxGraph* parent, const std::string& name)
   ((TxParameterSamples*)_params.back())->setIndex(1);
   _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
+  std::cout << "arythmetic constructor ok" << std::endl;
 }
 
 TxArythmetic::~TxArythmetic() 
@@ -69,26 +72,26 @@ void TxArythmetic::setMode(int mode)
   _mode = mode;
 }
 
-void TxArythmetic::_drawImpl(bool* modified)
+void TxArythmetic::_drawImpl(TxEditor* editor, bool* modified)
 {
   TxParameter* input1 = _params[INPUT1];
-  input1->draw();
+  input1->draw(editor);
   TxParameter* input2 = _params[INPUT2];
-  input2->draw();
-  TxNode::_drawAlignLeft();
-  TxNode::_drawAlignTop();
+  input2->draw(editor);
+  TxNode::_drawAlignLeft(editor);
+  TxNode::_drawAlignTop(editor);
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(TX_SLIDER_WIDTH * _parent->scale());
+  ImGui::SetNextItemWidth(TX_SLIDER_WIDTH * editor->scale());
   TxParameter* mode = _params[TxArythmetic::MODE];
-  if(mode->draw() && modified)*modified = true;
+  if(mode->draw(editor) && modified)*modified = true;
   if (mode->tick() == MIX) {
     ImGui::SetNextItemWidth(128);
     TxParameter* float1 = _params[TxArythmetic::FLOAT1];
-    if(float1->draw() && modified)*modified = true;
+    if(float1->draw(editor) && modified)*modified = true;
   }
   ImGui::EndGroup();
 
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxArythmetic::reset()

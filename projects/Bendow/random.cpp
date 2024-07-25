@@ -2,8 +2,8 @@
 #include "random.h"
 
 
-TxRandom::TxRandom(TxGraph* parent, const std::string& name)
-  : TxNode(parent, name)
+TxRandom::TxRandom(TxNode* parent, const std::string& name)
+  : TxNode(parent, TxNode::RANDOM, name)
   , _minimum(-1.f)
   , _maximum(1.f)
   , _seed(0)
@@ -72,27 +72,39 @@ stk::StkFloat TxRandom::tick(unsigned int)
   return _frames[0];
 }
 
-void TxRandom::_drawImpl(bool* modified)
+stk::StkFrames& TxRandom::tick(stk::StkFrames& frames, unsigned int channel)
+{
+  for(size_t i = 0; i < frames.size(); ++i) {
+    if(_cnt++ > _rate) {
+      _cnt = 0;
+      _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
+    }
+    frames[i] = _frames[0];
+  }
+  return frames;
+}
+
+void TxRandom::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
   ImGui::SetNextItemWidth(128);
   TxParameter* seed = _params[TxRandom::SEED];
-  if(seed->draw() && modified)*modified = true;
+  if(seed->draw(editor) && modified)*modified = true;
   TxParameter* frequency = _params[TxRandom::FREQUENCY];
-  if(frequency->draw() && modified)*modified = true;
+  if(frequency->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* minimum = _params[TxRandom::MINIMUM];
-  if(minimum->draw() && modified)*modified = true;
+  if(minimum->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* maximum = _params[TxRandom::MAXIMUM];
-  if(maximum->draw() && modified)*modified = true;
+  if(maximum->draw(editor) && modified)*modified = true;
   
   ImGui::EndGroup();
 
   ImGui::SameLine();
   ImGui::Dummy(ImVec2(20, 100));
   ImGui::SameLine();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxRandom::reset()

@@ -93,11 +93,6 @@ void TxMixer::stop()
   _running = false;
 }
 
-uint64_t TxMixer::timeToIndex(double time)
-{
-  uint64_t index = time * (60 / _bpm * _n);
-  return index % _length;
-}
 
 stk::StkFloat TxMixer::tick(void)
 {

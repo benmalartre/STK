@@ -9,16 +9,12 @@
 
 class TxNode;
 class TxGraph;
+class TxTrack;
 
 extern ImFont* TX_FONT_BASE;
 extern ImFont* TX_FONT_TITLE;
 
-struct TxConnexion {
-  TxParameter* source;
-  TxParameter* target;
-  int sourceChannel;
-  int targetChannel;
-};
+struct TxConnexion;
 
 class TxNode {
 
@@ -26,40 +22,47 @@ public:
   static const int Flags;
   static const int PortSize;
 
-  static const int NumNode = 10;
+  static const int NumNode = 11;
+  static const int NumExposedNode = 8;
   static const char* NodeName[NumNode];
 
   enum Type {
     VALUE,
     RANDOM,
     OSCILLATOR,
-    SEQUENCER,
     LFO,
     ADSR,
     ARYTHMETIC,
     FILTER,
     EFFECT,
-    MIXER
+    GRAPH,
+    TRACK,
+    SEQUENCER
   };
 
   enum Parameters {
+    ACTIVE,
     OUTPUT,
     LAST
   };
 
-  TxNode(TxGraph* parent, const std::string& name, uint32_t numChannels=1);
+  TxNode(TxNode* parent, short type, const std::string& name, uint32_t numChannels=1);
   virtual ~TxNode();
   virtual stk::StkFloat tick(unsigned int=0) = 0;
   stk::StkFloat lastSample(unsigned int channel);
   int numChannels();
   
   bool selected();
+  short type();
   const std::string& name();
   const ImVec2& position();
   virtual const ImVec2& size() = 0;
-  const ImVec4& color();
-  const ImColor& color(short colorIdx);
+  const ImU32 color();
+  const ImU32 color(short colorIdx);
+  TxNode* parent();
+  TxConnexion* connexion(TxParameter* dst);
   TxGraph* graph();
+  TxTrack* track();
   TxParameter* parameter(const std::string& name);
 
   void setDirty(bool state);
@@ -69,27 +72,36 @@ public:
   void disconnect(const std::string& name);
   
   int pick(const ImVec2& pos);
-  virtual void draw(bool* modified);
+  virtual void draw(TxEditor* editor, bool* modified);
   virtual void reset() = 0;
 
 protected:
-  void                      _drawPopup();
-  void                      _drawOutput();
-  void                      _drawAlignLeft();
-  void                      _drawAlignTop();
-  virtual void              _drawImpl(bool* modified) {};
-  TxGraph*                  _parent;
+  void                      _drawPopup(TxEditor* editor);
+  void                      _drawOutput(TxEditor* editor);
+  void                      _drawAlignLeft(TxEditor* editor);
+  void                      _drawAlignTop(TxEditor* editor);
+  virtual void              _drawImpl(TxEditor* editor, bool* modified) = 0;
+
+  TxNode*                   _parent;
   ImVec2                    _position;
   ImVec2                    _size;
   ImVec4                    _color;
+  short                     _type;
   int                       _expended;
   bool                      _selected;
+  bool                      _active;
 
   std::string               _name;
   int                       _nChannels;
   bool                      _dirty;
   stk::StkFrames            _frames;
   std::vector<TxParameter*> _params;
+};
+
+struct TxConnexion {
+  TxParameter* source;
+  TxParameter* target;
+  int channel;
 };
 
 

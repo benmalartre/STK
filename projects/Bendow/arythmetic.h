@@ -24,7 +24,7 @@ public:
     LAST
   };
 
-  TxArythmetic(TxGraph* parent, const std::string& name);
+  TxArythmetic(TxNode* parent, const std::string& name);
   ~TxArythmetic();
   stk::StkFloat tick(unsigned int) override;
   void setMode(int mode);
@@ -32,7 +32,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl(bool* modified) override;
+  void _drawImpl(TxEditor* editor, bool* modified) override;
 
 private:
   static ImVec2  Size;

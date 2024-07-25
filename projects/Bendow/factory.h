@@ -9,12 +9,12 @@ class TxGraph;
 
 class TxFactory {
 public:
-  typedef TxNode* (*CONSTRUCTOR)(TxGraph* graph, const std::string& name);
+  typedef TxNode* (*CONSTRUCTOR)(TxNode* parent, const std::string& name);
   typedef std::pair<CONSTRUCTOR, int> Node;
   static TxFactory& get();
 
   static void initialize();
-  static TxNode* createNodeByType(TxGraph* graph, int type);
+  static TxNode* createNodeByType(TxNode* parent, int type);
 
 private:
   std::map<int, Node> __NodeMap;

@@ -27,17 +27,17 @@ FIND_PACKAGE(OpenGL REQUIRED)
 # system
 IF(APPLE)
   SET(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} 
-    -lm 
-    -framework CoreFoundation 
-    -framework AudioToolbox 
-    -framework AudioUnit 
-    -framework CoreAudio 
-    -framework CoreAudioKit
-    -framework CoreMIDI
-    -framework CoreMIDIServer
-    -framework Cocoa
-    -framework IOKit
-    -framework OpenGL
+    "-lm" 
+    "-framework CoreFoundation"
+    "-framework AudioToolbox" 
+    "-framework AudioUnit" 
+    "-framework CoreAudio" 
+    "-framework CoreAudioKit"
+    "-framework CoreMIDI"
+    "-framework CoreMIDIServer"
+    "-framework Cocoa"
+    "-framework IOKit"
+    "-framework OpenGL"
   )
 ELSEIF(WIN32)
  SET(ADDITIONAL_LIBRARIES ${ADDITIONAL_LIBRARIES} 
@@ -104,6 +104,7 @@ SET(SOURCES
 	${STK_DIR}/src/Plucked.cpp
 	${STK_DIR}/src/RtAudio.cpp
 	${STK_DIR}/src/FM.cpp
+	common.cpp
 	parameter.cpp
 	buffer.cpp
 	node.cpp
@@ -115,8 +116,10 @@ SET(SOURCES
 	arythmetic.cpp
 	lfo.cpp
 	adsr.cpp
+	track.cpp
 	sequencer.cpp
 	graph.cpp
+	editor.cpp
 	factory.cpp
 	main.cpp
 )

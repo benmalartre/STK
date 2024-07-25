@@ -1,6 +1,7 @@
 #include "common.h"
 #include "oscillator.h"
 #include "graph.h"
+#include "editor.h"
 #include <Blit.h>
 #include <BlitSaw.h>
 #include <BlitSquare.h>
@@ -19,8 +20,8 @@ const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "SingWave"
 };
 
-TxOscillator::TxOscillator(TxGraph* parent, const std::string& name) 
-  : TxNode(parent, name)
+TxOscillator::TxOscillator(TxNode* parent, const std::string& name) 
+  : TxNode(parent, TxNode::OSCILLATOR, name)
   , _generator(NULL)
   , _waveFormIdx(-1)
   , _lastWaveFormIdx(-1)
@@ -194,24 +195,26 @@ void TxOscillator::setHarmonics(int harmonics)
   }
 }
 
-void TxOscillator::_drawImpl(bool* modified)
-{
-  TxNode::_drawAlignLeft();
+void TxOscillator::_drawImpl(TxEditor* editor, bool* modified)
+{  
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128 * _parent->scale());
-  TxParameter* waveform = _params[TxOscillator::WAVEFORM];
-  if(waveform->draw() && modified)*modified = true;
-  TxNode::_drawAlignLeft();
+  
+  TxNode::_drawAlignLeft(editor);
   TxParameter* frequency = _params[TxOscillator::FREQUENCY];
-  if(frequency->draw() && modified)*modified = true;
+  if(frequency->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* harmonics = _params[TxOscillator::HARMONICS];
-  if(harmonics->draw() && modified)*modified = true;
+  if(harmonics->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
   TxParameter* envelope = _params[TxOscillator::ENVELOPE];
-  if(envelope->draw() && modified)*modified = true;
+  if(envelope->draw(editor) && modified)*modified = true;
+
+  ImGui::SetNextItemWidth(128 * editor->scale());
+  TxParameter* waveform = _params[TxOscillator::WAVEFORM];
+  if(waveform->draw(editor) && modified)*modified = true;
+  
   ImGui::EndGroup();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxOscillator::reset()

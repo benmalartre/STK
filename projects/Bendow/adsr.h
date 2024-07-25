@@ -17,7 +17,7 @@ public:
     LAST
   };
 
-  TxAdsr(TxGraph* parent, const std::string& name);
+  TxAdsr(TxNode* parent, const std::string& name);
   ~TxAdsr();
   stk::StkFloat tick(unsigned int) override;
   void setAttack(stk::StkFloat attack);
@@ -28,7 +28,7 @@ public:
   void reset() override;
 
 protected:
-  void _drawImpl(bool*) override;
+  void _drawImpl(TxEditor*, bool*) override;
 
 private:
   stk::ADSR     _adsr;

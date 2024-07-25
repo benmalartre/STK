@@ -2,8 +2,8 @@
 
 ImVec2 TxValue::Size(200, 120);
 
-TxValue::TxValue(TxGraph* parent, const std::string& name)
-  : TxNode(parent, name)
+TxValue::TxValue(TxNode* parent, const std::string& name)
+  : TxNode(parent, TxNode::VALUE, name)
 {
   _value = 0.f;
   _params.push_back(new TxParameterFloat(this, "Value", -10000, 10000, &_value, TxParameter::KNOB));
@@ -29,15 +29,23 @@ stk::StkFloat TxValue::tick(unsigned int)
   return _value;
 }
 
-void TxValue::_drawImpl(bool* modified)
+stk::StkFrames& TxValue::tick(stk::StkFrames& frames, unsigned int channel)
+{
+  for(size_t i = 0; i < frames.size(); ++i) {
+    frames[i] = _value;
+  }
+  return frames;
+}
+
+void TxValue::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
   TxParameter* value = _params[TxValue::VALUE];
-  if (value->draw() && modified)*modified = true;
+  if (value->draw(editor) && modified)*modified = true;
   ImGui::EndGroup();
 
   ImGui::SameLine();
-  TxNode::_drawOutput();
+  TxNode::_drawOutput(editor);
 }
 
 void TxValue::reset()
