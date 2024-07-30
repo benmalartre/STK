@@ -24,15 +24,6 @@ stk::StkFloat TxTrack::tick(unsigned int channel)
   else if(channel == 1) return beat.second;
 }
 
-stk::StkFrames& TxTrack::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  const Index index = TxTime::instance().index(_sequence.size());
-  for(size_t i = 0; i < frames.size(); ++i) {
-    frames[i] = 0.f;
-  }
-  return frames;
-}
-
 void TxTrack::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();

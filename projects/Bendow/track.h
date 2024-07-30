@@ -14,7 +14,6 @@ public:
   ~TxTrack();
   const ImVec2& size() override{return ImVec2();};
   stk::StkFloat tick(unsigned int) override;
-  stk::StkFrames& tick(stk::StkFrames&, unsigned int channel) override;
     
   void basicGraph();
   void reset() override;
@@ -25,7 +24,7 @@ public:
     return &_sequence[beatIdx%_sequence.size()];
 };
   size_t length(){return _sequence.size();};
-
+  const Sequence& sequence(){return _sequence;};
   void setLength(size_t length);
   void setBeat(size_t length, const Beat& beat);
 

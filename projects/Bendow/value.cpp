@@ -29,14 +29,6 @@ stk::StkFloat TxValue::tick(unsigned int)
   return _value;
 }
 
-stk::StkFrames& TxValue::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  for(size_t i = 0; i < frames.size(); ++i) {
-    frames[i] = _value;
-  }
-  return frames;
-}
-
 void TxValue::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();

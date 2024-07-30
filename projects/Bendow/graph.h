@@ -23,7 +23,6 @@ public:
   TxConnexion*            connexion(TxParameter* dst);
   
   stk::StkFloat           tick(unsigned int=0) override;
-  stk::StkFrames&         tick(stk::StkFrames& frames, unsigned int channel) override;
 
   const ImVec2&           size() override;
   void                    reset() override;

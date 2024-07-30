@@ -35,20 +35,6 @@ stk::StkFloat TxLfo::tick(unsigned int)
   return sample;
 }
 
-stk::StkFrames& TxLfo::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  if(_dirty) {
-    _sine.tick(frames, 0);
-    stk::StkFloat* samples = &frames[0];
-    for(size_t f = 0; f < frames.size(); ++f) {
-        *samples *= _amplitude;
-        *samples++ += _offset;
-    }
-    //_dirty = false;
-  }
-  return frames;
-}
-
 void TxLfo::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();

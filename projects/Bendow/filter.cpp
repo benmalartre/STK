@@ -343,11 +343,6 @@ stk::StkFloat TxFilter::tick(unsigned int)
   return sample;
 }
 
-stk::StkFrames& TxFilter::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  return frames;
-}
-
 void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();

@@ -111,15 +111,6 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
   return sample;
 }
 
-stk::StkFloat TxSequencer::tick(unsigned int channel)
-{
-  memset(&frames[0], 0, frames.size() * sizeof(stk::StkFloat));
-  
-  Index index = TxTime::instance().index(_tracks[0]->length());
-
-  const Beat* beat = &_tracks[channel]._sequence[index.first];
-  return BIT_CHECK(beat->first, index.second) ? beat->second : 0.f;
-}
 
 void TxSequencer::draw(TxEditor* editor)
 {  

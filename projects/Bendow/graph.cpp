@@ -134,8 +134,3 @@ stk::StkFloat TxGraph::tick(unsigned int channel)
   return 0;
 }
 
-stk::StkFrames& TxGraph::tick(stk::StkFrames& frames, unsigned int channel)
-{
-  if(_current)return _current->tick(frames, channel);
-  return frames;
-}

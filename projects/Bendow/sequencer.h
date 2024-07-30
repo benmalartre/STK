@@ -30,7 +30,6 @@ public:
   
   void setBeat(uint32_t trackIdx, uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
-  stk::StkFrames& tick(stk::StkFrames& frames, unsigned int channel) override;
 
   Beat* beat(uint32_t trackIdx, size_t beatIdx);
   
