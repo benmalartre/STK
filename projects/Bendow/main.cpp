@@ -263,8 +263,8 @@ int main()
 
   static ImVec4 clear_color = ImColor(220, 220, 220);
 
-    // Rendering
-    int display_w, display_h;
+  // Rendering
+  int display_w, display_h;
   glfwGetWindowSize(window, &display_w, &display_h);
   SizeCallback(window, display_w, display_h);
 

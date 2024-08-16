@@ -41,6 +41,7 @@ public:
   short type();
   const int& flags();
   const std::string& name();
+  const std::string& shortName();
   const std::string& label();
   const ImVec2& plug(short channel);
   const float& radius(short channel);
@@ -52,14 +53,15 @@ public:
   virtual stk::StkFloat tick() = 0;
   virtual stk::StkFloat tick(unsigned int channel) { return 0.f; };
   virtual bool draw(TxEditor* editor) = 0;
+  void drawPlug(TxEditor* editor, short index, short channel=0);
   void setCallback(TxCallback* callback);
 
 protected:
-  void              _drawPlug(TxEditor* editor, short channel);
 
   short             _type;
   int               _flags;
   std::string       _name;
+  std::string       _shortName;
   std::string       _label;
   TxNode*           _node;
   TxNode*           _input;

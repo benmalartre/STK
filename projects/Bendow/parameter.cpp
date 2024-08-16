@@ -23,6 +23,7 @@ static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
 TxParameter::TxParameter(TxNode* node, const std::string& name, void* data, short type, int flags)
   : _node(node)
   , _name(name)
+  , _shortName(name.substr(0, 1))
   , _label(name)
   , _input(NULL)
   , _type(type)
@@ -65,6 +66,12 @@ const std::string& TxParameter::name()
   return _name;
 };
 
+const std::string& TxParameter::shortName()
+{
+  return _shortName;
+};
+
+
 const std::string& TxParameter::label()
 {
   return _label;
@@ -101,23 +108,17 @@ void TxParameter::setCallback(TxCallback* callback)
   _callback = callback;
 }
 
-void TxParameter::_drawPlug(TxEditor* editor, short channel)
+void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
 {
   const float scale = editor->scale();
   ImVec2 center;
   float radius;
-  bool horizontal = (_type == TxParameter::BOOL) || _flags & TxParameter::HORIZONTAL;
   std::string name = ("##plug" + node()->name() +":"+_name + std::to_string(channel));
-  if (horizontal) {
-    radius = TX_PLUG_SIZE * scale;
-    center = ImGui::GetCursorScreenPos() + ImVec2(radius, radius);
-    ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
-  } else {
-    center = ImGui::GetCursorScreenPos() + ImVec2(TX_KNOB_SIZE * 0.5, TX_PLUG_SIZE * 2) * scale;
-    radius = TX_PLUG_SIZE * scale;
-    ImGui::SetCursorScreenPos(center - ImVec2(TX_PLUG_SIZE, TX_PLUG_SIZE * 0.5) * scale);
-    ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
-  }
+
+  center = editor->pos() + (node()->position() + ImVec2(0, TX_PLUG_SIZE * 3 * (index + 1))) * scale + editor->offset();
+  radius = TX_PLUG_SIZE * scale;
+  ImGui::SetCursorScreenPos(center - ImVec2(TX_PLUG_SIZE, TX_PLUG_SIZE * 0.5) * scale);
+  ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
 
   ImColor plugColor = TX_PLUG_COLOR_DEFAULT;
   
@@ -144,6 +145,7 @@ void TxParameter::_drawPlug(TxEditor* editor, short channel)
 
   TxConnexion* connexion = editor->connexion();
   ImDrawList* drawList = ImGui::GetWindowDrawList();
+  drawList->AddText(ImVec2(center.x - TX_PLUG_SIZE * 2, center.y), TX_PLUG_COLOR_DEFAULT, _shortName.c_str());
   drawList->AddCircle(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * scale);
   drawList->AddCircleFilled(center, radius, TX_PLUG_COLOR_DEFAULT, 32);
   drawList->AddCircleFilled(center, radius * 0.6, TX_CONTOUR_COLOR_DEFAULT, 32);
@@ -179,13 +181,7 @@ stk::StkFloat TxParameterBool::tick()
 
 bool TxParameterBool::draw(TxEditor* editor)
 {
-  ImGui::BeginGroup();
-  _drawPlug(editor, 0);
-
-  ImGui::SameLine();
-  bool modified = ImGui::Checkbox(_label.c_str(), (bool*)_data);
-  ImGui::EndGroup();
-  return modified;
+  return ImGui::Checkbox(_label.c_str(), (bool*)_data);
 }
 
 // TxParameterInt
@@ -227,17 +223,14 @@ bool TxParameterInt::draw(TxEditor* editor)
   bool modified = false;
   ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
-    _drawPlug(editor, 0);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100 * editor->scale());
     modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    _drawPlug(editor, 0);
     modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * editor->scale(), 
       (int*)_data, _minimum, _maximum);
   } else if (_flags & TxParameter::KNOB) {
-    _drawPlug(editor, 0);
     modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, 
       _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE * editor->scale());
   }
@@ -335,17 +328,14 @@ bool TxParameterFloat::draw(TxEditor* editor)
   ImGui::BeginGroup();
 
   if (_flags & TxParameter::HORIZONTAL) {
-    _drawPlug(editor, 0);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100 * editor->scale());
     modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    _drawPlug(editor, 0);
     modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::KNOB) {
-    _drawPlug(editor, 0);
     modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE * editor->scale());
   }
@@ -437,7 +427,6 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
   ImGui::InvisibleButton(("##plug" + node()->name() + std::to_string(channel+_io*64+_index)).c_str(), 
     ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
   if (!ImGui::IsDragDropActive() && ImGui::BeginDragDropSource()) {
-    std::cout << "start connexion : " << _node->name() << ":" << _name << std::endl;
     editor->startConnexion(this, channel);
     ImGui::SetDragDropPayload("connect", NULL, 0);
     ImGui::EndDragDropSource();

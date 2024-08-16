@@ -214,6 +214,12 @@ void TxOscillator::_drawImpl(TxEditor* editor, bool* modified)
   if(waveform->draw(editor) && modified)*modified = true;
   
   ImGui::EndGroup();
+
+  TxNode::_drawInput(editor, _params[TxOscillator::FREQUENCY], 0);
+  TxNode::_drawInput(editor, _params[TxOscillator::HARMONICS], 1);
+  TxNode::_drawInput(editor, _params[TxOscillator::ENVELOPE], 2);
+  TxNode::_drawInput(editor, _params[TxOscillator::WAVEFORM], 3);
+
   TxNode::_drawOutput(editor);
 }
 

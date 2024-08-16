@@ -75,6 +75,7 @@ void TxAdsr::setRelease(stk::StkFloat release)
 
 void TxAdsr::_drawImpl(TxEditor* editor, bool* modified)
 {
+  
   ImGui::BeginGroup();
   
   TxParameter* attack = _params[TxAdsr::ATTACK];
@@ -93,6 +94,13 @@ void TxAdsr::_drawImpl(TxEditor* editor, bool* modified)
   trigger->draw(editor);
   
   ImGui::EndGroup();
+
+  TxNode::_drawInput(editor, _params[TxAdsr::ATTACK], 0);
+  TxNode::_drawInput(editor, _params[TxAdsr::DECAY], 1);
+  TxNode::_drawInput(editor, _params[TxAdsr::SUSTAIN], 2);
+  TxNode::_drawInput(editor, _params[TxAdsr::RELEASE], 3);
+  TxNode::_drawInput(editor, _params[TxAdsr::TRIGGER], 4);
+
   TxNode::_drawOutput(editor);
 }
 

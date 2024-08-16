@@ -77,6 +77,7 @@ public:
 
 protected:
   void                      _drawPopup(TxEditor* editor);
+  void                      _drawInput(TxEditor* editor, TxParameter* parameter, short index);
   void                      _drawOutput(TxEditor* editor);
   void                      _drawAlignLeft(TxEditor* editor);
   void                      _drawAlignTop(TxEditor* editor);
