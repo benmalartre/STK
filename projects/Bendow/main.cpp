@@ -232,11 +232,11 @@ int main()
 
   // create the sequencer
   TxFactory::initialize();
-  sequencer = new TxSequencer(1);
+  sequencer = new TxSequencer(2);
   sequencer->setLength(16);
   for (size_t t = 0; t < 16; ++t) {
     sequencer->setBeat(0, t, { 1, BASS[t] });
-    //sequencer->setBeat(1, t, { 4, DRUM[t] });
+    sequencer->setBeat(1, t, { 4, DRUM[t] });
   }
   sequencer->start();
 

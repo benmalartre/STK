@@ -115,9 +115,9 @@ void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
   float radius;
   std::string name = ("##plug" + node()->name() +":"+_name + std::to_string(channel));
 
-  center = editor->pos() + (node()->position() + ImVec2(0, TX_PLUG_SIZE * 3 * (index + 1))) * scale + editor->offset();
+  center = editor->pos() + (node()->position() + ImVec2(0, TX_PLUG_SIZE * (3 * index + 2))) * scale + editor->offset();
   radius = TX_PLUG_SIZE * scale;
-  ImGui::SetCursorScreenPos(center - ImVec2(TX_PLUG_SIZE, TX_PLUG_SIZE * 0.5) * scale);
+  ImGui::SetCursorScreenPos(center - ImVec2(TX_PLUG_SIZE, TX_PLUG_SIZE) * scale);
   ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
 
   ImColor plugColor = TX_PLUG_COLOR_DEFAULT;

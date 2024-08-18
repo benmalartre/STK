@@ -48,6 +48,7 @@ public:
   void setLabel(const std::string& label);
   void connect(TxNode* node, short channel=0);
   void disconnect();
+  void setShortName(const std::string& shortName){_shortName=shortName;};
  
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;

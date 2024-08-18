@@ -353,6 +353,7 @@ void TxGraphEditor::draw()
 {
   std::vector<TxNode*>& nodes = _graph->nodes();
   std::vector<TxConnexion*>& connexions = _graph->connexions();
+  
   ImGuiIO& io = ImGui::GetIO();
   ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing * _scale);
