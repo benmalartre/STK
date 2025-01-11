@@ -18,11 +18,11 @@ public:
   void scale(float smin, float smax);
 
 private:
- std::vector<float> _samples;
- size_t             _n;
- int                _p;
- stk::StkFloat      _smin;
- stk::StkFloat      _smax;
+ std::vector<stk::StkFloat> _samples;
+ size_t                     _n;
+ int                        _p;
+ stk::StkFloat              _smin;
+ stk::StkFloat              _smax;
 
 };
 

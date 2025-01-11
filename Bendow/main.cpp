@@ -225,7 +225,7 @@ int main()
     dac.openStream( &parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(), 
     &bufferFrames, &tick, (void *)&frames );
   }
-  catch ( RtAudioError& error ) {
+  catch (stk::StkError& error ) {
     error.printMessage();
     return 0;
   }
@@ -255,7 +255,7 @@ int main()
   try {
     dac.startStream();
   }
-  catch ( RtAudioError &error ) {
+  catch ( stk::StkError &error ) {
     error.printMessage();
     return 0;
   }
@@ -299,7 +299,7 @@ int main()
   try {
     dac.closeStream();
   }
-  catch ( RtAudioError &error ) {
+  catch (stk::StkError &error ) {
     error.printMessage();
   }
   

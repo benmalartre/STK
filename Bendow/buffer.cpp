@@ -34,7 +34,7 @@ void TxBuffer::write(float sample)
 
 const float* TxBuffer::read()
 {
-  return &_samples[_p - _n];
+  return (float*)&_samples[_p - _n];
 }
 
 void TxBuffer::scale(float smin, float smax)

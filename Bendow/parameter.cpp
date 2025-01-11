@@ -330,13 +330,13 @@ bool TxParameterFloat::draw(TxEditor* editor)
   if (_flags & TxParameter::HORIZONTAL) {
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100 * editor->scale());
-    modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+    modified = ImGui::SliderFloat(_label.c_str(), (float*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (stk::StkFloat*)_data, _minimum, _maximum);
+    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (float*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::KNOB) {
-    modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum,
+    modified = ImGuiKnobs::Knob(_label.c_str(), (float*)_data, _minimum, _maximum,
       0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE * editor->scale());
   }
   

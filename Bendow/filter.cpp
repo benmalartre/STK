@@ -103,7 +103,7 @@ static double Ino(double x)
   return s;
 }
 
-std::vector<float> computeFirCoefficients(int Fs, float Fa, float Fb, int Att, int M)
+std::vector<stk::StkFloat> computeFirCoefficients(int Fs, float Fa, float Fb, int Att, int M)
 {
   /*
     * This function calculates Kaiser windowed
@@ -256,7 +256,7 @@ void TxFilter::setFilter(int filterIdx)
       float2->setMaximum(60000.f);
       float2->set(4400.f);
       float2->setLabel("High");
-      std::vector<float> coeffs = computeFirCoefficients(stk::Stk::sampleRate(), 
+      std::vector<stk::StkFloat> coeffs = computeFirCoefficients(stk::Stk::sampleRate(), 
         float1->tick(), float2->tick(), int2->tick(), int1->tick());
 
       ((stk::Fir*)_filter)->setCoefficients(coeffs, true);
@@ -327,7 +327,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
 
     case FIR:
     {
-      std::vector<float> firCoefficients = 
+      std::vector<stk::StkFloat> firCoefficients =
         computeFirCoefficients(stk::Stk::sampleRate(),
           _params[FLOAT1]->tick(), _params[FLOAT2]->tick(), 
           _params[INT2]->tick(), _params[INT1]->tick());
