@@ -1,6 +1,6 @@
 # Bendow
 
-Bendow is and experimental nodal based synthesizer and sequencer
+Bendow is a work in progress nodal based synthesizer and sequencer
 
 
 ![UI preview of Jivaro 0](images/bendow.png)
