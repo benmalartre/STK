@@ -1,0 +1,10 @@
+^C:\USERS\GRAPH\DOCUMENTS\BMAL\SRC\STK\PROJECTS\BENDOW\BUILD\CMAKEFILES\D83D4C73F4C9CF918C65067C1B1FA3B5\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/graph/Documents/bmal/src/STK/projects/Bendow -BC:/Users/graph/Documents/bmal/src/STK/projects/Bendow/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/graph/Documents/bmal/src/STK/projects/Bendow/build/BendoW.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

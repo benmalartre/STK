@@ -1,0 +1,9 @@
+﻿  Checking Build System
+  CMake is re-running because C:/Users/graph/Documents/bmal/src/STK/projects/Bendow/build/CMakeFiles/generate.stamp is out-of-date.
+    the file 'C:/Users/graph/Documents/bmal/src/STK/projects/Bendow/CMakeLists.txt'
+    is newer than 'C:/Users/graph/Documents/bmal/src/STK/projects/Bendow/build/CMakeFiles/generate.stamp.depend'
+    result='-1'
+  -- Selecting Windows SDK version 10.0.18362.0 to target Windows 10.0.19045.
+  -- Configuring done (0.1s)
+  -- Generating done (0.1s)
+  -- Build files have been written to: C:/Users/graph/Documents/bmal/src/STK/projects/Bendow/build

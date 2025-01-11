@@ -1,0 +1,98 @@
+﻿  Building Custom Rule C:/Users/graph/Documents/bmal/src/STK/projects/Bendow/CMakeLists.txt
+  imgui.cpp
+  imgui_stdlib.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui_draw.cpp
+  imgui_widgets.cpp
+  imgui_tables.cpp
+  imgui_demo.cpp
+  imgui_knobs.cpp
+  imgui_plot.cpp
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\imgui\imgui_plot.cpp(222,29): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\imgui\imgui_plot.cpp(238,33): warning C4018: '<' : incompatibilité signed/unsigned
+  implot.cpp
+  implot_items.cpp
+  implot_demo.cpp
+  Stk.cpp
+  BeeThree.cpp
+  Noise.cpp
+  Blit.cpp
+  BlitSaw.cpp
+  BlitSquare.cpp
+  Modulate.cpp
+  Génération de code en cours...
+  Compilation en cours...
+  Granulate.cpp
+C:\Users\graph\Documents\bmal\src\STK\src\Granulate.cpp(114,31): warning C4267: '=' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\Granulate.cpp(138,31): warning C4267: '=' : conversion de 'size_t' en 'unsigned long', perte possible de données
+  FileRead.cpp
+C:\Users\graph\Documents\bmal\src\STK\src\FileRead.cpp(85,9): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  FileWvIn.cpp
+  FileLoop.cpp
+  Chorus.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\DelayL.h(43,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+  Echo.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\Delay.h(40,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+  Fir.cpp
+  Delay.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\Delay.h(40,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\Delay.cpp(57,53): warning C4267: '=' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\Delay.cpp(87,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\Delay.cpp(96,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\Delay.cpp(105,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+  DelayA.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\DelayA.h(47,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\DelayA.cpp(67,40): warning C4267: 'initialisation' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\DelayA.cpp(103,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\DelayA.cpp(112,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+  DelayL.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\DelayL.h(43,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\DelayL.cpp(59,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\src\DelayL.cpp(68,26): warning C4267: '+=' : conversion de 'size_t' en 'long', perte possible de données
+  SineWave.cpp
+  SingWave.cpp
+  TwoZero.cpp
+  OneZero.cpp
+  OnePole.cpp
+  Envelope.cpp
+  Twang.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\DelayA.h(47,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\include\DelayL.h(43,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+  Plucked.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\DelayA.h(47,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+  RtAudio.cpp
+  FM.cpp
+  Génération de code en cours...
+  Compilation en cours...
+  parameter.cpp
+  buffer.cpp
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\buffer.cpp(9,10): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\buffer.cpp(18,10): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\buffer.cpp(54,10): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\buffer.cpp(62,25): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+  node.cpp
+  value.cpp
+  random.cpp
+  oscillator.cpp
+  effect.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\DelayL.h(43,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\include\Delay.h(40,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+  filter.cpp
+C:\Users\graph\Documents\bmal\src\STK\include\Delay.h(40,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\include\DelayA.h(47,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\include\DelayL.h(43,41): warning C4267: 'return' : conversion de 'size_t' en 'unsigned long', perte possible de données
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\filter.cpp(138,3): warning C4065: l'instruction switch contient 'default' mais aucune étiquette 'case'
+  arythmetic.cpp
+  lfo.cpp
+  sequencer.cpp
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\sequencer.cpp(157,49): warning C4267: 'argument' : conversion de 'size_t' en 'uint32_t', perte possible de données
+  graph.cpp
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\graph.cpp(14,34): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
+  main.cpp
+C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\main.cpp(79,72): warning C4267: 'argument' : conversion de 'size_t' en 'int', perte possible de données
+  Génération de code en cours...
+  ADSR.cpp
+  adsr.cpp
+LINK : warning LNK4098: conflit entre la bibliothèque par défaut 'MSVCRT' et les autres bibliothèques ; utilisez /NODEFAULTLIB:library
+  Bendow.vcxproj -> C:\Users\graph\Documents\bmal\src\STK\projects\Bendow\build\Debug\Bendow.exe
