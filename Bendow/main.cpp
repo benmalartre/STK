@@ -8,9 +8,11 @@
 
 bool dragSplitter = false;
 bool splitterHovered = false;
+
 TxGraphEditor* graphEditor;
 TxSequencerEditor* sequencerEditor;
 TxSequencer* sequencer;
+TxTrack* currentTrack = NULL;
 stk::StkFrames frames;
 
 ImFont* TX_FONT_BASE = NULL;
@@ -240,15 +242,17 @@ int main()
   }
   sequencer->start();
 
+  currentTrack = sequencer->track(0);
+
   // setup the editors
   sequencerEditor = new TxSequencerEditor(sequencer);
-  graphEditor = new TxGraphEditor(sequencer->track(0)->graph());
+  graphEditor = new TxGraphEditor(currentTrack->graph());
 
   sequencerEditor->resize(SplitterHeight);
   graphEditor->resize(SplitterHeight);
 
-  graphEditor->setCurrent(sequencer->track(0));
-  sequencerEditor->setCurrent(0);
+  graphEditor->setCurrent(currentTrack);
+  sequencerEditor->setCurrent(currentTrack);
 
 
   // start the audio backkground stream
@@ -283,6 +287,8 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT);
 
     ImGui::SetMouseCursor(splitterHovered ? ImGuiMouseCursor_ResizeNS : ImGuiMouseCursor_Arrow);
+
+    graphEditor->setCurrent(sequencerEditor->getCurrentTrackIndex());
 
     sequencerEditor->draw();
     graphEditor->draw();

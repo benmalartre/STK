@@ -7,15 +7,16 @@
 
 
 static size_t SplitterHeight = 250;
+extern TxTrack* currentTrack;
 
 class TxSequencer;
 class TxEditor {
 public:
   enum Layer {
-      BACKGROUND,
-      FOREGROUND,
-      CNT
-    };
+    BACKGROUND,
+    FOREGROUND,
+    CNT
+  };
 
   TxEditor(TxGraph* graph, bool navigatable=false);
   virtual ~TxEditor(){};
