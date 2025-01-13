@@ -183,7 +183,7 @@ STKStream* STKStreamSetup(RtAudio* DAC, int numChannels)
 	try {
 		DAC->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKStreamTick, (void *)stream);
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		delete stream;
 		return NULL;
@@ -201,7 +201,7 @@ bool STKStreamStart(STKStream* stream)
 		
 		stream->m_dac->startStream();
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		return false;
 	}
@@ -214,7 +214,7 @@ bool STKStreamStop(STKStream* stream)
         try {
             stream->m_dac->stopStream();
         }
-        catch (RtAudioError &error) {
+        catch (stk::StkError &error) {
             error.printMessage();
             return false;
         }
@@ -229,7 +229,7 @@ bool STKStreamClean(STKStream* stream)
 	try {
 		stream->m_dac->closeStream();
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		return false;
 	}
@@ -335,7 +335,7 @@ STKVoicerStream* STKVoicerStreamSetup(RtAudio* DAC, int _nbInstruments)
 	try {
 		voicer->m_dac->openStream(&parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &STKVoicerStreamTick, (void *)&voicer->m_instruments[0]);
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		delete voicer;
 		return NULL;
@@ -349,7 +349,7 @@ bool STKVoicerStreamStart(STKVoicerStream* voicer)
 	try {
 		voicer->m_dac->startStream();
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		return false;
 	}
@@ -361,7 +361,7 @@ bool STKVoicerStreamStop(STKVoicerStream* voicer)
 	try {
 		voicer->m_dac->stopStream();
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		return false;
 	}
@@ -374,7 +374,7 @@ bool STKVoicerStreamClean(STKVoicerStream* voicer)
 	try {
 		voicer->m_dac->closeStream();
 	}
-	catch (RtAudioError &error) {
+	catch (stk::StkError &error) {
 		error.printMessage();
 		return false;
 	}

@@ -20,7 +20,7 @@ RtAudio* STKInit()
     RtAudio* DAC = new RtAudio();
     return DAC;
   }
-  catch (RtAudioError &error) {
+  catch (stk::StkError &error) {
     return NULL;
   }
 
