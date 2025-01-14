@@ -262,6 +262,7 @@ int main()
     error.printMessage();
     return 0;
   }
+  sequencer->stop();
 
 
   static ImVec4 clear_color = ImColor(220, 220, 220);
@@ -270,8 +271,6 @@ int main()
   int display_w, display_h;
   glfwGetWindowSize(window, &display_w, &display_h);
   SizeCallback(window, display_w, display_h);
-
-  std::cout << "before main loop" << std::endl;
 
   // main loop audio rendering in background
   while (!glfwWindowShouldClose(window)) {
@@ -294,11 +293,8 @@ int main()
       graphEditor->setCurrent(currentTrack);
     }
 
-    std::cout << "before sequencer draw" << std::endl;
     sequencerEditor->draw();
-    std::cout << "before graph draw" << std::endl;
     graphEditor->draw();
-    std::cout << "after graph draw" << std::endl;
     
     ImGui::Render();
 
