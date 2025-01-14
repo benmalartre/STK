@@ -44,6 +44,9 @@ public:
   void                    setCurrent(TxTrack* track);
   void                    setGraph(TxGraph* graph);
 
+  TxTrack*                getCurrent();
+  TxGraph*                getGraph();
+
 
 protected:            
   static const int        Flags;

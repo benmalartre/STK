@@ -183,11 +183,23 @@ void TxEditor::handleInput()
 void TxEditor::setCurrent(TxTrack* track)
 {
   _current = track;
+  if(_current)setGraph(_current->graph());
+  else setGraph(nullptr);
 }
 
 void TxEditor::setGraph(TxGraph* graph)
 {
   _graph = graph;
+}
+
+TxTrack* TxEditor::getCurrent()
+{
+  return _current;
+}
+
+TxGraph* TxEditor::getGraph()
+{
+  return _graph;
 }
 
 TxGraphEditor::TxGraphEditor(TxGraph* graph)

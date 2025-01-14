@@ -254,7 +254,6 @@ int main()
   graphEditor->setCurrent(currentTrack);
   sequencerEditor->setCurrent(currentTrack);
 
-
   // start the audio backkground stream
   try {
     dac.startStream();
@@ -288,7 +287,11 @@ int main()
 
     ImGui::SetMouseCursor(splitterHovered ? ImGuiMouseCursor_ResizeNS : ImGuiMouseCursor_Arrow);
 
-    graphEditor->setCurrent(sequencerEditor->getCurrentTrackIndex());
+    if(currentTrack != sequencerEditor->getCurrent()) {
+      std::cout << "switch current track !!" << std::endl;
+      currentTrack = sequencerEditor->getCurrent();
+      graphEditor->setCurrent(currentTrack);
+    }
 
     sequencerEditor->draw();
     graphEditor->draw();
