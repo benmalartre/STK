@@ -74,6 +74,8 @@ void TxEditor::terminateConnexion()
 
     if(_connexion->target->node()->type() == TxNode::GRAPH) {
       ((TxGraph*)_connexion->target->node())->setCurrent(_connexion->source->node());
+      std::cout << "connected " << _connexion->target->node()->name() << "," << 
+        _connexion->target->name() << std::endl;
     }
   }
 
@@ -404,7 +406,7 @@ void TxGraphEditor::draw()
     }
 
     if(_graph->current())_graph->current()->draw(this, &modified);
-  }
+  } 
     
   setSplitterChannel(TxEditor::BACKGROUND);
   if (ImGui::IsDragDropActive()) {

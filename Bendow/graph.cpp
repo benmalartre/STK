@@ -62,10 +62,13 @@ void TxGraph::basic(TxNode* input)
     track->connect(adsr, "Trigger", 0);
     track->connect(oscillator, "Frequency", 1);
   }
-  adsr->connect(oscillator, "Envelope");
   
   addNode(oscillator);
   addNode(adsr);
+
+  adsr->connect(oscillator, "Envelope");
+  oscillator->connect(this, "Samples", 0);
+  
   setCurrent(oscillator);
 }
 
