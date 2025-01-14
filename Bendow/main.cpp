@@ -242,11 +242,11 @@ int main()
   }
   sequencer->start();
 
-  currentTrack = sequencer->track(0);
+  currentTrack = nullptr;//sequencer->track(0);
 
   // setup the editors
   sequencerEditor = new TxSequencerEditor(sequencer);
-  graphEditor = new TxGraphEditor(currentTrack->graph());
+  graphEditor = new TxGraphEditor(currentTrack ? currentTrack->graph() : nullptr);
 
   sequencerEditor->resize(SplitterHeight);
   graphEditor->resize(SplitterHeight);
@@ -271,6 +271,8 @@ int main()
   glfwGetWindowSize(window, &display_w, &display_h);
   SizeCallback(window, display_w, display_h);
 
+  std::cout << "before main loop" << std::endl;
+
   // main loop audio rendering in background
   while (!glfwWindowShouldClose(window)) {
     stk::Stk::sleep( 10 );
@@ -288,13 +290,15 @@ int main()
     ImGui::SetMouseCursor(splitterHovered ? ImGuiMouseCursor_ResizeNS : ImGuiMouseCursor_Arrow);
 
     if(currentTrack != sequencerEditor->getCurrent()) {
-      std::cout << "switch current track !!" << std::endl;
       currentTrack = sequencerEditor->getCurrent();
       graphEditor->setCurrent(currentTrack);
     }
 
+    std::cout << "before sequencer draw" << std::endl;
     sequencerEditor->draw();
+    std::cout << "before graph draw" << std::endl;
     graphEditor->draw();
+    std::cout << "after graph draw" << std::endl;
     
     ImGui::Render();
 

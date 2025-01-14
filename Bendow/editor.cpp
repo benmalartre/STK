@@ -240,22 +240,24 @@ void TxGraphEditor::_drawFrame()
 
   ImVec2 pMin, pMax;
 
-  TxParameterSamples* inputs = (TxParameterSamples*)_current->parameter("Output");
-  pMin = _pos + ImVec2(24, 100);
-  pMax = pMin + ImVec2(8, 10);
+  if(_current) {
+    TxParameterSamples* inputs = (TxParameterSamples*)_current->parameter("Output");
+    pMin = _pos + ImVec2(24, 100);
+    pMax = pMin + ImVec2(8, 10);
 
-  inputs->draw(this, pMin, pMax, 1.f, 0);
+    inputs->draw(this, pMin, pMax, 1.f, 0);
 
-  pMin += ImVec2(0, 32);
-  pMax += ImVec2(0, 32);
-  inputs->draw(this, pMin, pMax, 1.f, 1);
+    pMin += ImVec2(0, 32);
+    pMax += ImVec2(0, 32);
+    inputs->draw(this, pMin, pMax, 1.f, 1);
 
 
-  TxParameterSamples* output = (TxParameterSamples*)_current->graph()->parameter("Samples");
-  pMin = _pos + ImVec2(_size.x - 24, 100);
-  pMax = pMin + ImVec2(8, 10);
+    TxParameterSamples* output = (TxParameterSamples*)_current->graph()->parameter("Samples");
+    pMin = _pos + ImVec2(_size.x - 24, 100);
+    pMax = pMin + ImVec2(8, 10);
 
-  output->draw(this, pMin, pMax, 1.f, 0);
+    output->draw(this, pMin, pMax, 1.f, 0);
+  }
 
 }
 
@@ -363,16 +365,14 @@ void TxGraphEditor::resize(size_t splitterHeight)
 
 void TxGraphEditor::draw()
 {
-  std::vector<TxNode*>& nodes = _graph->nodes();
-  std::vector<TxConnexion*>& connexions = _graph->connexions();
-  
+
   ImGuiIO& io = ImGui::GetIO();
   ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, style.ItemSpacing * _scale);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing * _scale);
   ImGui::SetNextWindowPos(_pos);
   ImGui::SetNextWindowSize(_size);
-  ImGui::Begin("editor", NULL, TxEditor::Flags);
+  ImGui::Begin("Graph", NULL, TxEditor::Flags);
 
   ImGui::SetWindowFontScale(1.f);
   _drawGrid();
@@ -385,21 +385,27 @@ void TxGraphEditor::draw()
 
   bool modified = false;
 
-  for (size_t n = 0; n < nodes.size(); ++n) {
-    _drawNode(nodes[n], &modified);
+  if(_graph) {
+    std::vector<TxNode*>& nodes = _graph->nodes();
+    std::vector<TxConnexion*>& connexions = _graph->connexions();
+
+    for (size_t n = 0; n < nodes.size(); ++n) {
+      _drawNode(nodes[n], &modified);
+    }
+
+    setSplitterChannel(TxEditor::FOREGROUND);
+
+    if (_connexion && io.MouseDown[0] && ImGui::IsDragDropActive()) {
+      _drawConnexion(_connexion);
+    }
+
+    for (auto& connexion : connexions) {
+      _drawConnexion(connexion);
+    }
+
+    if(_graph->current())_graph->current()->draw(this, &modified);
   }
-
-  setSplitterChannel(TxEditor::FOREGROUND);
-
-  if (_connexion && io.MouseDown[0] && ImGui::IsDragDropActive()) {
-    _drawConnexion(_connexion);
-  }
-
-  for (auto& connexion : connexions) {
-    _drawConnexion(connexion);
-  }
-
-  if(_graph->current())_graph->current()->draw(this, &modified);
+    
   setSplitterChannel(TxEditor::BACKGROUND);
   if (ImGui::IsDragDropActive()) {
     drawList->AddRectFilled(_pos, _pos + _size, IM_COL32(0,0,0,60));
@@ -443,7 +449,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, style.ItemInnerSpacing);
   ImGui::SetNextWindowPos(_pos);
   ImGui::SetNextWindowSize(_size);
-  ImGui::Begin("sequencer", NULL, Flags);
+  ImGui::Begin("Sequencer", NULL, Flags);
 
   ImGui::SetWindowFontScale(1.f);
 
@@ -459,7 +465,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   for (size_t i = 0; i < tracks.size(); ++i) {
     ImGui::SetCursorPosX(20);
     ImGui::SetCursorPosY(cursorY);
-    bool expended = tracks[i] == _current;
+    bool expended = (tracks[i] == _current);
     const bool selected = (tracks[i] == _current);
     ImGui::BeginGroup();
     if(ImGui::Selectable(tracks[i]->name().c_str(), selected))
@@ -472,7 +478,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
       if (i < tracks[i]->length() - 1)  ImGui::SameLine();
     }
     ImGui::EndGroup();
-    cursorY += (tracks[i] == _current) ? 140 : 24;
+    cursorY += expended ? 140 : 24;
   }
 
   ImGui::End();
