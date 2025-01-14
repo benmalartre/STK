@@ -1,2 +1,5 @@
 # build folder
 *build*
+
+#vscode folder
+*.vscode*

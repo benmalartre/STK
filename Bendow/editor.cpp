@@ -284,7 +284,7 @@ void TxGraphEditor::_drawPopup()
 {
   ImGui::SetCursorPos(ImVec2(10, 10));
   static const char* name = "GraphNodesMenu";
-  if (ImGui::Button("Show popup")) {
+  if (ImGui::Button("Nodes")) {
     ImGui::OpenPopup(name);
   }
 
@@ -472,7 +472,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
       if (i < tracks[i]->length() - 1)  ImGui::SameLine();
     }
     ImGui::EndGroup();
-    cursorY += (tracks[i] == _current) ? 250 : 24;
+    cursorY += (tracks[i] == _current) ? 140 : 24;
   }
 
   ImGui::End();
@@ -505,7 +505,7 @@ bool TxSequencerEditor::_drawBeat(TxTrack* track, bool expended, uint32_t beatId
       : (bit ? ImVec4(1, 0.75, 0, 1) : style.Colors[ImGuiCol_FrameBg]);
 
     ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-    if (ImGui::Button((hiddenPrefix + "Btn" + std::to_string(i)).c_str(), ImVec2(bitWidth, 12))) {
+    if (ImGui::Button((hiddenPrefix + std::to_string((intptr_t)(void*)track) + "Btn" + std::to_string(i)).c_str(), ImVec2(bitWidth, 12))) {
       BIT_FLIP(beat->first, i);
       modified = true;
     }
