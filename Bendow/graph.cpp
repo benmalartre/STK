@@ -43,7 +43,6 @@ int TxGraph::index(const TxNode* node)
 
 void TxGraph::setCurrent(TxNode* node)
 {
-  std::cout << "set current : " << node->name() << std::endl;
   _current = node;
 }
 
@@ -53,6 +52,21 @@ TxNode* TxGraph::current()
 }
 
 void TxGraph::basic(TxNode* input)
+{
+
+  TxLfo* lfo = new TxLfo(this, "Lfo");
+  TxOscillator* oscillator = new TxOscillator(this, "Oscillator");
+
+  addNode(lfo);
+  addNode(oscillator);
+
+  lfo->connect(oscillator, "Frequency");
+  oscillator->connect(this, "Samples", 0);
+  
+  setCurrent(oscillator);
+}
+
+void TxGraph::sequenced(TxNode* input)
 {
   TxOscillator* oscillator = new TxOscillator(this, "Oscillator");
   oscillator->setHarmonics(7);

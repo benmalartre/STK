@@ -70,9 +70,6 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
       *samples++ = sample;
       *samples++ = sample;
       time.increment();
-    } else {
-      *samples++ = 0.f;
-      *samples++ = 0.f;
     }
   }
 
@@ -225,7 +222,7 @@ int main()
   
   try {
     dac.openStream( &parameters, NULL, format, (unsigned int)stk::Stk::sampleRate(), 
-    &bufferFrames, &tick, (void *)&frames );
+      &bufferFrames, &tick, (void *)&frames );
   }
   catch (stk::StkError& error ) {
     error.printMessage();
@@ -242,7 +239,7 @@ int main()
   }
   sequencer->start();
 
-  currentTrack = nullptr;//sequencer->track(0);
+  currentTrack = sequencer->track(0);
 
   // setup the editors
   sequencerEditor = new TxSequencerEditor(sequencer);

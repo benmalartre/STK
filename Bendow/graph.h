@@ -29,6 +29,7 @@ public:
 
   TxNode*                 current();
   void                    basic(TxNode * input);
+  void                    sequenced(TxNode * input);
 
   std::vector<TxNode*>&  nodes() {return _nodes;};
   std::vector<TxConnexion*>& connexions(){return _connexions;};

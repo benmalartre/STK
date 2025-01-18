@@ -12,10 +12,6 @@ const int TxEditor::Flags =
   ImGuiWindowFlags_NoMove |
   ImGuiWindowFlags_NoNav |
   ImGuiWindowFlags_NoTitleBar;
-/*
-ImGuiWindowFlags_NoBackground |
-*/
-/*|ImGuiWindowFlags_NoInputs;*/
 
 
 TxEditor::TxEditor(TxGraph* graph, bool navigatable)
@@ -29,7 +25,6 @@ TxEditor::TxEditor(TxGraph* graph, bool navigatable)
   , _scale(1.f)
   , _invScale(1.f)
   , _navigatable(navigatable)
-
 {};
 
 TxNode* TxEditor::current()
@@ -74,8 +69,6 @@ void TxEditor::terminateConnexion()
 
     if(_connexion->target->node()->type() == TxNode::GRAPH) {
       ((TxGraph*)_connexion->target->node())->setCurrent(_connexion->source->node());
-      std::cout << "connected " << _connexion->target->node()->name() << "," << 
-        _connexion->target->name() << std::endl;
     }
   }
 
@@ -96,7 +89,6 @@ static bool inside(const ImVec2& point, const ImVec2& bmin, const ImVec2& bmax)
 
 TxNode* TxEditor::pick(const ImVec2& p)
 {
-
   std::vector<TxNode*>& nodes = _graph->nodes();
   int nodeIdx = nodes.size() - 1;
   _hovered = NULL;
@@ -216,7 +208,7 @@ bool TxGraphEditor::contains(const TxNode* node)
 {
   if(_graph)
     for(auto& n: _graph->nodes())
-      if(node == n)return true;
+      if(node == n) return true;
   
   return false;
 }
@@ -260,9 +252,7 @@ void TxGraphEditor::_drawFrame()
 
     output->draw(this, pMin, pMax, 1.f, 0);
   }
-
 }
-
 
 void TxGraphEditor::_drawGrid()
 {

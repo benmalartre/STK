@@ -45,6 +45,12 @@ void TxTrack::basicGraph()
   _graph->basic(this);
 }
 
+void TxTrack::sequencedGraph()
+{
+  _graph = new TxGraph(this, "graph");
+  _graph->sequenced(this);
+}
+
 void TxTrack::setLength(size_t length)
 {
   _sequence.resize(length);

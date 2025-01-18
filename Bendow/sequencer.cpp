@@ -47,7 +47,6 @@ void TxSequencer::setLength(uint64_t length)
 {
   _length = length;
   for (size_t i = 0; i < _tracks.size(); ++i) {
-    std::cout << "resize track sequence " << i << std::endl;
     _tracks[i]->setLength(_length);
   }
 }
@@ -97,7 +96,6 @@ TxTrack* TxSequencer::track(size_t index)
 
 stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
-  
   float sample = 0.f;
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i]->active() && _tracks[i]->graph()) {

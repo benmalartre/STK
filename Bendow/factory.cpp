@@ -39,7 +39,6 @@ void TxFactory::initialize()
   constructorMap[TxNode::ARYTHMETIC] = { &(DEFINE_NODE(TxArythmetic)), 0 };
   constructorMap[TxNode::FILTER] = { &(DEFINE_NODE(TxFilter)), 0 };
   constructorMap[TxNode::EFFECT] = { &(DEFINE_NODE(TxEffect)), 0 };
-  //constructorMap[TxNode::SEQUENCER] = { &(DEFINE_NODE(TxSequencer)), 0 };
 }
 
 

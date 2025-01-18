@@ -37,7 +37,8 @@ TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t num
   , _size(100,25)
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
 {
-  if(_parent && _parent->type() == TxNode::GRAPH) ((TxGraph*)_parent)->addNode(this);
+  if(_parent && _parent->type() == TxNode::GRAPH) 
+    ((TxGraph*)_parent)->addNode(this);
   _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
   _params.push_back(new TxParameterBool(this, "Active", &_active));
   _params.push_back(new TxParameterSamples(this, "Output", true, _nChannels));
@@ -162,18 +163,12 @@ stk::StkFloat TxNode::lastSample(unsigned int channel)
 
 TxConnexion* TxNode::connect(TxNode* node, const std::string& name, short channel) 
 {
-  std::cout << "connect node " << _name  << " to" << node->name() << ":" << name << std::endl;
   TxParameter* param = node->parameter(name);
   if(!param)return NULL;
 
   if(param->input()) {
-    std::cout << "input : " << param->input()->name() << std::endl;
     TxConnexion* connexion = graph()->connexion(param);
-    std::cout << "connexion : " << connexion << std::endl;
     if(connexion)graph()->removeConnexion(connexion);
-  } else {
-    std::cout << "no input ! " << std::endl;
-
   }
   param->connect(this, channel);
   
@@ -221,15 +216,12 @@ void TxNode::_drawPopup(TxEditor* editor)
 
     {
       ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
-      //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
       if (ImGui::BeginPopup("##popup", ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
       {
         static const char* autocomplete[] = { "cats", "dogs", "rabbits", "turtles" };
 
         for (int i = 0; i < IM_ARRAYSIZE(autocomplete); i++)
         {
-          //if (strstr(autocomplete[i], input) == NULL)
-          //    continue;
           if (ImGui::Selectable(autocomplete[i]))
           {
             ImGui::ClearActiveID();

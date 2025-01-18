@@ -11,11 +11,10 @@ TxLfo::TxLfo(TxNode* parent, const std::string& name)
   , _offset(6.f)
 {
   _sine.setFrequency(_frequency);
-  _params.push_back(new TxParameterFloat(this, "Frequency", 0.01f, 1000.f, &_frequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Amplitude", 0.01f, 100.f, &_amplitude, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Offset", -1000.f, 1000.f, &_offset, TxParameter::KNOB));
-  //_buffer.scale(-10, 10);
-  _size = ImVec2(TX_KNOB_SIZE * 4 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2);
+  _params.push_back(new TxParameterFloat(this, "Freq", 0.01f, 1000.f, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Ampl", 0.01f, 100.f, &_amplitude, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Zero", -1000.f, 1000.f, &_offset, TxParameter::KNOB));
+  _size = ImVec2(TX_KNOB_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2);
 }
 
 TxLfo::~TxLfo() 
@@ -38,7 +37,8 @@ stk::StkFloat TxLfo::tick(unsigned int)
 void TxLfo::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128 * editor->scale());
+
+  TxNode::_drawAlignLeft(editor);
   TxParameter* frequency = _params[TxLfo::FREQUENCY];
   if(frequency->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
@@ -49,9 +49,10 @@ void TxLfo::_drawImpl(TxEditor* editor, bool* modified)
   if(offset->draw(editor) && modified)*modified = true;
   ImGui::EndGroup();
 
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
+  TxNode::_drawInput(editor, _params[TxLfo::FREQUENCY], 0);
+  TxNode::_drawInput(editor, _params[TxLfo::AMPLITUDE], 1);
+  TxNode::_drawInput(editor, _params[TxLfo::OFFSET], 2);
+
   TxNode::_drawOutput(editor);
 }
 

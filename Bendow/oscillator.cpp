@@ -25,6 +25,7 @@ TxOscillator::TxOscillator(TxNode* parent, const std::string& name)
   , _generator(NULL)
   , _waveFormIdx(-1)
   , _lastWaveFormIdx(-1)
+  , _envelope(1.f)
   , _frequency(110.f)
   , _lastHarmonics(3)
   , _harmonics(3)
@@ -35,7 +36,7 @@ TxOscillator::TxOscillator(TxNode* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt(this, "Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Envelope", 0.f, 2.f, &_envelope, TxParameter::KNOB));
-  _size = ImVec2(TX_KNOB_SIZE * 4 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
+  _size = ImVec2(TX_KNOB_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
 TxOscillator::~TxOscillator() 

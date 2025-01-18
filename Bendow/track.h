@@ -16,6 +16,7 @@ public:
   stk::StkFloat tick(unsigned int) override;
     
   void basicGraph();
+  void sequencedGraph();
   void reset() override;
 
   bool active(){return _active;};
