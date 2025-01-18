@@ -17,9 +17,7 @@ SET(GLFW_INCLUDE_DIR "${GLFW_DIR}/include")
 FIND_LIBRARY(GLFW NAMES glfw3 PATHS "${GLFW_DIR}/build/src" "${GLFW_DIR}/build/src/Release")
 
 # stk 
-IF(NOT DEFINED STK_DIR)
-	MESSAGE(FATAL_ERROR "No STK_DIR variable set! STK path must be passed to cmake!!!")
-ENDIF()
+SET(STK_DIR ../stk)
 
 # OpenGL
 FIND_PACKAGE(OpenGL REQUIRED)

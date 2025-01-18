@@ -90,7 +90,6 @@ void TxGraph::addNode(TxNode* node)
 {
   if(!contains(node)) {
     _nodes.push_back(node);
-    _current = node;
     node->setSelected(true);
   }
 }
