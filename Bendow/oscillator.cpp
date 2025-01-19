@@ -16,8 +16,8 @@ const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "BlitSaw",
   "BlitSquare",
   "Noise",
-  "SineWave",
-  "SingWave"
+  "SineWave"/*,
+  "SingWave"*/
 };
 
 TxOscillator::TxOscillator(TxNode* parent, const std::string& name) 
@@ -31,11 +31,11 @@ TxOscillator::TxOscillator(TxNode* parent, const std::string& name)
   , _harmonics(3)
 {
   setWaveForm(BLIT);
-  _params.push_back(new TxParameterEnum(this, "WaveForm", &TxOscillator::WaveFormName[0], 
+  _params.push_back(new TxParameterEnum(this, "Wave", &TxOscillator::WaveFormName[0], 
     TxOscillator::NumWaveForm, &_waveFormIdx));
-  _params.push_back(new TxParameterFloat(this, "Frequency", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt(this, "Harmonics", 0, 16, &_harmonics, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Envelope", 0.f, 2.f, &_envelope, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Freq", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Harm", 0, 16, &_harmonics, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Env", 0.f, 2.f, &_envelope, TxParameter::KNOB));
   _size = ImVec2(TX_KNOB_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
@@ -81,10 +81,11 @@ stk::StkFloat TxOscillator::tick(unsigned int)
     case SINEWAVE:
       sample = ((stk::SineWave*)_generator)->tick() * _envelope;
       break;
-
+/*
     case SINGWAVE:
       sample = ((stk::SingWave*)_generator)->tick() * _envelope;
       break;
+*/
   }   
   //_buffer.write(sample);
   return sample;
@@ -126,12 +127,13 @@ void TxOscillator::setWaveForm(short index)
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
       ((stk::SineWave*)_generator)->reset();
       break;
-
+/*
     case SINGWAVE:
       _generator = new stk::SingWave( (stk::Stk::rawwavePath() + "impuls20.raw").c_str(), true );
       ((stk::SingWave*)_generator)->setFrequency(_frequency);
       ((stk::SingWave*)_generator)->reset();
       break;
+*/
   }
   _lastWaveFormIdx = _waveFormIdx;
 }
@@ -159,10 +161,10 @@ void TxOscillator::setFrequency(const stk::StkFloat& frequency)
     case SINEWAVE:
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
       break;
-
+/*
     case SINGWAVE:
       ((stk::SingWave*)_generator)->setFrequency(_frequency);
-      break;
+      break;*/
   }
 }
 
@@ -190,9 +192,10 @@ void TxOscillator::setHarmonics(int harmonics)
 
     case SINEWAVE:
       break;
-
+/*
     case SINGWAVE:
       break;
+*/
   }
 }
 
@@ -246,9 +249,9 @@ void TxOscillator::reset()
     case SINEWAVE:
       ((stk::SineWave*)_generator)->reset();
       break;
-      
+/*
     case SINGWAVE:
       ((stk::SingWave*)_generator)->reset();
-      break;
+      break;*/
   }
 }

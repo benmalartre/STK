@@ -7,7 +7,7 @@
 
 class TxOscillator : public TxNode {
 public:
-  static const int NumWaveForm = 6;
+  static const int NumWaveForm = 5;
   static const char* WaveFormName[NumWaveForm];
 
   enum Type {
@@ -15,8 +15,8 @@ public:
     BLITSAW,
     BLITSQUARE,
     NOISE,
-    SINEWAVE,
-    SINGWAVE
+    SINEWAVE/*,
+    SINGWAVE*/
   };
 
   enum Parameters {

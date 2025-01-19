@@ -1,5 +1,6 @@
 #include <Stk.h>
 #include <vector>
+#include "fonts.h"
 #include "buffer.h"
 #include "parameter.h"
 
@@ -11,8 +12,6 @@ class TxNode;
 class TxGraph;
 class TxTrack;
 
-extern ImFont* TX_FONT_BASE;
-extern ImFont* TX_FONT_TITLE;
 
 struct TxConnexion;
 

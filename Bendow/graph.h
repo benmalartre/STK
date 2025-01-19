@@ -16,6 +16,7 @@ public:
   ~TxGraph();
 
   void                    setCurrent(TxNode* node);
+  void                    setVolume(float volume);
   void                    addNode(TxNode* node);
   void                    removeNode(TxNode* node);
   void                    addConnexion(TxConnexion* connexion);
@@ -27,16 +28,17 @@ public:
   const ImVec2&           size() override;
   void                    reset() override;
 
+  float                   volume(){return _volume;};
   TxNode*                 current();
   void                    basic(TxNode * input);
   void                    sequenced(TxNode * input);
 
-  std::vector<TxNode*>&  nodes() {return _nodes;};
+  std::vector<TxNode*>&   nodes() {return _nodes;};
   std::vector<TxConnexion*>& connexions(){return _connexions;};
 
 protected:            
-  bool                    contains(const TxNode* node);
-  int                     index(const TxNode* node);
+  bool                     contains(const TxNode* node);
+  int                      index(const TxNode* node);
 
 private:
   void                      _createNodeByType(int type);
@@ -46,7 +48,7 @@ private:
   std::vector<TxNode*>      _nodes;
   std::vector<TxConnexion*> _connexions;
   std::vector<TxParameter*> _inputs;
-
+  float                     _volume;
   TxNode*                   _current;
 };
 

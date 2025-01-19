@@ -104,6 +104,7 @@ SET(SOURCES
 	${STK_DIR}/src/RtAudio.cpp
 	${STK_DIR}/src/FM.cpp
 	common.cpp
+	fonts.cpp
 	parameter.cpp
 	buffer.cpp
 	node.cpp

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "fonts.h"
 #include "sequencer.h"
 #include "graph.h"
 #include "factory.h"
@@ -14,10 +15,6 @@ TxSequencerEditor* sequencerEditor;
 TxSequencer* sequencer;
 TxTrack* currentTrack = NULL;
 stk::StkFrames frames;
-
-ImFont* TX_FONT_BASE = NULL;
-ImFont* TX_FONT_TITLE = NULL;
-
 
 void 
 SizeCallback(GLFWwindow* window, int width, int height)
@@ -192,20 +189,22 @@ int main()
   GLFWwindow* window = openWindow(1200, 800);
   glfwMakeContextCurrent(window);
 
-  // Setup ImGui binding
+  std::cout << "create font atlas..." << std::endl;
+  createFontAtlas();
+  std::cout << "font atlas created..." << std::endl;
+
+  // setup imgui context
   IMGUI_CHECKVERSION();
-  ImGuiContext* context = ImGui::CreateContext();
+  ImGuiContext* context = ImGui::CreateContext(SHARED_ATLAS);
   ImPlotContext* plotContext = ImPlot::CreateContext();
+  ImGui::SetCurrentContext(context);  
   
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330 ");
 
-  ImGuiIO& io = ImGui::GetIO();
-  //io.Fonts->AddFontDefault();
-  TX_FONT_BASE = io.Fonts->AddFontFromFileTTF("fonts/tahoma.ttf", 13);
-  TX_FONT_TITLE = io.Fonts->AddFontFromFileTTF("fonts/tahomabd.ttf", 24);
-
   setupStyle();
+  ImGuiIO& io = ImGui::GetIO();
+  io.FontAllowUserScaling = true;
 
   // start an audio stream
   stk::Stk::setSampleRate( 44100.0 );
@@ -231,7 +230,7 @@ int main()
 
   // create the sequencer
   TxFactory::initialize();
-  sequencer = new TxSequencer(2);
+  sequencer = new TxSequencer(4);
   sequencer->setLength(16);
   for (size_t t = 0; t < 16; ++t) {
     sequencer->setBeat(0, t, { 1, BASS[t] });

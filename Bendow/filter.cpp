@@ -177,13 +177,13 @@ void TxFilter::setFilter(int filterIdx)
       float1->setMinimum(20.f);
       float1->setMaximum(30000.f);
       float1->set(220.f);
-      float1->setLabel("Resonance");
+      float1->setLabel("Res");
       float2->setMinimum(0.f);
       float2->setMaximum(1.f);
       float2->set(0.5f);
-      float2->setLabel("Radius");
+      float2->setLabel("Rad");
       bool1->set(true);
-      bool1->setLabel("Normalize");
+      bool1->setLabel("Nrm");
       ((stk::BiQuad*)_filter)->setResonance(float1->tick(), float2->tick(), bool1->tick());
       //((stk::BiQuad*)_filter)->setNotch(0.2);
       break;
@@ -201,7 +201,7 @@ void TxFilter::setFilter(int filterIdx)
       int1->setMinimum(0);
       int1->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int1->set(4096.f);
-      int1->setLabel("Maximum");
+      int1->setLabel("Max");
       int2->setMinimum(0);
       int2->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int2->set(0.f);
@@ -215,7 +215,7 @@ void TxFilter::setFilter(int filterIdx)
       int1->setMinimum(0);
       int1->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int1->set(4096.f);
-      int1->setLabel("Maximum");
+      int1->setLabel("Max");
       int2->setMinimum(0);
       int2->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int2->set(0.f);
@@ -229,7 +229,7 @@ void TxFilter::setFilter(int filterIdx)
       int1->setMinimum(0);
       int1->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int1->set(4096.f);
-      int1->setLabel("Maximum");
+      int1->setLabel("Max");
       int2->setMinimum(0);
       int2->setMaximum((int)stk::Stk::sampleRate() * 0.5);
       int2->set(0.f);

@@ -14,6 +14,7 @@
 TxGraph::TxGraph(TxNode* parent, const std::string& name)
   : TxNode(parent, TxNode::GRAPH, name)
   , _current(NULL)
+  , _volume(1.f)
 {
   _params.push_back(new TxParameterSamples(this, "Samples", false, 1));
 
@@ -60,7 +61,7 @@ void TxGraph::basic(TxNode* input)
   addNode(lfo);
   addNode(oscillator);
 
-  lfo->connect(oscillator, "Frequency");
+  lfo->connect(oscillator, "Freq");
   oscillator->connect(this, "Samples", 0);
   
   setCurrent(oscillator);
@@ -74,13 +75,13 @@ void TxGraph::sequenced(TxNode* input)
   if(input && input->type() == TxNode::TRACK) {
     TxTrack* track = (TxTrack*)input;
     track->connect(adsr, "Trigger", 0);
-    track->connect(oscillator, "Frequency", 1);
+    track->connect(oscillator, "Freq", 1);
   }
   
   addNode(oscillator);
   addNode(adsr);
 
-  adsr->connect(oscillator, "Envelope");
+  adsr->connect(oscillator, "Env");
   oscillator->connect(this, "Samples", 0);
   
   setCurrent(oscillator);
@@ -146,7 +147,7 @@ void TxGraph::reset()
 
 stk::StkFloat TxGraph::tick(unsigned int channel)
 {
-  if(_current)return _current->tick(channel);
+  if(_current && _active)return _current->tick(channel) * _volume;
   return 0;
 }
 

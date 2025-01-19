@@ -280,7 +280,7 @@ void TxNode::draw(TxEditor* editor, bool* modified)
   ImDrawList* drawList = ImGui::GetWindowDrawList();
 
   // draw node name
-  ImGui::PushFont(TX_FONT_TITLE);
+  ImGui::PushFont(FONTS_MEDIUM[0]);
   drawList->AddText(
     offset + position + ImVec2(TX_TITLE_X, -TX_TITLE_HEIGHT) * scale, 
     TX_CONTOUR_COLOR_SELECTED, 
