@@ -36,7 +36,7 @@ TxOscillator::TxOscillator(TxNode* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "Freq", 20.f, 3000.f, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterInt(this, "Harm", 0, 16, &_harmonics, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Env", 0.f, 2.f, &_envelope, TxParameter::KNOB));
-  _size = ImVec2(TX_KNOB_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
+  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
 TxOscillator::~TxOscillator() 
@@ -225,6 +225,7 @@ void TxOscillator::_drawImpl(TxEditor* editor, bool* modified)
   TxNode::_drawInput(editor, _params[TxOscillator::WAVEFORM], 3);
 
   TxNode::_drawOutput(editor);
+  
 }
 
 void TxOscillator::reset()

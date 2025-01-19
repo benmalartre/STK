@@ -397,7 +397,7 @@ void TxGraphEditor::draw()
 
     if(_graph->current())_graph->current()->draw(this, &modified);
   } 
-    
+  
   setSplitterChannel(TxEditor::BACKGROUND);
   if (ImGui::IsDragDropActive()) {
     drawList->AddRectFilled(_pos, _pos + _size, IM_COL32(0,0,0,60));
@@ -450,11 +450,14 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   
   _sequencer->draw(this);
 
+
+
   std::vector<TxTrack*>& tracks = _sequencer->tracks();
   Index index = TxTime::instance().index(tracks[0]->length());
 
   size_t cursorY = ImGui::GetCursorPosY();
   for (size_t i = 0; i < tracks.size(); ++i) {
+    ImGui::PushID(i);
     ImGui::SetCursorPosX(20);
     ImGui::SetCursorPosY(cursorY);
     bool expended = (tracks[i] == _current);
@@ -463,9 +466,28 @@ void TxSequencerEditor::resize(size_t splitterHeight)
     if(ImGui::Selectable(tracks[i]->name().c_str(), selected))
       _current = tracks[i];
 
-    if(expended && ImGui::Button(ICON_FA_HEADPHONES, ImVec2(32, 32)))
-      tracks[i]->toggleActive();
+    if(expended) {
+      ImGui::BeginGroup();
+      ImVec4* colors = style.Colors;
+      const bool active = tracks[i]->active();
+      ImGui::PushStyleColor(ImGuiCol_Text, active ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
+      
+      if (active) {
+        ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, style.Colors[ImGuiCol_ButtonActive]);
+      }
+      
+      if(ImGui::Button(ICON_FA_HEADPHONES, ImVec2(32, 32)))
+        tracks[i]->toggleActive();
 
+      if(active) ImGui::PopStyleColor(2);
+      ImGui::PopStyleColor();
+      TxParameter* volume = tracks[i]->parameter("Volume");
+      volume->draw(this);
+      ImGui::EndGroup();
+      ImGui::PopID();
+    }
+    
     ImGui::SameLine();
 
     ImGui::SetCursorPosX(60);
@@ -474,7 +496,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
       if (i < tracks[i]->length() - 1)  ImGui::SameLine();
     }
     ImGui::EndGroup();
-    cursorY += expended ? 140 : 24;
+    cursorY += expended ? 160 : 24;
   }
 
   ImGui::End();

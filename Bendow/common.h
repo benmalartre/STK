@@ -56,7 +56,9 @@
 #define TX_CONNEXION_WIDTH 4.f
 #define TX_NODE_ROUNDING 2.f
 #define TX_PLUG_SIZE 8.f
-#define TX_KNOB_SIZE 48.f
+#define TX_KNOB_SMALL_SIZE 32.f
+#define TX_KNOB_MIDDLE_SIZE 48.f
+#define TX_KNOB_LARGE_SIZE 64.f
 #define TX_SLIDER_SIZE 32.f
 
 // macros

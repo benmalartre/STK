@@ -33,6 +33,12 @@ public:
     KNOB          = 4
   };
 
+  enum Size {
+    SMALL  = 1,
+    MIDDLE = 2,
+    LARGE  = 4
+  };
+
   TxParameter(TxNode* node, const std::string& name, void* data, 
     short type=NONE, int flags=HORIZONTAL);
   virtual ~TxParameter();
@@ -48,7 +54,6 @@ public:
   void setLabel(const std::string& label);
   void connect(TxNode* node, short channel=0);
   void disconnect();
-  void setShortName(const std::string& shortName){_shortName=shortName;};
  
   virtual void set(stk::StkFloat value) = 0;
   virtual stk::StkFloat tick() = 0;
@@ -62,7 +67,6 @@ protected:
   short             _type;
   int               _flags;
   std::string       _name;
-  std::string       _shortName;
   std::string       _label;
   TxNode*           _node;
   TxNode*           _input;
@@ -90,12 +94,15 @@ public:
   void set(stk::StkFloat value) override;
   void setMinimum(int value);
   void setMaximum(int value);
+  size_t size(){return _size;};
+  void setSize(size_t size){_size = size;};
   stk::StkFloat tick() override;
   bool draw(TxEditor*) override;
 
 private:
   int     _minimum;
   int     _maximum;
+  size_t  _size;
 };
 
 class TxParameterEnum : public TxParameter {
@@ -119,12 +126,15 @@ public:
   void set(stk::StkFloat value) override;
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);
+  size_t size(){return _size;};
+  void setSize(size_t size){_size = size;};
   stk::StkFloat tick() override;
   bool draw(TxEditor*) override;
 
 private:
   stk::StkFloat     _minimum;
   stk::StkFloat     _maximum;
+  size_t            _size;
 };
 
 class TxParameterString : public TxParameter {

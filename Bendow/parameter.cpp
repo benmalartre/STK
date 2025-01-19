@@ -4,6 +4,7 @@
 #include "graph.h"
 #include "editor.h"
 
+
 static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
 {
   if (!connexion)return false;
@@ -23,7 +24,6 @@ static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
 TxParameter::TxParameter(TxNode* node, const std::string& name, void* data, short type, int flags)
   : _node(node)
   , _name(name)
-  , _shortName(name.substr(0, 1))
   , _label(name)
   , _input(NULL)
   , _type(type)
@@ -64,11 +64,6 @@ const int& TxParameter::flags()
 const std::string& TxParameter::name()
 {
   return _name;
-};
-
-const std::string& TxParameter::shortName()
-{
-  return _shortName;
 };
 
 
@@ -145,7 +140,7 @@ void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
 
   TxConnexion* connexion = editor->connexion();
   ImDrawList* drawList = ImGui::GetWindowDrawList();
-  drawList->AddText(ImVec2(center.x - TX_PLUG_SIZE * 2, center.y), TX_PLUG_COLOR_DEFAULT, _shortName.c_str());
+  drawList->AddText(ImVec2(center.x - TX_PLUG_SIZE * 2, center.y), TX_PLUG_COLOR_DEFAULT, _label.c_str());
   drawList->AddCircle(center, radius, TX_CONTOUR_COLOR_DEFAULT, 32, TX_CONTOUR_WIDTH * scale);
   drawList->AddCircleFilled(center, radius, TX_PLUG_COLOR_DEFAULT, 32);
   drawList->AddCircleFilled(center, radius * 0.6, TX_CONTOUR_COLOR_DEFAULT, 32);
@@ -181,7 +176,7 @@ stk::StkFloat TxParameterBool::tick()
 
 bool TxParameterBool::draw(TxEditor* editor)
 {
-  return ImGui::Checkbox(_label.c_str(), (bool*)_data);
+  return ImGui::Checkbox(_name.c_str(), (bool*)_data);
 }
 
 // TxParameterInt
@@ -225,14 +220,14 @@ bool TxParameterInt::draw(TxEditor* editor)
   if (_flags & TxParameter::HORIZONTAL) {
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100 * editor->scale());
-    modified = ImGui::SliderInt(_label.c_str(), (int*)_data, _minimum, _maximum);
+    modified = ImGui::SliderInt(_name.c_str(), (int*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderInt(_label.c_str(), ImVec2(20, 100) * editor->scale(), 
+    modified = ImGui::VSliderInt(_name.c_str(), ImVec2(20, 100) * editor->scale(), 
       (int*)_data, _minimum, _maximum);
   } else if (_flags & TxParameter::KNOB) {
-    modified = ImGuiKnobs::KnobInt(_label.c_str(), (int*)_data, 
-      _minimum, _maximum, 0.f, 0, 1, TX_KNOB_SIZE * editor->scale());
+    modified = ImGuiKnobs::KnobInt(_name.c_str(), (int*)_data, 
+      _minimum, _maximum, 0.f, 0, 1, _size * editor->scale());
   }
   
   ImGui::EndGroup();
@@ -268,7 +263,7 @@ bool TxParameterEnum::draw(TxEditor* editor)
 {
   int value = *(int*)_data;
   bool modified = false;
-  if (ImGui::BeginCombo(_label.c_str(), _names[value], ImGuiComboFlags_NoArrowButton))
+  if (ImGui::BeginCombo(_name.c_str(), _names[value], ImGuiComboFlags_NoArrowButton))
   {
     for (int n = 0; n < _num; ++n)
     {
@@ -295,6 +290,7 @@ TxParameterFloat::TxParameterFloat(TxNode* node, const std::string& name, stk::S
   : TxParameter(node, name, (void*)data, TxParameter::FLOAT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
+  , _size(TX_KNOB_MIDDLE_SIZE)
 {
 }
 
@@ -330,17 +326,17 @@ bool TxParameterFloat::draw(TxEditor* editor)
   if (_flags & TxParameter::HORIZONTAL) {
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100 * editor->scale());
-    modified = ImGui::SliderFloat(_label.c_str(), (float*)_data, _minimum, _maximum);
+    modified = ImGui::SliderFloat(_name.c_str(), (float*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {
-    modified = ImGui::VSliderFloat(_label.c_str(), ImVec2(20, 100) * editor->scale(), (float*)_data, _minimum, _maximum);
+    modified = ImGui::VSliderFloat(_name.c_str(), ImVec2(20, 100) * editor->scale(), 
+      (float*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::KNOB) {
-    modified = ImGuiKnobs::Knob(_label.c_str(), (float*)_data, _minimum, _maximum,
-      0.f, "%.3f", ImGuiKnobVariant_WiperDot, TX_KNOB_SIZE * editor->scale());
+    modified = ImGuiKnobs::Knob(_name.c_str(), (float*)_data, _minimum, _maximum,
+      0.f, "%.3f", ImGuiKnobVariant_WiperDot, _size * editor->scale());
   }
   
-
   ImGui::EndGroup();
 
   if(modified && _callback) _callback->execute();
@@ -369,13 +365,13 @@ bool TxParameterString::draw(TxEditor* editor)
   /*
   switch(_display) {
     case TxParameter::HORIZONTAL:
-      modified = ImGui::SliderFloat(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
+      modified = ImGui::SliderFloat(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum);
       break;
     case TxParameter::VERTICAL:
-      modified = ImGui::VSliderFloat(_label.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
+      modified = ImGui::VSliderFloat(_name.c_str(),ImVec2(20, 100), (stk::StkFloat*)_data, _minimum, _maximum);
       break;
     case TxParameter::KNOB:
-      modified = ImGuiKnobs::Knob(_label.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
+      modified = ImGuiKnobs::Knob(_name.c_str(), (stk::StkFloat*)_data, _minimum, _maximum, 
         0.f, "%.3f", ImGuiKnobVariant_WiperDot);
       break;
   }

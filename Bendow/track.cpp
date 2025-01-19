@@ -7,7 +7,10 @@ TxTrack::TxTrack(const std::string& name)
   : TxNode(NULL, TxNode::TRACK, name, 2)
   , _graph(NULL)
 {
-  _params.push_back(new TxParameterFloat(this, "Volume", 20.f, 3000.f, &_volume, TxParameter::KNOB));
+  TxParameterFloat* volume = new TxParameterFloat(this, "Volume", 0.f, 2.f, &_volume, TxParameter::KNOB);
+  _params.push_back(volume);
+  volume->setSize(TX_KNOB_SMALL_SIZE);
+  volume->set(1.f);
 }
 
 TxTrack::~TxTrack()

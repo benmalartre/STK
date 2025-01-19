@@ -94,17 +94,25 @@ TxTrack* TxSequencer::track(size_t index)
   else return NULL;
 }
 
+float _percentageToDb(float volume, double maxDb=12.0) {
+  return maxDb * (1 - (std::log(volume) / std::log(0.5)));
+};
+
 stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
-  float sample = 0.f;
+  double sample = 0.f;
+  
+  size_t nActiveTracks = 0;
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i]->active() && _tracks[i]->graph()) {
-      //nActiveTrack++;
+      nActiveTracks++;
       const Index index = TxTime::instance().index(_tracks[i]->length());
-      sample += _tracks[i]->graph()->tick() * _volume;
-      //sample += channel ? beat->second : BIT_CHECK(beat->first, index.second);
+      sample += _tracks[i]->graph()->tick();
     }
   }
+
+  if(nActiveTracks)
+    sample *= 1.0 / static_cast<double>(nActiveTracks) * _volume;
 
   _buffer.write(sample);
   
@@ -125,7 +133,7 @@ void TxSequencer::draw(TxEditor* editor)
   
   ImGui::SameLine();
 
-  ImGuiKnobs::Knob("Volume", &_volume, 0.f, 2.f, 0.f, 0,
+  ImGuiKnobs::Knob("Vol", &_volume, 0.f, 2.f, 0.f, 0,
     ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal);
 
   ImGui::SameLine();

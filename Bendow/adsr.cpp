@@ -17,7 +17,7 @@ TxAdsr::TxAdsr(TxNode* parent, const std::string& name)
   _params.push_back(new TxParameterBool(this, "Trigger", &_trigger));
 
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
-  _size = ImVec2(TX_KNOB_SIZE * 4 + TX_PADDING_X * 8, TX_PADDING_Y * 2 + TX_KNOB_SIZE * 2 + TX_SLIDER_SIZE);
+  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 4 + TX_PADDING_X * 8, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
 TxAdsr::~TxAdsr() 
