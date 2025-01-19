@@ -462,6 +462,10 @@ void TxSequencerEditor::resize(size_t splitterHeight)
     ImGui::BeginGroup();
     if(ImGui::Selectable(tracks[i]->name().c_str(), selected))
       _current = tracks[i];
+
+    if(expended && ImGui::Button(ICON_FA_HEADPHONES, ImVec2(32, 32)))
+      tracks[i]->toggleActive();
+
     ImGui::SameLine();
 
     ImGui::SetCursorPosX(60);
@@ -496,6 +500,7 @@ bool TxSequencerEditor::_drawBeat(TxTrack* track, bool expended, uint32_t beatId
   
   const ImGuiStyle& style = ImGui::GetStyle();
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1, 1));
+
   for(size_t i = 0; i < 4; ++i) {
     bool bit = BIT_CHECK(beat->first, i);
     const ImVec4 btnColor = (current && (i == bitIdx))? 

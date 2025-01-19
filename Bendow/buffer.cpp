@@ -56,8 +56,9 @@ void TxBuffer::swap()
 
 void TxBuffer::draw()
 {
+  ImVec2 avail = ImGui::GetContentRegionAvail();
   ImPlotAxisFlags ax_flags = ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks;
-  if (ImPlot::BeginPlot("##buffer", ImVec2(256,128), ImPlotFlags_CanvasOnly| ImPlotFlags_NoInputs)) {
+  if (ImPlot::BeginPlot("##buffer", ImVec2(avail[0], 64), ImPlotFlags_CanvasOnly| ImPlotFlags_NoInputs)) {
     ImPlot::SetupAxes(0,0,ax_flags,ax_flags);
     ImPlot::SetupAxesLimits(0, _n, -1.2f, 1.2f);
     ImPlot::PlotLine("samples", read(), _n, 2.f, 2.f);

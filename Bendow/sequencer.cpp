@@ -105,6 +105,8 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
       //sample += channel ? beat->second : BIT_CHECK(beat->first, index.second);
     }
   }
+
+  _buffer.write(sample);
   
   return sample;
 }
@@ -113,6 +115,7 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
 void TxSequencer::draw(TxEditor* editor)
 {  
   TxTime& time = TxTime::instance();
+
   ImGui::Checkbox("Running", &_running);
   ImGui::SameLine();
   
@@ -135,6 +138,12 @@ void TxSequencer::draw(TxEditor* editor)
 
   ImGui::Text("Rate : %fs", time.rate());
   ImGui::Text("Index : %i", time.index(_length).first);
+  ImGui::EndGroup();
+
+  ImGui::SameLine();
+
+  ImGui::BeginGroup();
+  _buffer.draw();
   ImGui::EndGroup();
 
 }

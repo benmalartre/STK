@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "node.h"
+#include "buffer.h"
 #include "graph.h"
 #include "track.h"
 

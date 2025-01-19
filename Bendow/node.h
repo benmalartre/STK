@@ -96,6 +96,8 @@ protected:
   bool                      _dirty;
   stk::StkFrames            _frames;
   std::vector<TxParameter*> _params;
+
+  TxBuffer                  _buffer;
 };
 
 struct TxConnexion {

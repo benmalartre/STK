@@ -36,6 +36,7 @@ TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t num
   , _position(RANDOM_LO_HI(0,200), RANDOM_LO_HI(0,200))
   , _size(100,25)
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
+  , _buffer(1024)
 {
   if(_parent && _parent->type() == TxNode::GRAPH) 
     ((TxGraph*)_parent)->addNode(this);

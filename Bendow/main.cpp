@@ -163,9 +163,9 @@ void setupStyle()
   style.Colors[ImGuiCol_CheckMark]             = ImVec4(0.78f, 0.78f, 0.78f, 1.00f);
   style.Colors[ImGuiCol_SliderGrab]            = ImVec4(0.74f, 0.74f, 0.74f, 1.00f);
   style.Colors[ImGuiCol_SliderGrabActive]      = ImVec4(0.74f, 0.74f, 0.74f, 1.00f);
-  style.Colors[ImGuiCol_Button]                = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
-  style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
-  style.Colors[ImGuiCol_ButtonActive]          = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+  style.Colors[ImGuiCol_Button]                = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+  style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(0.44f, 0.44f, 0.44f, 1.00f);
+  style.Colors[ImGuiCol_ButtonActive]          = ImVec4(1.00f, 0.00f, 0.50f, 1.00f);
   style.Colors[ImGuiCol_Header]                = ImVec4(0.36f, 0.36f, 0.36f, 1.00f);
   style.Colors[ImGuiCol_HeaderHovered]         = ImVec4(0.36f, 0.36f, 0.36f, 1.00f);
   style.Colors[ImGuiCol_HeaderActive]          = ImVec4(0.36f, 0.36f, 0.36f, 1.00f);
@@ -189,9 +189,8 @@ int main()
   GLFWwindow* window = openWindow(1200, 800);
   glfwMakeContextCurrent(window);
 
-  std::cout << "create font atlas..." << std::endl;
+  // create font atlas with icons
   createFontAtlas();
-  std::cout << "font atlas created..." << std::endl;
 
   // setup imgui context
   IMGUI_CHECKVERSION();
@@ -313,6 +312,8 @@ int main()
 
   ImPlot::DestroyContext(plotContext);
   ImGui::DestroyContext(context);
+
+  deleteFontAtlas();
   
   glfwTerminate();
 }

@@ -19,6 +19,7 @@ public:
   void sequencedGraph();
   void reset() override;
 
+  void toggleActive(){_active = 1 - _active;};
   bool active(){return _active;};
   TxGraph* graph(){return _graph;};
   Beat* beat(size_t beatIdx){
