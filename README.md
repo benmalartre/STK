@@ -1,9 +1,9 @@
 # Bendow
 
-Bendow is a work in progress nodal based synthesizer and sequencer
+Bendow is and experimental nodal based synthesizer and sequencer
 
 
-![UI preview of Jivaro 0](images/bendow.png)
+![UI preview of Jivaro 0](images/gBssm574.gif)
 
 
 Bendow is developed and tested on Windows (Windows 10 Pro) and on MacBookPro M1 (MacOs Monterey 12.3.1)
@@ -11,9 +11,10 @@ Bendow is developed and tested on Windows (Windows 10 Pro) and on MacBookPro M1 
 # How to build
 1. clone and build glfw
 2. clone STK repository with submodule
-3. change StkFloat from double to float in Stk.h (for imgui widgets compatibility)
-4. create a build folder inside Bendow folder
-5. from this build repo run
+3. change StkFloat from double to float in Stk.h
+4. add 
+5. create a build folder inside Bendow folder
+6. from this build repo run
     - cmake -DGLFW_DIR=path_to_glfw_build -DSTK_DIR=path_to_stk_submodule ../
     - cmake --build . --config Release
 
