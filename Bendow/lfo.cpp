@@ -28,6 +28,10 @@ const ImVec2& TxLfo::size()
 
 stk::StkFloat TxLfo::tick(unsigned int)
 {
+  _frequency = _params[FREQUENCY]->tick();
+  _amplitude = _params[AMPLITUDE]->tick();
+  _offset = _params[OFFSET]->tick();
+
   _sine.setFrequency(_frequency);
   const stk::StkFloat sample = _sine.tick() * _amplitude +_offset;
   //_buffer.write(sample);

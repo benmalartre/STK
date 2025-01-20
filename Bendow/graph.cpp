@@ -96,13 +96,19 @@ void TxGraph::addNode(TxNode* node)
 
 void TxGraph::removeNode(TxNode* node) 
 {
+  std::cout << "remove node " << node << std::endl;
   int idx = index(node);
   if(idx >= 0) {
+    std::vector<TxConnexion*> connexions;
     for(TxConnexion* connexion: _connexions)
       if(connexion->source->node() == node || connexion->target->node() == node)
-        removeConnexion(connexion);
+        connexions.push_back(connexion);
+
+    for(TxConnexion* connexion: connexions)
+      removeConnexion(connexion);
 
     _nodes.erase(_nodes.begin() + idx);
+    std::cout << "delete node" << std::endl;
     delete node;
   }
 }
@@ -116,6 +122,9 @@ void TxGraph::removeConnexion(TxConnexion* connexion)
 {
   for (size_t c = 0; c < _connexions.size(); ++c) {
     if (_connexions[c] == connexion) {
+      if(_connexions[c]->target->node()->type() == TxNode::GRAPH) {
+        _current = NULL;
+      }
       _connexions[c]->target->disconnect();
       _connexions.erase(_connexions.begin() + c);
       delete connexion;
