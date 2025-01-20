@@ -107,7 +107,7 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
     if (_tracks[i]->active() && _tracks[i]->graph()) {
       nActiveTracks++;
       const Index index = TxTime::instance().index(_tracks[i]->length());
-      sample += _tracks[i]->graph()->tick();
+      sample += _tracks[i]->graph()->tick() * _tracks[i]->volume();
     }
   }
 

@@ -165,7 +165,7 @@ void setupStyle()
   style.Colors[ImGuiCol_SliderGrabActive]      = ImVec4(0.74f, 0.74f, 0.74f, 1.00f);
   style.Colors[ImGuiCol_Button]                = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
   style.Colors[ImGuiCol_ButtonHovered]         = ImVec4(0.44f, 0.44f, 0.44f, 1.00f);
-  style.Colors[ImGuiCol_ButtonActive]          = ImVec4(1.00f, 0.00f, 0.50f, 1.00f);
+  style.Colors[ImGuiCol_ButtonActive]          = ImVec4(1.00f, 0.50f, 0.75f, 1.00f);
   style.Colors[ImGuiCol_Header]                = ImVec4(0.36f, 0.36f, 0.36f, 1.00f);
   style.Colors[ImGuiCol_HeaderHovered]         = ImVec4(0.36f, 0.36f, 0.36f, 1.00f);
   style.Colors[ImGuiCol_HeaderActive]          = ImVec4(0.36f, 0.36f, 0.36f, 1.00f);

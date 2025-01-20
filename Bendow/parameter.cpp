@@ -186,6 +186,7 @@ TxParameterInt::TxParameterInt(TxNode* node, const std::string& name, int minimu
   : TxParameter(node, name, (void*)data, TxParameter::INT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
+  , _size(TX_KNOB_MIDDLE_SIZE)
 {
 }
 

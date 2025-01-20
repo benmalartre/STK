@@ -25,6 +25,7 @@ public:
   Beat* beat(size_t beatIdx){
     return &_sequence[beatIdx%_sequence.size()];
 };
+  float volume(){return _volume;};
   size_t length(){return _sequence.size();};
   const Sequence& sequence(){return _sequence;};
   void setLength(size_t length);

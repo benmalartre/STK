@@ -457,7 +457,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
 
   size_t cursorY = ImGui::GetCursorPosY();
   for (size_t i = 0; i < tracks.size(); ++i) {
-    ImGui::PushID(i);
+    ImGui::PushID(tracks[i]->name().c_str());
     ImGui::SetCursorPosX(20);
     ImGui::SetCursorPosY(cursorY);
     bool expended = (tracks[i] == _current);
