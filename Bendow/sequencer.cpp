@@ -102,17 +102,14 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
 {
   double sample = 0.f;
   
-  size_t nActiveTracks = 0;
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i]->active() && _tracks[i]->graph()) {
-      nActiveTracks++;
       const Index index = TxTime::instance().index(_tracks[i]->length());
       sample += _tracks[i]->graph()->tick() * _tracks[i]->volume();
     }
   }
 
-  if(nActiveTracks)
-    sample *= 1.0 / static_cast<double>(nActiveTracks) * _volume;
+  sample *= _volume;
 
   _buffer.write(sample);
   

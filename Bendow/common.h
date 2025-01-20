@@ -88,7 +88,6 @@ using Index = std::pair<uint32_t, uint32_t>;
 
 static const uint32_t NumBits = 4;
 
-
 static float computeSampleTime() {
   return stk::RT_BUFFER_SIZE / stk::Stk::sampleRate();
 };

@@ -42,8 +42,6 @@ MouseMoveCallback(GLFWwindow* window, double x, double y)
 void 
 ClickCallback(GLFWwindow* window, int button, int action, int mods)
 { 
-  //ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-
   if(action == GLFW_PRESS) {
     if(button == GLFW_MOUSE_BUTTON_LEFT) {
       double x, y;
@@ -53,6 +51,13 @@ ClickCallback(GLFWwindow* window, int button, int action, int mods)
   } else if(action == GLFW_RELEASE) {
     dragSplitter = false;
   } 
+}
+
+void
+KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+  if (key == GLFW_KEY_DELETE && action == GLFW_PRESS)
+    graphEditor->deleteSelectedNodes();
 }
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
@@ -69,24 +74,6 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
       time.increment();
     }
   }
-
-  /*
-  for(size_t trackIdx = 0; trackIdx < sequencer->numTracks(); ++trackIdx) {
-    StkFloat *samples = (StkFloat *) outputBuffer;
-    stk::StkFrames& frames = sequencer->tick(data->frames, trackIdx, timeIdx);
-    for ( unsigned int i=0; i<frames.size(); i++ ) {
-      if(trackIdx == 0){
-        for(int i=0; i < data->num_channels; ++i) {
-          *samples++ = frames[i];
-        }
-      } else {
-        for(int i=0; i < data->num_channels; ++i) {
-          *samples++ += frames[i];
-        }
-      }
-    }
-  }
-  */
 
   return 0;
 }
@@ -115,13 +102,14 @@ GLFWwindow* openWindow(size_t width, size_t height)
   glfwWindowHint(GLFW_STENCIL_BITS, 8);
   glfwWindowHint(GLFW_SAMPLES, 4);
   
-  GLFWwindow* window = glfwCreateWindow(width,height,"bendow",NULL,NULL);
+  GLFWwindow* window = glfwCreateWindow(width,height,"Bendow",NULL,NULL);
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
 
   glfwSetWindowSizeCallback(window, SizeCallback);
   glfwSetMouseButtonCallback(window, ClickCallback);
   glfwSetCursorPosCallback(window, MouseMoveCallback);
+  glfwSetKeyCallback(window, KeyboardCallback);
 
   return window;
 }
@@ -288,7 +276,6 @@ int main()
       graphEditor->setCurrent(currentTrack);
     }
 
-    
     sequencerEditor->draw();
     graphEditor->draw();
     

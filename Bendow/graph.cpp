@@ -91,7 +91,6 @@ void TxGraph::addNode(TxNode* node)
 {
   if(!contains(node)) {
     _nodes.push_back(node);
-    node->setSelected(true);
   }
 }
 
@@ -99,6 +98,10 @@ void TxGraph::removeNode(TxNode* node)
 {
   int idx = index(node);
   if(idx >= 0) {
+    for(TxConnexion* connexion: _connexions)
+      if(connexion->source->node() == node || connexion->target->node() == node)
+        removeConnexion(connexion);
+
     _nodes.erase(_nodes.begin() + idx);
     delete node;
   }

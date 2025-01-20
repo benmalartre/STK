@@ -219,8 +219,6 @@ bool TxParameterInt::draw(TxEditor* editor)
   bool modified = false;
   ImGui::BeginGroup();
   if (_flags & TxParameter::HORIZONTAL) {
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(100 * editor->scale());
     modified = ImGui::SliderInt(_name.c_str(), (int*)_data, _minimum, _maximum);
   }
   else if (_flags & TxParameter::VERTICAL) {

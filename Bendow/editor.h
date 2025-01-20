@@ -68,6 +68,7 @@ protected:
 
   TxNode*                   _hovered;
   TxNode*                   _pick;
+  std::vector<TxNode*>      _selected;
 
 };
 
@@ -86,6 +87,7 @@ public:
   void                    draw() override;
 
   bool                    contains(const TxNode* node);
+  void                    deleteSelectedNodes();
 
 protected:
   void                      _createNodeByType(int type);

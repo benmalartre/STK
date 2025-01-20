@@ -109,16 +109,27 @@ void TxEditor::select(const ImVec2& p)
   std::vector<TxNode*>& nodes = _graph->nodes();
   int nodeIdx = nodes.size() - 1;
   ImGuiIO& io = ImGui::GetIO();
-  if (!io.KeyMods)for (auto& node : nodes)node->setSelected(false);
+  if (!io.KeyMods)for (auto& node : nodes) {
+    node->setSelected(false);
+    _selected.clear();
+  }
 
   for (; nodeIdx >= 0; --nodeIdx) {
     TxNode* node = nodes[nodeIdx];
     if (inside(p, node->position(), node->position() + node->size()))
     {
       if (io.KeyCtrl) {
-        nodes[nodeIdx]->setSelected(1 - nodes[nodeIdx]->selected());
+        const bool selected = nodes[nodeIdx]->selected();
+        if(selected) {
+          nodes[nodeIdx]->setSelected(false);
+          _selected.erase(std::find(nodes.begin(), nodes.end(), nodes[nodeIdx]));
+        } else {
+          nodes[nodeIdx]->setSelected(true);
+          _selected.push_back(nodes[nodeIdx]);
+        }
       } else {
         nodes[nodeIdx]->setSelected(true);
+        _selected.push_back(nodes[nodeIdx]);
       }
       break;
     }
@@ -211,6 +222,16 @@ bool TxGraphEditor::contains(const TxNode* node)
       if(node == n) return true;
   
   return false;
+}
+
+void TxGraphEditor::deleteSelectedNodes()
+{
+  std::cout << "deleted selected nodes : " << _selected.size() << std::endl;
+  if(_graph && _selected.size()) {
+    for(TxNode* node: _selected) {
+      _graph->removeNode(node);
+    }
+  }
 }
 
 void TxGraphEditor::_createNodeByType(int type)

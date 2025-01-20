@@ -1,11 +1,12 @@
 #include "common.h"
 #include "random.h"
+#include "editor.h"
 
 
 TxRandom::TxRandom(TxNode* parent, const std::string& name)
   : TxNode(parent, TxNode::RANDOM, name)
-  , _minimum(-1.f)
-  , _maximum(1.f)
+  , _minimum(0.f)
+  , _maximum(100.f)
   , _seed(0)
   , _cnt(INT_MAX)
   , _frequency(1.f)
@@ -75,9 +76,8 @@ stk::StkFloat TxRandom::tick(unsigned int)
 void TxRandom::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
-  ImGui::SetNextItemWidth(128);
-  TxParameter* seed = _params[TxRandom::SEED];
-  if(seed->draw(editor) && modified)*modified = true;
+
+  TxNode::_drawAlignLeft(editor);
   TxParameter* frequency = _params[TxRandom::FREQUENCY];
   if(frequency->draw(editor) && modified)*modified = true;
   ImGui::SameLine();
@@ -86,12 +86,18 @@ void TxRandom::_drawImpl(TxEditor* editor, bool* modified)
   ImGui::SameLine();
   TxParameter* maximum = _params[TxRandom::MAXIMUM];
   if(maximum->draw(editor) && modified)*modified = true;
-  
+
+  ImGui::SetNextItemWidth(128 * editor->scale());
+  TxParameter* seed = _params[TxRandom::SEED];
+  if(seed->draw(editor) && modified)*modified = true;
+
   ImGui::EndGroup();
 
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
+  TxNode::_drawInput(editor, _params[TxRandom::FREQUENCY], 0);
+  TxNode::_drawInput(editor, _params[TxRandom::MINIMUM], 1);
+  TxNode::_drawInput(editor, _params[TxRandom::MAXIMUM], 2);
+  TxNode::_drawInput(editor, _params[TxRandom::SEED], 3);
+
   TxNode::_drawOutput(editor);
 }
 
