@@ -15,9 +15,9 @@ TxRandom::TxRandom(TxNode* parent, const std::string& name)
   srand(_seed);
   _params.push_back(new TxParameterFloat(this, "Freq", _minimum, _maximum, &_frequency, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Min", -1000.f, 1000.f, &_minimum, TxParameter::KNOB));
-  _params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
+  //_params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
   _params.push_back(new TxParameterFloat(this, "Max", -1000.f, 1000.f, &_maximum, TxParameter::KNOB));
-  _params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
+  //_params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
   _params.push_back(new TxParameterInt(this, "Seed", 0, 65535, &_seed, TxParameter::HORIZONTAL));
   _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 4 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
 
@@ -68,7 +68,7 @@ stk::StkFloat TxRandom::tick(unsigned int)
   if(_lastFrequency != _frequency)setFrequency(_frequency);
   if(_cnt++ > _rate) {
     _cnt = 0;
-    _frames[0] = RANDOM_LO_HI(_minimum, _maximum);;
+    _frames[0] = RANDOM_LO_HI(_minimum, _maximum);
   }
   return _frames[0];
 }

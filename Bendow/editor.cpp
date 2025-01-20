@@ -164,17 +164,18 @@ void TxEditor::handleInput()
   }
 
   if (io.MouseClicked[0]) {
+    if(io.KeyShift) _pan = true;
+    else _drag = 1 - ImGui::IsAnyItemHovered();
     select((ImGui::GetMousePos() - pos() - _offset) * _invScale);
-    _drag = 1 - ImGui::IsAnyItemHovered();
-    if(io.KeySuper) _pan = true;
   } else if (io.MouseReleased[0]) {
     _drag = false;
     _pan = false;
     terminateConnexion();
   }
-  if (_pan) _offset += io.MouseDelta;
 
-  if (!_drag)return;
+  if (!_drag && !_pan)return;
+
+  if (_pan) _offset += io.MouseDelta;
 
   if (io.MouseDown[0] && !_pan && !ImGui::IsDragDropActive()) {
     std::vector<TxNode*>& nodes = _graph->nodes();
@@ -182,7 +183,7 @@ void TxEditor::handleInput()
       if (!nodes[n]->selected())continue;
       nodes[n]->setPosition(nodes[n]->position() + io.MouseDelta * 1.f / _scale);
     }
-  }
+  } 
 }
 
 void TxEditor::setCurrent(TxTrack* track)
@@ -476,12 +477,13 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   size_t cursorY = ImGui::GetCursorPosY();
   for (size_t i = 0; i < tracks.size(); ++i) {
     ImGui::PushID(tracks[i]->name().c_str());
-    ImGui::SetCursorPosX(20);
+    ImGui::SetCursorPosX(10);
     ImGui::SetCursorPosY(cursorY);
     bool expended = (tracks[i] == _current);
     const bool selected = (tracks[i] == _current);
     ImGui::BeginGroup();
-    if(ImGui::Selectable(tracks[i]->name().c_str(), selected))
+
+    if(ImGui::Button(tracks[i]->name().c_str(), ImVec2(60, 16)))
       _current = tracks[i];
 
     if(expended) {
@@ -508,7 +510,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
     
     ImGui::SameLine();
 
-    ImGui::SetCursorPosX(60);
+    ImGui::SetCursorPosX(70);
     for (size_t j = 0; j < tracks[i]->length(); ++j) {
       _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
       if (i < tracks[i]->length() - 1)  ImGui::SameLine();
@@ -516,6 +518,12 @@ void TxSequencerEditor::resize(size_t splitterHeight)
     ImGui::EndGroup();
     cursorY += expended ? 160 : 24;
   }
+
+  ImGui::SetCursorPosX(10);
+  ImGui::SetCursorPosY(cursorY);
+
+  if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16)))
+    std::cout << "AD FUCKIN TRACK" << std::endl;
 
   ImGui::End();
   ImGui::PopStyleVar(2);
