@@ -17,7 +17,6 @@ TxGraph::TxGraph(TxNode* parent, const std::string& name)
   , _volume(1.f)
 {
   _params.push_back(new TxParameterSamples(this, "Samples", false, 1));
-
 };
 
 TxGraph::~TxGraph()
@@ -96,7 +95,6 @@ void TxGraph::addNode(TxNode* node)
 
 void TxGraph::removeNode(TxNode* node) 
 {
-  std::cout << "remove node " << node << std::endl;
   int idx = index(node);
   if(idx >= 0) {
     std::vector<TxConnexion*> connexions;
@@ -108,7 +106,6 @@ void TxGraph::removeNode(TxNode* node)
       removeConnexion(connexion);
 
     _nodes.erase(_nodes.begin() + idx);
-    std::cout << "delete node" << std::endl;
     delete node;
   }
 }

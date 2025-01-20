@@ -226,12 +226,9 @@ bool TxGraphEditor::contains(const TxNode* node)
 
 void TxGraphEditor::deleteSelectedNodes()
 {
-  std::cout << "deleted selected nodes : " << _selected.size() << std::endl;
-  if(_graph && _selected.size()) {
-    for(TxNode* node: _selected) {
+  if(_graph && _selected.size())
+    for(TxNode* node: _selected)
       _graph->removeNode(node);
-    }
-  }
 }
 
 void TxGraphEditor::_createNodeByType(int type)
