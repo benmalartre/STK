@@ -60,6 +60,17 @@ KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     graphEditor->deleteSelectedNodes();
 }
 
+void 
+RemoveTrackCallback(TxTrack* track)
+{
+  if(track == graphEditor->current())
+    graphEditor->setCurrent(nullptr);
+  if(track == sequencerEditor->current())
+    sequencerEditor->setCurrent(nullptr);
+
+  sequencer->removeTrack(track);
+}
+
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status, void *userData )
 {
@@ -166,6 +177,9 @@ void setupStyle()
   style.Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
   style.Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.32f, 0.52f, 0.65f, 1.00f);
   style.Colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.50f);
+  style.Colors[ImGuiCol_Tab]                   = ImVec4(0.80f, 0.20f, 0.20f, 0.50f);
+  style.Colors[ImGuiCol_TabHovered]            = ImVec4(0.20f, 0.80f, 0.20f, 0.50f); 
+  style.Colors[ImGuiCol_TabActive]             = ImVec4(0.20f, 0.20f, 0.80f, 0.50f);
  
 }
 

@@ -13,6 +13,7 @@
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
 
+
 class TxSequencer : public TxNode {
 public:
   enum Parameters {
@@ -21,6 +22,8 @@ public:
     TIME,
     LAST
   };
+
+  static size_t TRACK_INDEX;
 
 public:
   TxSequencer(uint32_t numTracks);
@@ -45,6 +48,9 @@ public:
 
   TxTrack* track(size_t index);
   std::vector<TxTrack*>& tracks(){return _tracks;};
+  size_t numTracks(){return _tracks.size();};
+  void addTrack();
+  void removeTrack(TxTrack* track);
   
 protected:
   static const int        Flags;

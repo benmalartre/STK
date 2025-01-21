@@ -49,7 +49,7 @@ public:
 
 
 protected:            
-  static const int        Flags;
+  static const int          Flags;
 
   ImVec2                    _pos;
   ImVec2                    _size;

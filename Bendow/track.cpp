@@ -16,6 +16,8 @@ TxTrack::TxTrack(const std::string& name)
 TxTrack::~TxTrack()
 {
 
+  if(_graph) delete _graph;
+
 }
 
 stk::StkFloat TxTrack::tick(unsigned int channel)

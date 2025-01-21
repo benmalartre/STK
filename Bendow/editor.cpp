@@ -470,24 +470,28 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   _sequencer->draw(this);
 
 
-
+  TxTrack* removeTrack = nullptr;
   std::vector<TxTrack*>& tracks = _sequencer->tracks();
   Index index = TxTime::instance().index(tracks[0]->length());
 
-  size_t cursorY = ImGui::GetCursorPosY();
+
   for (size_t i = 0; i < tracks.size(); ++i) {
-    ImGui::PushID(tracks[i]->name().c_str());
+    //ImGui::PushID(tracks[i]->name().c_str());
     ImGui::SetCursorPosX(10);
-    ImGui::SetCursorPosY(cursorY);
-    bool expended = (tracks[i] == _current);
     const bool selected = (tracks[i] == _current);
     ImGui::BeginGroup();
 
-    if(ImGui::Button(tracks[i]->name().c_str(), ImVec2(60, 16)))
+    //ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_Framed;
+    bool expended = (ImGui::TreeNode(tracks[i]->name().c_str()));
+    ImGui::SameLine();
+    if(ImGui::Button(ICON_FA_TRASH))
+      removeTrack = tracks[i];
+    
+    if(expended) 
+    {
       _current = tracks[i];
 
-    if(expended) {
-      ImGui::BeginGroup();
+      //ImGui::BeginGroup();
       ImVec4* colors = style.Colors;
       const bool active = tracks[i]->active();
       ImGui::PushStyleColor(ImGuiCol_Text, active ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
@@ -504,26 +508,34 @@ void TxSequencerEditor::resize(size_t splitterHeight)
       ImGui::PopStyleColor();
       TxParameter* volume = tracks[i]->parameter("Volume");
       volume->draw(this);
-      ImGui::EndGroup();
-      ImGui::PopID();
-    }
-    
-    ImGui::SameLine();
+      //ImGui::EndGroup();
+      //ImGui::PopID();
 
-    ImGui::SetCursorPosX(70);
-    for (size_t j = 0; j < tracks[i]->length(); ++j) {
-      _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
-      if (i < tracks[i]->length() - 1)  ImGui::SameLine();
+      if(expended) {
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(70);
+        for (size_t j = 0; j < tracks[i]->length(); ++j) {
+          _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
+          if (i < tracks[i]->length() - 1)  ImGui::SameLine();
+        }
+      }
+
+      ImGui::TreePop();
     }
     ImGui::EndGroup();
-    cursorY += expended ? 160 : 24;
   }
 
-  ImGui::SetCursorPosX(10);
-  ImGui::SetCursorPosY(cursorY);
+  if(removeTrack) {
+    if(_current == removeTrack)_current = nullptr;
+    _sequencer->removeTrack(removeTrack);
+  }
+  
 
-  if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16)))
-    std::cout << "AD FUCKIN TRACK" << std::endl;
+  ImGui::SetCursorPosX(10);
+
+  if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16))) {
+    TxTrack* track = new TxTrack("Track"+std::to_string(TxSequencer::TRACK_INDEX++));
+  }
 
   ImGui::End();
   ImGui::PopStyleVar(2);

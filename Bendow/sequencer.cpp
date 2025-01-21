@@ -3,6 +3,8 @@
 #include "graph.h"
 #include "factory.h"
 
+size_t TxSequencer::TRACK_INDEX = 0;
+
 void updateBPM(TxSequencer* sequencer)
 {
   TxTime& time = TxTime::instance();
@@ -29,7 +31,7 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
 
   _tracks.resize(numTracks);
   for (size_t i = 0; i < numTracks; ++i) {
-    _tracks[i] = new TxTrack("track"+std::to_string(i));
+    _tracks[i] = new TxTrack("Track"+std::to_string(TxSequencer::TRACK_INDEX++));
     _tracks[i]->basicGraph();
   }
 }
@@ -92,6 +94,25 @@ TxTrack* TxSequencer::track(size_t index)
 {
   if (index < _tracks.size())return _tracks[index];
   else return NULL;
+}
+
+void TxSequencer::addTrack()
+{
+  TxTrack* track = new TxTrack("Track"+std::to_string(TxSequencer::TRACK_INDEX++));
+  track->setLength(_length);
+  track->basicGraph();
+  _tracks.push_back(track);
+}
+
+void TxSequencer::removeTrack(TxTrack* track)
+{
+  if(_current == track)_current = nullptr;
+  for(size_t i = 0; i < _tracks.size(); ++i) {
+    if(track != _tracks[i]) continue;
+    _tracks.erase(_tracks.begin() + i);
+    delete track;
+    break;
+  }
 }
 
 float _percentageToDb(float volume, double maxDb=12.0) {
