@@ -128,6 +128,12 @@ protected:
   int _bpm;
 };
 
+class TxGraphEditor;
+class TxSequencerEditor;
+
+TxGraphEditor* getGraphEditor();
+TxSequencerEditor* getSequencerEditor();
+
 
 
 #endif // TX_COMMON_H

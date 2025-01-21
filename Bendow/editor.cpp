@@ -528,14 +528,16 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   if(removeTrack) {
     if(_current == removeTrack)_current = nullptr;
     _sequencer->removeTrack(removeTrack);
+    TxGraphEditor* editor = getGraphEditor();
+    editor->setCurrent(nullptr);
   }
   
 
   ImGui::SetCursorPosX(10);
 
-  if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16))) {
-    TxTrack* track = new TxTrack("Track"+std::to_string(TxSequencer::TRACK_INDEX++));
-  }
+  if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16)))
+    _sequencer->addTrack();
+  
 
   ImGui::End();
   ImGui::PopStyleVar(2);

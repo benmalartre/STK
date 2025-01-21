@@ -16,6 +16,16 @@ TxSequencer* sequencer;
 TxTrack* currentTrack = NULL;
 stk::StkFrames frames;
 
+TxGraphEditor* getGraphEditor()
+{
+  return graphEditor;
+};
+
+TxSequencerEditor* getSequencerEditor()
+{
+  return sequencerEditor;
+}
+
 void 
 SizeCallback(GLFWwindow* window, int width, int height)
 {  
@@ -58,17 +68,6 @@ KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 {
   if (key == GLFW_KEY_DELETE && action == GLFW_PRESS)
     graphEditor->deleteSelectedNodes();
-}
-
-void 
-RemoveTrackCallback(TxTrack* track)
-{
-  if(track == graphEditor->current())
-    graphEditor->setCurrent(nullptr);
-  if(track == sequencerEditor->current())
-    sequencerEditor->setCurrent(nullptr);
-
-  sequencer->removeTrack(track);
 }
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
