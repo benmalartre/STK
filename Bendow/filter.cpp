@@ -18,7 +18,7 @@
 #include <TwoZero.h>
 #include <TapDelay.h>
 
-ImVec2 TxFilter::Size(512, 256);
+ImVec2 TxFilter::Size(256, 128);
 
 const char* TxFilter::FilterName[TxFilter::NumFilter] = {
   "Biquad",
@@ -238,6 +238,32 @@ void TxFilter::setFilter(int filterIdx)
       ((stk::DelayL*)_filter)->setDelay(int2->tick());
       break;
 
+    case IIR:
+      _filter = new stk::Iir();
+      int1->setMinimum(4);
+      int1->setMaximum(1024);
+      int1->set(64);
+      int1->setLabel("N");
+      int2->setMinimum(21);
+      int2->setMaximum(1000);
+      int2->set(64);
+      int2->setLabel("Db");
+      float1->setMinimum(0.f);
+      float1->setMaximum(20000.f);
+      float1->set(220.f);
+      float1->setLabel("Low");
+      float2->setMinimum(0.f);
+      float2->setMaximum(60000.f);
+      float2->set(4400.f);
+      float2->setLabel("High");
+      /*
+      std::vector<stk::StkFloat> coeffs = computeFirCoefficients(stk::Stk::sampleRate(), 
+        float1->tick(), float2->tick(), int2->tick(), int1->tick());
+
+      ((stk::Fir*)_filter)->setCoefficients(coeffs, true);
+      */
+      break;
+
     case FIR:
       _filter = new stk::Fir();
       int1->setMinimum(4);
@@ -347,6 +373,24 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
 {
   ImGui::BeginGroup();
 
+  TxNode::_drawAlignLeft(editor);
+/*
+  ImGui::BeginGroup();
+
+  
+  TxParameter* frequency = _params[TxLfo::FREQUENCY];
+  if(frequency->draw(editor) && modified)*modified = true;
+  ImGui::SameLine();
+  TxParameter* amplitude = _params[TxLfo::AMPLITUDE];
+  if(amplitude->draw(editor) && modified)*modified = true;
+  ImGui::SameLine();
+  TxParameter* offset = _params[TxLfo::OFFSET];
+  if(offset->draw(editor) && modified)*modified = true;
+  ImGui::EndGroup();
+
+  TxNode::_drawOutput(editor);
+  */
+
   ImGui::SetNextItemWidth(128);
   TxParameter* filter = _params[TxFilter::FILTER];
   if(filter->draw(editor)&&modified)*modified=true;
@@ -388,12 +432,12 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
     default:
       break;
   }
+
+  TxNode::_drawInput(editor, _params[TxFilter::INPUT], 0);
   
   ImGui::EndGroup();
 
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
+
   TxNode::_drawOutput(editor);
 }
 

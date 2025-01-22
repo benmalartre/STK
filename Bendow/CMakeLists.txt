@@ -89,6 +89,7 @@ SET(SOURCES
 	${STK_DIR}/src/Chorus.cpp
 	${STK_DIR}/src/Echo.cpp
 	${STK_DIR}/src/Fir.cpp
+	${STK_DIR}/src/Iir.cpp
 	${STK_DIR}/src/Delay.cpp
 	${STK_DIR}/src/DelayA.cpp
 	${STK_DIR}/src/DelayL.cpp

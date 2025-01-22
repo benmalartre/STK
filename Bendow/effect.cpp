@@ -81,11 +81,11 @@ void TxEffect::_drawImpl(TxEditor* editor, bool* modified)
       break;
   }
   
+ TxNode::_drawInput(editor, _params[TxEffect::INPUT], 0);
+  
   ImGui::EndGroup();
 
-  ImGui::SameLine();
-  ImGui::Dummy(ImVec2(20, 100));
-  ImGui::SameLine();
+
   TxNode::_drawOutput(editor);
 
 }

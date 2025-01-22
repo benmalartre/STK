@@ -477,7 +477,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
 
   for (size_t i = 0; i < tracks.size(); ++i) {
     //ImGui::PushID(tracks[i]->name().c_str());
-    ImGui::SetCursorPosX(10);
+    //ImGui::SetCursorPosX(10);
     const bool selected = (tracks[i] == _current);
     ImGui::BeginGroup();
 
@@ -491,7 +491,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
     {
       _current = tracks[i];
 
-      //ImGui::BeginGroup();
+      ImGui::BeginGroup();
       ImVec4* colors = style.Colors;
       const bool active = tracks[i]->active();
       ImGui::PushStyleColor(ImGuiCol_Text, active ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
@@ -508,19 +508,24 @@ void TxSequencerEditor::resize(size_t splitterHeight)
       ImGui::PopStyleColor();
       TxParameter* volume = tracks[i]->parameter("Volume");
       volume->draw(this);
-      //ImGui::EndGroup();
+      ImGui::EndGroup();
       //ImGui::PopID();
 
-      if(expended) {
-        ImGui::SameLine();
-        ImGui::SetCursorPosX(70);
-        for (size_t j = 0; j < tracks[i]->length(); ++j) {
-          _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
-          if (i < tracks[i]->length() - 1)  ImGui::SameLine();
-        }
+      ImGui::SameLine();
+      //ImGui::SetCursorPosX(70);
+      for (size_t j = 0; j < tracks[i]->length(); ++j) {
+        _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
+        if (i < tracks[i]->length() - 1)  ImGui::SameLine();
       }
 
       ImGui::TreePop();
+    } else {
+      ImGui::SameLine();
+      //ImGui::SetCursorPosX(70);
+      for (size_t j = 0; j < tracks[i]->length(); ++j) {
+        _drawBeat(tracks[i], expended, j, index.second, (j == index.first));
+        if (i < tracks[i]->length() - 1)  ImGui::SameLine();
+      }
     }
     ImGui::EndGroup();
   }
@@ -533,7 +538,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   }
   
 
-  ImGui::SetCursorPosX(10);
+  //ImGui::SetCursorPosX(10);
 
   if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16)))
     _sequencer->addTrack();
