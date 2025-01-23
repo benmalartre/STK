@@ -21,10 +21,13 @@ static bool _checkCompatibility(TxParameter* param, TxConnexion* connexion)
 
 // TxParameter (base class)
 // ---------------------------------------------------------------
-TxParameter::TxParameter(TxNode* node, const std::string& name, void* data, short type, int flags)
+TxParameter::TxParameter(TxNode* node, const std::string& name, void* data, 
+  size_t index, short type, int flags)
   : _node(node)
   , _name(name)
   , _label(name)
+  , _index(index)
+  , _fullname("##plug" + node->name() +":"+_name + std::to_string(index))
   , _input(NULL)
   , _type(type)
   , _flags(flags)
@@ -108,12 +111,11 @@ void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
   const float scale = editor->scale();
   ImVec2 center;
   float radius;
-  std::string name = ("##plug" + node()->name() +":"+_name + std::to_string(channel));
 
   center = editor->pos() + (node()->position() + ImVec2(0, TX_PLUG_SIZE * (3 * index + 2))) * scale + editor->offset();
   radius = TX_PLUG_SIZE * scale;
   ImGui::SetCursorScreenPos(center - ImVec2(TX_PLUG_SIZE, TX_PLUG_SIZE) * scale);
-  ImGui::Button(name.c_str(), ImVec2(2 * radius, 2 * radius));
+  ImGui::Button(_fullname.c_str(), ImVec2(2 * radius, 2 * radius));
 
   ImColor plugColor = TX_PLUG_COLOR_DEFAULT;
   
@@ -157,8 +159,8 @@ void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
 
 // TxParameterBool
 // ---------------------------------------------------------------
-TxParameterBool::TxParameterBool(TxNode* node, const std::string& name, bool* data)
-  : TxParameter(node, name, (void*)data, TxParameter::BOOL)
+TxParameterBool::TxParameterBool(TxNode* node, const std::string& name, bool* data, size_t index)
+  : TxParameter(node, name, (void*)data, index, TxParameter::BOOL)
 {
 }
 void TxParameterBool::set(stk::StkFloat value)
@@ -183,8 +185,8 @@ bool TxParameterBool::draw(TxEditor* editor)
 // TxParameterInt
 // ---------------------------------------------------------------
 TxParameterInt::TxParameterInt(TxNode* node, const std::string& name, int minimum, int maximum,
-  int* data, int flags)
-  : TxParameter(node, name, (void*)data, TxParameter::INT, flags)
+  int* data, size_t index, int flags)
+  : TxParameter(node, name, (void*)data, index, TxParameter::INT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
   , _size(TX_KNOB_MIDDLE_SIZE)
@@ -238,8 +240,8 @@ bool TxParameterInt::draw(TxEditor* editor)
 // TxParameterEnum
 // ---------------------------------------------------------------
 TxParameterEnum::TxParameterEnum(TxNode* node, const std::string& name, 
-  const char** names, int num, int* data)
-  : TxParameter(node, name, (void*)data, TxParameter::ENUM)
+  const char** names, int num, int* data, size_t index)
+  : TxParameter(node, name, (void*)data, index, TxParameter::ENUM)
   , _names(names)
   , _num(num)
 {
@@ -286,8 +288,8 @@ bool TxParameterEnum::draw(TxEditor* editor)
 // TxParameterFloat
 // ---------------------------------------------------------------
 TxParameterFloat::TxParameterFloat(TxNode* node, const std::string& name, stk::StkFloat minimum, stk::StkFloat maximum,
-  stk::StkFloat* data, int flags)
-  : TxParameter(node, name, (void*)data, TxParameter::FLOAT, flags)
+  stk::StkFloat* data, size_t index, int flags)
+  : TxParameter(node, name, (void*)data, index, TxParameter::FLOAT, flags)
   , _minimum(minimum)
   , _maximum(maximum)
   , _size(TX_KNOB_MIDDLE_SIZE)
@@ -345,8 +347,9 @@ bool TxParameterFloat::draw(TxEditor* editor)
 
 // TxParameterString
 // ---------------------------------------------------------------
-TxParameterString::TxParameterString(TxNode* node, const std::string& name, std::string* data, int flags)
-  : TxParameter(node, name, (void*)data, TxParameter::STRING, flags)
+TxParameterString::TxParameterString(TxNode* node, const std::string& name, std::string* data, 
+  size_t index, int flags)
+  : TxParameter(node, name, (void*)data, index, TxParameter::STRING, flags)
 {
 }
 
