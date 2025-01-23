@@ -15,8 +15,7 @@ public:
     BLITSAW,
     BLITSQUARE,
     NOISE,
-    SINEWAVE/*,
-    SINGWAVE*/
+    SINEWAVE
   };
 
   enum Parameters {

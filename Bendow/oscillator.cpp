@@ -7,7 +7,6 @@
 #include <BlitSquare.h>
 #include <Noise.h>
 #include <SineWave.h>
-#include <SingWave.h>
 #include <Modulate.h>
 #include <Granulate.h>
 
@@ -16,8 +15,7 @@ const char* TxOscillator::WaveFormName[TxOscillator::NumWaveForm] = {
   "BlitSaw",
   "BlitSquare",
   "Noise",
-  "SineWave"/*,
-  "SingWave"*/
+  "SineWave"
 };
 
 TxOscillator::TxOscillator(TxNode* parent, const std::string& name) 
@@ -84,11 +82,6 @@ stk::StkFloat TxOscillator::tick(unsigned int channel)
     case SINEWAVE:
       _frames[channel] = ((stk::SineWave*)_generator)->tick() * _envelope;
       break;
-/*
-    case SINGWAVE:
-      sample = ((stk::SingWave*)_generator)->tick() * _envelope;
-      break;
-*/
   }   
   _buffer.write(_frames[channel]);
   _dirty = false;
@@ -131,13 +124,6 @@ void TxOscillator::setWaveForm(short index)
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
       ((stk::SineWave*)_generator)->reset();
       break;
-/*
-    case SINGWAVE:
-      _generator = new stk::SingWave( (stk::Stk::rawwavePath() + "impuls20.raw").c_str(), true );
-      ((stk::SingWave*)_generator)->setFrequency(_frequency);
-      ((stk::SingWave*)_generator)->reset();
-      break;
-*/
   }
   _lastWaveFormIdx = _waveFormIdx;
 }
@@ -165,10 +151,6 @@ void TxOscillator::setFrequency(const stk::StkFloat& frequency)
     case SINEWAVE:
       ((stk::SineWave*)_generator)->setFrequency(_frequency);
       break;
-/*
-    case SINGWAVE:
-      ((stk::SingWave*)_generator)->setFrequency(_frequency);
-      break;*/
   }
 }
 
@@ -196,10 +178,6 @@ void TxOscillator::setHarmonics(int harmonics)
 
     case SINEWAVE:
       break;
-/*
-    case SINGWAVE:
-      break;
-*/
   }
 }
 
@@ -254,9 +232,6 @@ void TxOscillator::reset()
     case SINEWAVE:
       ((stk::SineWave*)_generator)->reset();
       break;
-/*
-    case SINGWAVE:
-      ((stk::SingWave*)_generator)->reset();
-      break;*/
+
   }
 }
