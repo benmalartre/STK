@@ -16,7 +16,7 @@ TxGraph::TxGraph(TxNode* parent, const std::string& name)
   , _current(NULL)
   , _volume(1.f)
 {
-  _params.push_back(new TxParameterSamples(this, "Samples", false, 1));
+  _params.push_back(new TxParameterSamples(this, "Samples", SAMPLES, false, 1));
 };
 
 TxGraph::~TxGraph()

@@ -386,18 +386,12 @@ bool TxParameterString::draw(TxEditor* editor)
 
 // TxParameterSamples
 // ---------------------------------------------------------------
-TxParameterSamples::TxParameterSamples(TxNode* node, const std::string& name, bool io, int nChannels)
-  : TxParameter(node, name, NULL, TxParameter::SAMPLES)
+TxParameterSamples::TxParameterSamples(TxNode* node, const std::string& name, size_t index, bool io,  int nChannels)
+  : TxParameter(node, name, NULL, index, TxParameter::SAMPLES)
   , _frames(NULL)
   , _io(io)
-  , _index(0)
   , _nChannels(nChannels)
 {
-}
-
-void TxParameterSamples::setIndex(int index)
-{
-  _index = index;
 }
 
 void TxParameterSamples::set(stk::StkFloat value)

@@ -22,11 +22,11 @@ TxSequencer::TxSequencer(uint32_t numTracks, uint32_t bpm, uint64_t length)
   TxTime& time = TxTime::instance();
   time.setBPM(_bpm);
   setLength(length);
-  _params.push_back(new TxParameterBool(this, "Running", &_running));
-  _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Running", &_running, RUNNING));
+  _params.push_back(new TxParameterInt(this, "Bpm", 1, 440, &_bpm, BPM, TxParameter::KNOB));
   _params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateBPM, this));
-  _params.push_back(new TxParameterFloat(this, "Volume", 0.f, 2.f, &_volume));
-  _params.push_back(new TxParameterFloat(this, "Time", -10000.f, 10000.f, &_time, TxParameter::FLOAT));
+  _params.push_back(new TxParameterFloat(this, "Volume", 0.f, 2.f, &_volume, VOLUME));
+  _params.push_back(new TxParameterFloat(this, "Time", -10000.f, 10000.f, &_time, TIME, TxParameter::FLOAT));
 
   _size = ImVec2(200, 200);
 

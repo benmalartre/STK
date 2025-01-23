@@ -19,7 +19,9 @@ class TxSequencer : public TxNode {
 public:
   enum Parameters {
     TRIGGER = TxNode::LAST,
+    RUNNING,
     BPM,
+    VOLUME,
     TIME,
     LAST
   };

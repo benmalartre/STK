@@ -10,11 +10,11 @@ TxAdsr::TxAdsr(TxNode* parent, const std::string& name)
   , _release(0.25f)
   , _trigger(false)
 {
-  _params.push_back(new TxParameterFloat(this, "Attack", 0.01f, 1.f, &_attack, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Decay", 0.01f, 1.f, &_decay, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Sustain", 0.01f, 1.f, &_sustain, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Release", 0.01f, 1.f, &_release, TxParameter::KNOB));
-  _params.push_back(new TxParameterBool(this, "Trigger", &_trigger));
+  _params.push_back(new TxParameterFloat(this, "Attack", 0.01f, 1.f, &_attack, 0, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Decay", 0.01f, 1.f, &_decay, 1, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Sustain", 0.01f, 1.f, &_sustain, 2, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Release", 0.01f, 1.f, &_release, 3, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Trigger", &_trigger, 4));
 
   _adsr.setAllTimes(_attack, _decay, _sustain, _release);
   _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 4 + TX_PADDING_X * 8, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);

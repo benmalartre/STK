@@ -156,9 +156,8 @@ private:
 
 class TxParameterSamples : public TxParameter {
 public:
-  TxParameterSamples(TxNode* node, const std::string& name, bool io=true, int nChannels=1);
+  TxParameterSamples(TxNode* node, const std::string& name, size_t index, bool io=true, int nChannels=1);
 
-  void setIndex(int index);
   bool io();
   void set(stk::StkFloat value) override;
   stk::StkFloat tick() override;

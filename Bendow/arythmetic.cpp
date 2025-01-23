@@ -18,10 +18,9 @@ TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name)
   , _mode(ADD)
 {
   _params.push_back(new TxParameterEnum(this, "Mode", &TxArythmetic::ModeName[0], 
-    TxArythmetic::NumMode, &_mode));  
-  _params.push_back(new TxParameterSamples(this, "Input1", false, 1));
-  _params.push_back(new TxParameterSamples(this, "Input2", false, 1));
-  ((TxParameterSamples*)_params.back())->setIndex(1);
+    TxArythmetic::NumMode, &_mode, 0));  
+  _params.push_back(new TxParameterSamples(this, "Input1", INPUT1, false, 1));
+  _params.push_back(new TxParameterSamples(this, "Input2", INPUT2, false, 1));
   _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
 }

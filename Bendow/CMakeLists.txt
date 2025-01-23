@@ -95,7 +95,6 @@ SET(SOURCES
 	${STK_DIR}/src/DelayA.cpp
 	${STK_DIR}/src/DelayL.cpp
 	${STK_DIR}/src/SineWave.cpp
-	${STK_DIR}/src/SingWave.cpp
 	${STK_DIR}/src/BiQuad.cpp
 	${STK_DIR}/src/TwoZero.cpp
 	${STK_DIR}/src/OneZero.cpp
