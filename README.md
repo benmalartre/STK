@@ -3,7 +3,9 @@
 Bendow is and experimental nodal based synthesizer and sequencer
 
 
-![UI preview of Jivaro 0](images/gBssm574.gif)
+![UI preview of Bendow](images/gBssm574.gif)
+
+![Bendow exemple output](Bendow/exemples/exemple_001.wav)
 
 
 Bendow is developed and tested on Windows (Windows 10 Pro) and on MacBookPro M1 (MacOs Monterey 12.3.1)
