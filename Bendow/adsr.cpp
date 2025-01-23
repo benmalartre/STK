@@ -28,8 +28,10 @@ const ImVec2& TxAdsr::size()
   return _size;
 }
 
-stk::StkFloat TxAdsr::tick(unsigned int)
+stk::StkFloat TxAdsr::tick(unsigned int channel)
 {
+  if(!_dirty) return _frames[channel];
+
   _params[TxAdsr::ATTACK]->tick();
   _params[TxAdsr::DECAY]->tick();
   _params[TxAdsr::SUSTAIN]->tick();
@@ -45,8 +47,11 @@ stk::StkFloat TxAdsr::tick(unsigned int)
 
   if(_trigger) _adsr.keyOn();
   else _adsr.keyOff();
+
+  _frames[channel] = _adsr.tick();
+  _dirty = false;
   
-  return _adsr.tick();
+  return _frames[channel];
 }
 
 void TxAdsr::setAttack(stk::StkFloat attack)

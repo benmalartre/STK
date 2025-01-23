@@ -28,14 +28,17 @@ const ImVec2& TxLfo::size()
 
 stk::StkFloat TxLfo::tick(unsigned int channel)
 {
+  if(!_dirty) return _frames[channel];
+
   _frequency = _params[FREQUENCY]->tick();
   _amplitude = _params[AMPLITUDE]->tick();
   _offset = _params[OFFSET]->tick();
 
   _sine.setFrequency(_frequency);
-  const stk::StkFloat sample = _sine.tick() * _amplitude +_offset;
-  _buffer.write(sample);
-  return sample;
+  _frames[channel] = _sine.tick() * _amplitude +_offset;
+  _buffer.write(_frames[channel]);
+  _dirty = false;
+  return _frames[channel];
 }
 
 void TxLfo::_drawImpl(TxEditor* editor, bool* modified)

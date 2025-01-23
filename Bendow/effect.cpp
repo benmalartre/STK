@@ -33,23 +33,28 @@ const ImVec2& TxEffect::size()
   return TxEffect::Size;
 }
 
-stk::StkFloat TxEffect::tick(unsigned int)
+stk::StkFloat TxEffect::tick(unsigned int channel)
 {
+  if(!_dirty) return _frames[channel];
+
   stk::StkFloat sample = _params[TxEffect::INPUT]->tick();
   switch(_effectIdx) {
     case CHORUS:
       ((stk::Chorus*)_effect)->setModDepth(_modDepth);
       ((stk::Chorus*)_effect)->setModFrequency(_modFrequency);
-      return ((stk::Chorus*)_effect)->tick(sample);
+      _frames[channel] = ((stk::Chorus*)_effect)->tick(sample);
 
     case ECHO:
       ((stk::Echo*)_effect)->setDelay(_delay);
       ((stk::Echo*)_effect)->setMaximumDelay(_maximumDelay);
-      return ((stk::Echo*)_effect)->tick(sample);
+      _frames[channel] = ((stk::Echo*)_effect)->tick(sample);
     
     default:
-      return 0.f;
+      _frames[channel] = 0.f;
   }
+
+  _dirty = false;
+  return _frames[channel];
 }
 
 void TxEffect::_drawImpl(TxEditor* editor, bool* modified)

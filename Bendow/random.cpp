@@ -63,14 +63,17 @@ void TxRandom::setFrequency(stk::StkFloat frequency)
   _rate = stk::Stk::sampleRate()  / _frequency;
 }
 
-stk::StkFloat TxRandom::tick(unsigned int)
+stk::StkFloat TxRandom::tick(unsigned int channel)
 {
+  if(!_dirty)return _frames[channel];
+
   if(_lastFrequency != _frequency)setFrequency(_frequency);
   if(_cnt++ > _rate) {
     _cnt = 0;
-    _frames[0] = RANDOM_LO_HI(_minimum, _maximum);
+    _frames[channel] = RANDOM_LO_HI(_minimum, _maximum);
   }
-  return _frames[0];
+  _dirty = false;
+  return _frames[channel];
 }
 
 void TxRandom::_drawImpl(TxEditor* editor, bool* modified)

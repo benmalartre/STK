@@ -292,15 +292,17 @@ void TxFilter::setFilter(int filterIdx)
   _lastFilterIdx = _filterIdx;
 }
 
-stk::StkFloat TxFilter::tick(unsigned int)
+stk::StkFloat TxFilter::tick(unsigned int channel)
 {
   if (!_filter)return 0.f;
+
+  if(!_dirty) return _frames[channel];
+
   if (_params[FILTER]->tick() != _lastFilterIdx) {
     setFilter(_filterIdx);
   }
   stk::StkFloat input = _params[TxFilter::INPUT]->tick();
   stk::StkFloat gain = _params[TxFilter::GAIN]->tick();
-  stk::StkFloat sample = 0.f;
   _filter->setGain(gain);
   switch(_filterIdx) {
     case BIQUAD:
@@ -309,7 +311,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
       stk::StkFloat radius = _params[TxFilter::FLOAT2]->tick();
       bool normalize = _params[TxFilter::BOOL1]->tick();
       ((stk::BiQuad*)_filter)->setResonance(resonance, radius, normalize);
-      sample = ((stk::BiQuad*)_filter)->tick(input);
+      _frames[channel] = ((stk::BiQuad*)_filter)->tick(input);
       break;
     }
 
@@ -317,7 +319,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
     {
       stk::StkFloat pole = _params[TxFilter::FLOAT1]->tick();
       ((stk::OnePole*)_filter)->setPole(pole);
-      sample = ((stk::OnePole*)_filter)->tick(input);
+      _frames[channel] = ((stk::OnePole*)_filter)->tick(input);
       break;
     }
 
@@ -327,7 +329,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
       int delay = _params[TxFilter::INT2]->tick();
       ((stk::Delay*)_filter)->setMaximumDelay(maxDelay);
       ((stk::Delay*)_filter)->setDelay(delay);
-      sample = ((stk::Delay*)_filter)->tick(input);
+      _frames[channel] = ((stk::Delay*)_filter)->tick(input);
       break;
     }
 
@@ -337,7 +339,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
       int delay = _params[TxFilter::INT2]->tick();
       ((stk::DelayA*)_filter)->setMaximumDelay(maxDelay);
       ((stk::DelayA*)_filter)->setDelay(delay);
-      sample = ((stk::DelayA*)_filter)->tick(input);
+      _frames[channel] = ((stk::DelayA*)_filter)->tick(input);
       break;
     }
 
@@ -347,7 +349,7 @@ stk::StkFloat TxFilter::tick(unsigned int)
       int delay = _params[TxFilter::INT2]->tick();
       ((stk::DelayL*)_filter)->setMaximumDelay(maxDelay);
       ((stk::DelayL*)_filter)->setDelay(delay);
-      sample = ((stk::DelayL*)_filter)->tick(input);
+      _frames[channel] = ((stk::DelayL*)_filter)->tick(input);
       break;
     }
 
@@ -360,13 +362,13 @@ stk::StkFloat TxFilter::tick(unsigned int)
 
       ((stk::Fir*)_filter)->setCoefficients(firCoefficients, false);
       
-      sample = ((stk::Fir*)_filter)->tick(input);
+      _frames[channel] = ((stk::Fir*)_filter)->tick(input);
       break;
     }
   }
 
-  //_buffer.write(sample);
-  return sample;
+  _buffer.write(_frames[channel]);
+  return _frames[channel];
 }
 
 void TxFilter::_drawImpl(TxEditor* editor, bool* modified)

@@ -17,7 +17,6 @@ TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name)
   : TxNode(parent, TxNode::ARYTHMETIC, name)
   , _mode(ADD)
 {
-  std::cout << "arythmetic constructor" << std::endl;
   _params.push_back(new TxParameterEnum(this, "Mode", &TxArythmetic::ModeName[0], 
     TxArythmetic::NumMode, &_mode));  
   _params.push_back(new TxParameterSamples(this, "Input1", false, 1));
@@ -25,7 +24,6 @@ TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name)
   ((TxParameterSamples*)_params.back())->setIndex(1);
   _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
-  std::cout << "arythmetic constructor ok" << std::endl;
 }
 
 TxArythmetic::~TxArythmetic() 
@@ -37,34 +35,36 @@ const ImVec2& TxArythmetic::size()
   return TxArythmetic::Size;
 }
 
-stk::StkFloat TxArythmetic::tick(unsigned int)
+stk::StkFloat TxArythmetic::tick(unsigned int channel)
 {
+  if(!_dirty) return _frames[channel];
+
   const stk::StkFloat input1 = _params[INPUT1]->tick();
   const stk::StkFloat input2 = _params[INPUT2]->tick();
   const stk::StkFloat float1 = _params[FLOAT1]->tick();
-  stk::StkFloat sample = 0.f;
   switch(_mode) {
     case ADD:
-      sample = input1 + input2;
+      _frames[channel] = input1 + input2;
       break;
     
     case SUB:
-      sample = input1 - input2;
+      _frames[channel] = input1 - input2;
       break;
 
     case MUL:
-      sample = input1 * input2;
+      _frames[channel] = input1 * input2;
       break;
     
     case DIV:
-      sample = input1 / input2;
+      _frames[channel] = input1 / input2;
       break;
 
     case MIX:
-      sample = (1.f - float1) * input1 + float1 * input2;
+      _frames[channel] = (1.f - float1) * input1 + float1 * input2;
       break;
   }
-  return sample;
+  _dirty = false;
+  return _frames[channel];
 }
 
 void TxArythmetic::setMode(int mode)
