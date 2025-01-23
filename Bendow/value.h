@@ -6,8 +6,7 @@
 class TxValue : public TxNode {
 public:
   enum Parameters {
-    VALUE = TxNode::LAST,
-    LAST
+    VALUE = TxNode::LAST
   };
   TxValue(TxNode* parent, const std::string& name);
   ~TxValue();

@@ -18,10 +18,10 @@ TxArythmetic::TxArythmetic(TxNode* parent, const std::string& name)
   , _mode(ADD)
 {
   _params.push_back(new TxParameterEnum(this, "Mode", &TxArythmetic::ModeName[0], 
-    TxArythmetic::NumMode, &_mode, 0));  
+    TxArythmetic::NumMode, &_mode, MODE));  
   _params.push_back(new TxParameterSamples(this, "Input1", INPUT1, false, 1));
   _params.push_back(new TxParameterSamples(this, "Input2", INPUT2, false, 1));
-  _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, TxParameterFloat::HORIZONTAL));
+  _params.push_back(new TxParameterFloat(this, "Float1", 0.f, 1.f, &_float1, FLOAT1, TxParameterFloat::HORIZONTAL));
   _params.back()->setLabel("Blend");
 }
 
@@ -73,10 +73,12 @@ void TxArythmetic::setMode(int mode)
 
 void TxArythmetic::_drawImpl(TxEditor* editor, bool* modified)
 {
+  /*
   TxParameter* input1 = _params[INPUT1];
   input1->draw(editor);
   TxParameter* input2 = _params[INPUT2];
   input2->draw(editor);
+  */
   TxNode::_drawAlignLeft(editor);
   TxNode::_drawAlignTop(editor);
   ImGui::BeginGroup();
@@ -90,8 +92,8 @@ void TxArythmetic::_drawImpl(TxEditor* editor, bool* modified)
   }
   ImGui::EndGroup();
 
-  //TxNode::_drawInput(editor, _params[INPUT1], 0);
-  //TxNode::_drawInput(editor, _params[INPUT2], 1);
+  TxNode::_drawInput(editor, _params[INPUT1], 0);
+  TxNode::_drawInput(editor, _params[INPUT2], 1);
 
   TxNode::_drawOutput(editor);
 }

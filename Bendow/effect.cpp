@@ -84,9 +84,10 @@ void TxEffect::_drawImpl(TxEditor* editor, bool* modified)
 
     default:
       break;
-  }
-  
- TxNode::_drawInput(editor, _params[TxEffect::INPUT], 0);
+  }  
+
+  TxParameter* input = _params[INPUT];
+  input->draw(editor);
   
   ImGui::EndGroup();
 

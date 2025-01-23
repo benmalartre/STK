@@ -27,7 +27,6 @@ TxParameter::TxParameter(TxNode* node, const std::string& name, void* data,
   , _name(name)
   , _label(name)
   , _index(index)
-  , _fullname("##plug" + node->name() +":"+_name + std::to_string(index))
   , _input(NULL)
   , _type(type)
   , _flags(flags)
@@ -35,6 +34,7 @@ TxParameter::TxParameter(TxNode* node, const std::string& name, void* data,
   , _callback(NULL)
   , _iChannel(0)
 {
+    _fullname = "##plug" + _node->name() +":"+_name + std::to_string(_index);
 }
 
 TxParameter::~TxParameter()
@@ -416,8 +416,9 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
 {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   bool connected = false;
+  std::string name = _fullname + "Btn";
   ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
-  ImGui::InvisibleButton(("##plug" + node()->name() + std::to_string(channel+_io*64+_index)).c_str(), 
+  ImGui::InvisibleButton(name.c_str(), 
     ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
   if (!ImGui::IsDragDropActive() && ImGui::BeginDragDropSource()) {
     editor->startConnexion(this, channel);
@@ -483,11 +484,11 @@ bool TxParameterSamples::draw(TxEditor* editor)
 
   for (size_t channel = 0; channel < _nChannels; ++channel) {
     if (!_io) {
-      pMin = ep + (_node->position() + ImVec2(0.f, TX_TITLE_HEIGHT + plugOffsetY * (channel + _index))) * scale + offset;
+      pMin = ep + (_node->position() + ImVec2(0.f, TX_TITLE_HEIGHT + plugOffsetY * (channel /*+ _index*/))) * scale + offset;
       pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
     else {
-      pMin = ep + (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, TX_TITLE_HEIGHT + plugOffsetY * (channel + _index))) * scale + offset;
+      pMin = ep + (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, TX_TITLE_HEIGHT + plugOffsetY * (channel /*+ _index*/))) * scale + offset;
       pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
 

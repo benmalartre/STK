@@ -38,11 +38,11 @@ TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t num
   , _color(RANDOM_0_1, RANDOM_0_1, RANDOM_0_1, 1.f)
   , _buffer(1024)
 {
+  _frames.resize(1, numChannels, 0.0);
+  _params.push_back(new TxParameterBool(this, "Active", &_active, TxNode::ACTIVE));
+  _params.push_back(new TxParameterSamples(this, "Output", TxNode::OUTPUT, true, _nChannels));
   if(_parent && _parent->type() == TxNode::GRAPH) 
     ((TxGraph*)_parent)->addNode(this);
-  _frames.resize(1, numChannels, 0.0);
-  _params.push_back(new TxParameterBool(this, "Active", &_active, ACTIVE));
-  _params.push_back(new TxParameterSamples(this, "Output", OUTPUT, true, _nChannels));
 }
 
 TxNode::~TxNode()

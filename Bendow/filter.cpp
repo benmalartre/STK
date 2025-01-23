@@ -66,15 +66,15 @@ TxFilter::TxFilter(TxNode* parent, const std::string& name)
   , _int3(0)
 {
   _params.push_back(new TxParameterSamples(this, "Input", INPUT, false, 1));
-  _params.push_back(new TxParameterEnum(this, "Filter", &TxFilter::FilterName[0], TxFilter::NumFilter, &_filterIdx, 1));
-  _params.push_back(new TxParameterFloat(this, "Gain", 0.f, 1.f, &_gain, 2, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Float1", -1.f, 1.f, &_float1, 3, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Float2", -1.f, 1.f, &_float2, 4, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Float3", -1.f, 1.f, &_float3, 5, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt(this, "Int1", 0, 12, &_int1, 6, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt(this, "Int2", 0, 12, &_int2, 7, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt(this, "Int3", 0, 12, &_int3, 8, TxParameter::KNOB));
-  _params.push_back(new TxParameterBool(this, "Bool1", &_bool1, 9));
+  _params.push_back(new TxParameterEnum(this, "Filter", &TxFilter::FilterName[0], TxFilter::NumFilter, &_filterIdx, FILTER));
+  _params.push_back(new TxParameterFloat(this, "Gain", 0.f, 1.f, &_gain, GAIN, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Float1", -1.f, 1.f, &_float1, FLOAT1, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Float2", -1.f, 1.f, &_float2, FLOAT2, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Float3", -1.f, 1.f, &_float3, FLOAT3, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Int1", 0, 12, &_int1, INT1, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Int2", 0, 12, &_int2, INT2, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Int3", 0, 12, &_int3, INT3, TxParameter::KNOB));
+  _params.push_back(new TxParameterBool(this, "Bool1", &_bool1, BOOL1));
   setFilter(ONEPOLE);
 
 }
@@ -435,7 +435,8 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
       break;
   }
 
-  TxNode::_drawInput(editor, _params[TxFilter::INPUT], 0);
+  TxParameter* input = _params[INPUT];
+  input->draw(editor);
   
   ImGui::EndGroup();
 
