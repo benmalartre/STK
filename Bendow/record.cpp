@@ -40,14 +40,13 @@ void TxRecorder::start()
 
 void TxRecorder::stop()
 {
+  _recording = false;
   if(_output) {
     std::cout << "[TxRecorder] closed file : " << _filename << std::endl;
     _output->closeFile();
     delete _output;
     _output = nullptr;
   }
-
-  _recording = false;
 }
 
 void TxRecorder::tick(const stk::StkFloat& sample)
