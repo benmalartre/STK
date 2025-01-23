@@ -65,3 +65,10 @@ void TxTrack::setBeat(size_t beatIdx, const Beat& beat)
 {
     _sequence[beatIdx] = beat;
 }
+
+void TxTrack::dirtyAllNodes()
+{
+  if(!_graph) return;
+  for(TxNode* node: _graph->nodes())
+    node->setDirty(true);
+}

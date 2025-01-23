@@ -40,7 +40,7 @@ TxNode::TxNode(TxNode* parent, short type, const std::string& name, uint32_t num
 {
   if(_parent && _parent->type() == TxNode::GRAPH) 
     ((TxGraph*)_parent)->addNode(this);
-  _frames.resize((int)stk::Stk::sampleRate(), 1, 0.0);
+  _frames.resize(1, numChannels, 0.0);
   _params.push_back(new TxParameterBool(this, "Active", &_active));
   _params.push_back(new TxParameterSamples(this, "Output", true, _nChannels));
 }

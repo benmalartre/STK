@@ -31,6 +31,8 @@ public:
   void setLength(size_t length);
   void setBeat(size_t length, const Beat& beat);
 
+  void dirtyAllNodes();
+
 protected:
   void _drawImpl(TxEditor*, bool*) override;
 

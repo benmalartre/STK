@@ -90,10 +90,10 @@ protected:
   int                       _expended;
   bool                      _selected;
   bool                      _active;
+  bool                      _dirty;
 
   std::string               _name;
   int                       _nChannels;
-  bool                      _dirty;
   stk::StkFrames            _frames;
   std::vector<TxParameter*> _params;
 

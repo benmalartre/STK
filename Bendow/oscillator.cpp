@@ -49,37 +49,40 @@ const ImVec2& TxOscillator::size()
   return _size;
 }
 
-stk::StkFloat TxOscillator::tick(unsigned int)
+stk::StkFloat TxOscillator::tick(unsigned int channel)
 {
-  if(!_generator || !_dirty) {
+  if(!_generator)
     return 0.f;
-  }
-  if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick()) {
+  
+  if(!_dirty)
+    return _frames[channel];
+
+  if(_lastWaveFormIdx != (int)_params[WAVEFORM]->tick())
     setWaveForm(_waveFormIdx);
-  }
+
   _envelope = _params[ENVELOPE]->tick();
   setFrequency(_params[FREQUENCY]->tick());
   setHarmonics(_params[HARMONICS]->tick());
-  float sample = 0.f;
+  _frames[channel] = 0.f;
   switch(_waveFormIdx) {
     case BLIT:
-      sample = ((stk::Blit*)_generator)->tick() * _envelope;
+      _frames[channel] = ((stk::Blit*)_generator)->tick() * _envelope;
       break;
 
     case BLITSAW:
-      sample = ((stk::BlitSaw*)_generator)->tick() * _envelope;
+      _frames[channel] = ((stk::BlitSaw*)_generator)->tick() * _envelope;
       break;
 
     case BLITSQUARE:
-      sample = ((stk::BlitSquare*)_generator)->tick() * _envelope;
+      _frames[channel] = ((stk::BlitSquare*)_generator)->tick() * _envelope;
       break;
 
     case NOISE:
-      sample = ((stk::Noise*)_generator)->tick() * _envelope;
+      _frames[channel] = ((stk::Noise*)_generator)->tick() * _envelope;
       break;
 
     case SINEWAVE:
-      sample = ((stk::SineWave*)_generator)->tick() * _envelope;
+      _frames[channel] = ((stk::SineWave*)_generator)->tick() * _envelope;
       break;
 /*
     case SINGWAVE:
@@ -87,8 +90,9 @@ stk::StkFloat TxOscillator::tick(unsigned int)
       break;
 */
   }   
-  //_buffer.write(sample);
-  return sample;
+  _buffer.write(_frames[channel]);
+  _dirty = false;
+  return _frames[channel];
 }
 
 void TxOscillator::setWaveForm(short index)

@@ -130,12 +130,15 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
   
   for (size_t i = 0; i < _tracks.size(); ++i) {
     if (_tracks[i]->active() && _tracks[i]->graph()) {
+      _tracks[i]->dirtyAllNodes();
       const Index index = TxTime::instance().index(_tracks[i]->length());
       sample += _tracks[i]->graph()->tick() * _tracks[i]->volume();
     }
   }
 
   sample *= _volume;
+  if(_recorder.recording())
+    _recorder.tick(sample);
 
   _buffer.write(sample);
   

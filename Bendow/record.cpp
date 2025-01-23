@@ -50,6 +50,12 @@ void TxRecorder::stop()
   _recording = false;
 }
 
+void TxRecorder::tick(const stk::StkFloat& sample)
+{
+  if(!_output)return;
+  _output->tick(sample);
+}
+
 void TxRecorder::draw()
 {
   static const size_t BUFFER_SIZE = 512;
