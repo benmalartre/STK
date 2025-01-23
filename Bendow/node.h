@@ -75,6 +75,7 @@ public:
   virtual void reset() = 0;
 
 protected:
+  stk::StkFloat             _volumeToDb(float volume, double maxDb=12.0);
   void                      _drawPopup(TxEditor* editor);
   void                      _drawInput(TxEditor* editor, TxParameter* parameter, short index);
   void                      _drawOutput(TxEditor* editor);

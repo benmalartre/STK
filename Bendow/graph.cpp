@@ -35,9 +35,8 @@ bool TxGraph::contains(const TxNode* node)
 
 int TxGraph::index(const TxNode* node)
 {
-  for(size_t i = 0; i < _nodes.size(); ++i) {
-    if(_nodes[i] == node)return i;
-  }
+  for(size_t i = 0; i < _nodes.size(); ++i)
+    if(_nodes[i] == node) return i;
   return -1;
 }
 
@@ -157,7 +156,7 @@ void TxGraph::reset()
 
 stk::StkFloat TxGraph::tick(unsigned int channel)
 {
-  if(_current && _active)return _current->tick(channel) * _volume;
+  if(_current && _active) return _current->tick(channel) * _volumeToDb(_volume);
   return 0;
 }
 
