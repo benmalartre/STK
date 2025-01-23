@@ -42,7 +42,7 @@ protected:
 
 private:
   void                      _createNodeByType(int type);
-  void                      _drawImpl(TxEditor* editor, bool* modified){};
+  void                      _drawImpl(TxEditor* editor, bool* modified) override {};
 
   std::string               _name;
   std::vector<TxNode*>      _nodes;

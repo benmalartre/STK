@@ -1,3 +1,4 @@
+#include <cmath>
 #include "node.h"
 #include "sequencer.h"
 #include "graph.h"
