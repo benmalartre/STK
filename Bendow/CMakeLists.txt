@@ -104,6 +104,8 @@ SET(SOURCES
 	${STK_DIR}/src/Plucked.cpp
 	${STK_DIR}/src/RtAudio.cpp
 	${STK_DIR}/src/FM.cpp
+	${STK_DIR}/src/FileWrite.cpp
+	${STK_DIR}/src/FileWvOut.cpp
 	common.cpp
 	fonts.cpp
 	parameter.cpp
@@ -122,6 +124,7 @@ SET(SOURCES
 	graph.cpp
 	editor.cpp
 	factory.cpp
+	record.cpp
 	main.cpp
 )
 

@@ -469,7 +469,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   
   _sequencer->draw(this);
 
-
+  ImGui::BeginChild("Tracks");
   TxTrack* removeTrack = nullptr;
   std::vector<TxTrack*>& tracks = _sequencer->tracks();
   Index index = TxTime::instance().index(tracks[0]->length());
@@ -543,7 +543,7 @@ void TxSequencerEditor::resize(size_t splitterHeight)
   if(ImGui::Button(ICON_FA_PLUS, ImVec2(60, 16)))
     _sequencer->addTrack();
   
-
+  ImGui::EndChild();
   ImGui::End();
   ImGui::PopStyleVar(2);
 }

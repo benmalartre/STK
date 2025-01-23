@@ -68,6 +68,9 @@ KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 {
   if (key == GLFW_KEY_DELETE && action == GLFW_PRESS)
     graphEditor->deleteSelectedNodes();
+
+  else if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    sequencer->toggleRunning();
 }
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
@@ -82,6 +85,9 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
       *samples++ = sample;
       *samples++ = sample;
       time.increment();
+    } else {
+      *samples++ = 0.f;
+      *samples++ = 0.f;
     }
   }
 

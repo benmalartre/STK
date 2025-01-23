@@ -26,7 +26,7 @@ const ImVec2& TxLfo::size()
   return _size;
 }
 
-stk::StkFloat TxLfo::tick(unsigned int)
+stk::StkFloat TxLfo::tick(unsigned int channel)
 {
   _frequency = _params[FREQUENCY]->tick();
   _amplitude = _params[AMPLITUDE]->tick();
@@ -34,7 +34,7 @@ stk::StkFloat TxLfo::tick(unsigned int)
 
   _sine.setFrequency(_frequency);
   const stk::StkFloat sample = _sine.tick() * _amplitude +_offset;
-  //_buffer.write(sample);
+  _buffer.write(sample);
   return sample;
 }
 

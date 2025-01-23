@@ -31,4 +31,5 @@ private:
   stk::StkFloat   _offset;
 };
 
+
 #endif // TX_LFO_H

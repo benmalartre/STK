@@ -45,6 +45,11 @@ TxSequencer::~TxSequencer()
 {
 }
 
+void TxSequencer::toggleRunning()
+{
+  _running = !_running;
+}
+
 void TxSequencer::setLength(uint64_t length)
 {
   _length = length;
@@ -120,7 +125,7 @@ float _percentageToDb(float volume, double maxDb=12.0) {
 };
 
 stk::StkFloat TxSequencer::tick(unsigned int channel)
-{
+{  
   double sample = 0.f;
   
   for (size_t i = 0; i < _tracks.size(); ++i) {
@@ -142,9 +147,6 @@ void TxSequencer::draw(TxEditor* editor)
 {  
   TxTime& time = TxTime::instance();
 
-  ImGui::Checkbox("Running", &_running);
-  ImGui::SameLine();
-  
   if (ImGuiKnobs::KnobInt("Bpm", &_bpm, 1, 220, 1, "%ibpm",
     ImGuiKnobVariant_WiperDot, 0.f, ImGuiKnobFlags_DragHorizontal))
       updateBPM(this);
@@ -164,12 +166,18 @@ void TxSequencer::draw(TxEditor* editor)
 
   ImGui::Text("Rate : %fs", time.rate());
   ImGui::Text("Index : %i", time.index(_length).first);
+
+
   ImGui::EndGroup();
 
   ImGui::SameLine();
 
   ImGui::BeginGroup();
   _buffer.draw();
+
+  ImGui::Checkbox("Running", &_running);
+  ImGui::SameLine();
+  _recorder.draw();
   ImGui::EndGroup();
 
 }

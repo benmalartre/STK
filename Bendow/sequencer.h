@@ -9,6 +9,7 @@
 #include "buffer.h"
 #include "graph.h"
 #include "track.h"
+#include "record.h"
 
 #ifndef TX_SEQUENCER_H
 #define TX_SEQUENCER_H
@@ -31,6 +32,7 @@ public:
   ~TxSequencer();
   void setLength(uint64_t length);
   void setBPM(uint32_t bpm);
+  void toggleRunning();
   
   void setBeat(uint32_t trackIdx, uint64_t time, const Beat& value);
   stk::StkFloat tick(unsigned int channel) override;
@@ -57,6 +59,8 @@ protected:
 
 private:
   void _drawImpl(TxEditor* editor, bool* modified){};
+
+  TxRecorder            _recorder;
 
   std::vector<TxTrack*> _tracks;
   TxTrack*              _current;
