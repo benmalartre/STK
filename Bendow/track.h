@@ -12,7 +12,7 @@ public:
   };
   TxTrack(const std::string& name);
   ~TxTrack();
-  const ImVec2& size() override{return ImVec2();};
+  const ImVec2& size() override{static ImVec2 s; return s;};
   stk::StkFloat tick(unsigned int) override;
     
   void basicGraph();

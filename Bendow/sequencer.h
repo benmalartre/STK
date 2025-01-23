@@ -58,7 +58,7 @@ protected:
   static const int        Flags;
 
 private:
-  void _drawImpl(TxEditor* editor, bool* modified){};
+  void _drawImpl(TxEditor* editor, bool* modified) override{};
 
   TxRecorder            _recorder;
 

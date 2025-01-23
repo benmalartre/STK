@@ -32,7 +32,7 @@ public:
   ~TxEffect();
   stk::StkFloat tick(unsigned int) override;
 
-  const ImVec2& size();
+  const ImVec2& size() override;
   void reset() override;
 
 protected:

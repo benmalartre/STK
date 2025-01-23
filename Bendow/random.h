@@ -13,7 +13,7 @@ public:
   };
   TxRandom(TxNode* parent, const std::string& name);
   ~TxRandom();
-  const ImVec2& size();
+  const ImVec2& size() override;
   stk::StkFloat tick(unsigned int) override;
   void setMinimum(stk::StkFloat value);
   void setMaximum(stk::StkFloat value);

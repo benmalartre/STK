@@ -134,7 +134,8 @@ void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
 
     editor->startConnexion(source, channel);
     ImGui::SetDragDropPayload("disconnect", NULL, 0);
-    ImGui::Text(("disconnect "+node()->name()+":"+_name).c_str());
+    std::string msg("disconnect "+node()->name()+":"+_name);
+    ImGui::Text("%s", msg.c_str());
     ImGui::EndDragDropSource();
   }
 

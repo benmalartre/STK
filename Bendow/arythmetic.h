@@ -28,7 +28,7 @@ public:
   ~TxArythmetic();
   stk::StkFloat tick(unsigned int) override;
   void setMode(int mode);
-  const ImVec2& size();
+  const ImVec2& size() override;
   void reset() override;
 
 protected:

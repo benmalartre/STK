@@ -146,7 +146,8 @@ void TxGraph::_createNodeByType(int type)
 
 const ImVec2& TxGraph::size()
 {
-  return ImVec2();
+  static ImVec2 s;
+  return s;
 }
 
 void TxGraph::reset()
