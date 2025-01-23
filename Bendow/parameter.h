@@ -168,8 +168,6 @@ public:
 private:
   stk::StkFrames*    _frames;
   bool               _io;
-  int                _nChannels;
-  int                _index;
-};
+  int                _nChannels;};
 
 #endif // TX_PARAMETER_H

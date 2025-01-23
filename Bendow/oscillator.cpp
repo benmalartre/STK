@@ -29,12 +29,15 @@ TxOscillator::TxOscillator(TxNode* parent, const std::string& name)
   , _harmonics(3)
 {
   setWaveForm(BLIT);
-  _params.push_back(new TxParameterEnum(this, "Wave", &TxOscillator::WaveFormName[0], 
-    TxOscillator::NumWaveForm, &_waveFormIdx, WAVEFORM));
-  _params.push_back(new TxParameterFloat(this, "Freq", 20.f, 3000.f, &_frequency, FREQUENCY, TxParameter::KNOB));
-  _params.push_back(new TxParameterInt(this, "Harm", 0, 16, &_harmonics, HARMONICS, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Env", 0.f, 2.f, &_envelope, ENVELOPE, TxParameter::KNOB));
-  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
+  _params.push_back(new TxParameterEnum(this, "Wave", 
+    &TxOscillator::WaveFormName[0], TxOscillator::NumWaveForm, &_waveFormIdx, WAVEFORM));
+  _params.push_back(new TxParameterFloat(this, "Freq", 20.f, 3000.f, 
+    &_frequency, FREQUENCY, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Harm", 0, 16, 
+    &_harmonics, HARMONICS, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Env", 0.f, 2.f, 
+    &_envelope, ENVELOPE, TxParameter::KNOB));
+  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 3 + TX_PADDING_X * 4, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
 }
 
 TxOscillator::~TxOscillator() 

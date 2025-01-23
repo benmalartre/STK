@@ -13,13 +13,11 @@ TxRandom::TxRandom(TxNode* parent, const std::string& name)
 {
   _rate = stk::Stk::sampleRate() / _frequency;
   srand(_seed);
-  _params.push_back(new TxParameterFloat(this, "Freq", _minimum, _maximum, &_frequency, TxParameter::KNOB));
-  _params.push_back(new TxParameterFloat(this, "Min", -1000.f, 1000.f, &_minimum, TxParameter::KNOB));
-  //_params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
-  _params.push_back(new TxParameterFloat(this, "Max", -1000.f, 1000.f, &_maximum, TxParameter::KNOB));
-  //_params.back()->setCallback(new TxCallback((CALLBACK_FN)&updateRandomBounds, this));
-  _params.push_back(new TxParameterInt(this, "Seed", 0, 65535, &_seed, TxParameter::HORIZONTAL));
-  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 4 + TX_PADDING_X * 2, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
+  _params.push_back(new TxParameterFloat(this, "Freq", _minimum, _maximum, &_frequency, FREQUENCY, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Min", -1000.f, 1000.f, &_minimum, MINIMUM, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Max", -1000.f, 1000.f, &_maximum, MAXIMUM, TxParameter::KNOB));
+  _params.push_back(new TxParameterInt(this, "Seed", 0, 65535, &_seed, SEED, TxParameter::HORIZONTAL));
+  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 4 + TX_PADDING_X * 5, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2 + TX_SLIDER_SIZE);
 
 }
 

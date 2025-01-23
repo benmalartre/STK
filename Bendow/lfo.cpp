@@ -14,7 +14,7 @@ TxLfo::TxLfo(TxNode* parent, const std::string& name)
   _params.push_back(new TxParameterFloat(this, "Freq", 0.01f, 1000.f, &_frequency, FREQUENCY, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Ampl", 0.01f, 100.f, &_amplitude, AMPLITUDE, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "Zero", -1000.f, 1000.f, &_offset, OFFSET, TxParameter::KNOB));
-  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 3 + TX_PADDING_X * 6, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2);
+  _size = ImVec2(TX_KNOB_MIDDLE_SIZE * 3 + TX_PADDING_X * 4, TX_PADDING_Y * 2 + TX_KNOB_MIDDLE_SIZE * 2);
 }
 
 TxLfo::~TxLfo() 

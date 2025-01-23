@@ -416,7 +416,7 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
 {
   ImDrawList* drawList = ImGui::GetWindowDrawList();
   bool connected = false;
-  std::string name = _fullname + "Btn";
+  std::string name = _fullname + std::to_string(channel) + "Btn";
   ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
   ImGui::InvisibleButton(name.c_str(), 
     ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
@@ -484,11 +484,11 @@ bool TxParameterSamples::draw(TxEditor* editor)
 
   for (size_t channel = 0; channel < _nChannels; ++channel) {
     if (!_io) {
-      pMin = ep + (_node->position() + ImVec2(0.f, TX_TITLE_HEIGHT + plugOffsetY * (channel /*+ _index*/))) * scale + offset;
+      pMin = ep + (_node->position() + ImVec2(0.f, TX_TITLE_HEIGHT + plugOffsetY * (channel + _index - TxNode::LAST))) * scale + offset;
       pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
     else {
-      pMin = ep + (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, TX_TITLE_HEIGHT + plugOffsetY * (channel /*+ _index*/))) * scale + offset;
+      pMin = ep + (_node->position() + ImVec2(_node->size()[0] - TX_PLUG_WIDTH, TX_TITLE_HEIGHT + plugOffsetY * (channel + _index))) * scale + offset;
       pMax = pMin + ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT) * scale;
     }
 

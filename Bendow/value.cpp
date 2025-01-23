@@ -6,7 +6,8 @@ TxValue::TxValue(TxNode* parent, const std::string& name)
   : TxNode(parent, TxNode::VALUE, name)
 {
   _value = 0.f;
-  _params.push_back(new TxParameterFloat(this, "Value", -10000, 10000, &_value, TxParameter::KNOB));
+  _params.push_back(new TxParameterFloat(this, "Value", -10000, 10000, 
+    &_value, VALUE, TxParameter::KNOB));
 }
 
 TxValue::~TxValue()
