@@ -248,7 +248,10 @@ void TxNode::_drawPopup(TxEditor* editor)
 
 void TxNode::_drawInput(TxEditor* editor, TxParameter* parameter, short index)
 {
-  parameter->drawPlug(editor, index);
+  if(parameter->type() == TxParameter::SAMPLES)
+    parameter->draw(editor);
+  else
+    parameter->drawPlug(editor, index);
 }
 
 void TxNode::_drawOutput(TxEditor* editor)

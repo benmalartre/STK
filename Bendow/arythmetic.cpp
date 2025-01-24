@@ -92,13 +92,15 @@ void TxArythmetic::_drawImpl(TxEditor* editor, bool* modified)
   }
   ImGui::EndGroup();
 
-  //TxNode::_drawInput(editor, _params[INPUT1], 0);
-  //TxNode::_drawInput(editor, _params[INPUT2], 1);
+  TxNode::_drawInput(editor, _params[INPUT1], 0);
+  TxNode::_drawInput(editor, _params[INPUT2], 1);
 
+/*
   TxParameter* input1 = _params[INPUT1];
   input1->draw(editor);
   TxParameter* input2 = _params[INPUT2];
   input2->draw(editor);
+*/
 
   TxNode::_drawOutput(editor);
 }

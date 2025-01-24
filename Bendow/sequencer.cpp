@@ -121,10 +121,6 @@ void TxSequencer::removeTrack(TxTrack* track)
   }
 }
 
-float _percentageToDb(float volume, double maxDb=12.0) {
-  return maxDb * (1 - (std::log(volume) / std::log(0.5)));
-};
-
 stk::StkFloat TxSequencer::tick(unsigned int channel)
 {  
   double sample = 0.f;
@@ -137,7 +133,7 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
     }
   }
 
-  sample *= _volume;
+  sample *= _volumeToDb(_volume);
   if(_recorder.recording())
     _recorder.tick(sample);
 

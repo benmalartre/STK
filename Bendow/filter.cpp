@@ -1,5 +1,6 @@
 #include "common.h"
 #include "filter.h"
+#include "editor.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -376,24 +377,9 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
   ImGui::BeginGroup();
 
   TxNode::_drawAlignLeft(editor);
-/*
-  ImGui::BeginGroup();
 
+  ImGui::SetNextItemWidth(128 * editor->scale());
   
-  TxParameter* frequency = _params[TxLfo::FREQUENCY];
-  if(frequency->draw(editor) && modified)*modified = true;
-  ImGui::SameLine();
-  TxParameter* amplitude = _params[TxLfo::AMPLITUDE];
-  if(amplitude->draw(editor) && modified)*modified = true;
-  ImGui::SameLine();
-  TxParameter* offset = _params[TxLfo::OFFSET];
-  if(offset->draw(editor) && modified)*modified = true;
-  ImGui::EndGroup();
-
-  TxNode::_drawOutput(editor);
-  */
-
-  ImGui::SetNextItemWidth(128);
   TxParameter* filter = _params[TxFilter::FILTER];
   if(filter->draw(editor)&&modified)*modified=true;
 
@@ -407,6 +393,13 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
       ImGui::SameLine();
       if(_params[TxFilter::FLOAT2]->draw(editor) && modified)* modified = true;
       if(_params[TxFilter::BOOL1]->draw(editor) && modified)* modified = true;
+      ImGui::EndGroup();
+
+      _drawInput(editor, _params[INPUT], INPUT);
+      _drawInput(editor, _params[FLOAT1], FLOAT1);
+      _drawInput(editor, _params[FLOAT2], FLOAT2);
+      _drawInput(editor, _params[BOOL1], BOOL1);
+
       break;
 
     case ONEPOLE:
@@ -419,6 +412,11 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
       if(_params[TxFilter::INT1]->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
       if(_params[TxFilter::INT2]->draw(editor) && modified)*modified = true;
+      ImGui::EndGroup();
+
+      _drawInput(editor, _params[INPUT], INPUT);
+      _drawInput(editor, _params[INT1], INT1);
+      _drawInput(editor, _params[INT2], INT2);
       break;
 
     case FIR:
@@ -429,17 +427,19 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
       if(_params[TxFilter::FLOAT2]->draw(editor) && modified)*modified = true;
       ImGui::SameLine();
       if(_params[TxFilter::INT2]->draw(editor) && modified)*modified = true;
+      ImGui::EndGroup();
+
+      _drawInput(editor, _params[INPUT], INPUT);
+      _drawInput(editor, _params[FLOAT1], FLOAT1);
+      _drawInput(editor, _params[FLOAT2], FLOAT2);
+      _drawInput(editor, _params[INT1], INT1);
+      _drawInput(editor, _params[INT2], INT2);
       break;
       
     default:
+      ImGui::EndGroup();
       break;
   }
-
-  TxParameter* input = _params[INPUT];
-  input->draw(editor);
-  
-  ImGui::EndGroup();
-
 
   TxNode::_drawOutput(editor);
 }

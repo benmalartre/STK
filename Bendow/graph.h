@@ -28,7 +28,7 @@ public:
   const ImVec2&           size() override;
   void                    reset() override;
 
-  float                   volume(){return _volume;};
+  float                   volume(){return _volumeToDb(_volume);};
   TxNode*                 current();
   void                    basic(TxNode * input);
   void                    sequenced(TxNode * input);

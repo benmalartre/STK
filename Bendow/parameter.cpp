@@ -127,18 +127,20 @@ void TxParameter::drawPlug(TxEditor* editor, short index, short channel)
     }
   } else if(_input && ImGui::BeginDragDropSource()) {
     TxConnexion* connexion = _input->connexion(this);
-    TxParameter* source = connexion->source;
-    size_t channel = connexion->channel;
-    
-    node()->graph()->removeConnexion(connexion);
-    
-    _input = NULL;
+    if(connexion) {
+      TxParameter* source = connexion->source;
+      size_t channel = connexion->channel;
+      
+      node()->graph()->removeConnexion(connexion);
+      
+      _input = NULL;
 
-    editor->startConnexion(source, channel);
-    ImGui::SetDragDropPayload("disconnect", NULL, 0);
-    std::string msg("disconnect "+node()->name()+":"+_name);
-    ImGui::Text("%s", msg.c_str());
-    ImGui::EndDragDropSource();
+      editor->startConnexion(source, channel);
+      ImGui::SetDragDropPayload("disconnect", NULL, 0);
+      std::string msg("disconnect "+node()->name()+":"+_name);
+      ImGui::Text("%s", msg.c_str());
+      ImGui::EndDragDropSource();
+    }
   }
 
   TxConnexion* connexion = editor->connexion();
@@ -420,10 +422,28 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
   ImGui::SetCursorPos((pMin - ImVec2(0, TX_PLUG_DETAIL * scale)) - ImGui::GetWindowPos());
   ImGui::InvisibleButton(name.c_str(), 
     ImVec2(TX_PLUG_WIDTH, TX_PLUG_HEIGHT + 2 * TX_PLUG_DETAIL) * scale);
+
+  
   if (!ImGui::IsDragDropActive() && ImGui::BeginDragDropSource()) {
-    editor->startConnexion(this, channel);
-    ImGui::SetDragDropPayload("connect", NULL, 0);
-    ImGui::EndDragDropSource();
+    if(!_io && input()) {
+      TxConnexion* connexion = input()->connexion(this);
+      TxParameter* source = connexion->source;
+      size_t channel = connexion->channel;
+      
+      node()->graph()->removeConnexion(connexion);
+      
+      _input = NULL;
+
+      editor->startConnexion(source, channel);
+      ImGui::SetDragDropPayload("disconnect", NULL, 0);
+      std::string msg("disconnect "+node()->name()+":"+_name);
+      ImGui::Text("%s", msg.c_str());
+      ImGui::EndDragDropSource();
+    } else {
+      editor->startConnexion(this, channel);
+      ImGui::SetDragDropPayload("connect", NULL, 0);
+      ImGui::EndDragDropSource();
+    }
   } else {
     if (_checkCompatibility(this, editor->connexion()) && ImGui::BeginDragDropTarget()) {
       editor->updateConnexion(this, channel);
@@ -431,6 +451,7 @@ bool TxParameterSamples::draw(TxEditor* editor, const ImVec2& pMin, const ImVec2
       connected = true;
     }
   }
+ 
 
   ImColor plugColor = _node->color(TX_COLOR_PLUG_ID);
 

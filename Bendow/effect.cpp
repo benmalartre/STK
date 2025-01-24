@@ -17,7 +17,7 @@ TxEffect::TxEffect(TxNode* parent, const std::string& name)
 {
   _effect = new stk::Echo();
   _effectIdx = ECHO;
-  _params.push_back(new TxParameterSamples(this, "Input", INPUT, false));
+  _params.push_back(new TxParameterSamples(this, "Input", INPUT, false, 1));
   _params.push_back(new TxParameterFloat(this, "ModDpth", 0.f, 1.f, &_modDepth, MODDEPTH, TxParameter::KNOB));
   _params.push_back(new TxParameterFloat(this, "ModFreq", 1.f, 220.f, &_modFrequency, MODFREQUENCY, TxParameter::KNOB));
   _params.push_back(new TxParameterInt(this, "Delay", 0, 1000, &_delay, DELAY, TxParameter::KNOB));

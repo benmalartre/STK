@@ -20,8 +20,7 @@ public:
     MODE = TxNode::LAST,
     INPUT1,
     INPUT2,
-    FLOAT1,
-    LAST
+    FLOAT1
   };
 
   TxArythmetic(TxNode* parent, const std::string& name);
