@@ -133,7 +133,7 @@ stk::StkFloat TxSequencer::tick(unsigned int channel)
     }
   }
 
-  sample *= _volumeToDb(_volume);
+  sample *= _volume;
   if(_recorder.recording())
     _recorder.tick(sample);
 

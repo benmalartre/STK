@@ -94,14 +94,14 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   return 0;
 }
 
-static uint8_t BASS[16] = {
-  110, 20, 20, 10, 110, 20, 20, 10,
-  110, 30, 110, 20, 110, 55, 55, 33
+static uint8_t BASS[18] = {
+  110, 60, 50, 110, 60, 50, 110, 60, 50,
+  110, 60, 50, 110, 60, 50, 110, 60, 50
 };
 
-static uint8_t DRUM[16] = {
-  0, 0, 200, 0, 0, 0, 200, 200,
-  0, 0, 200, 0, 0, 0, 200, 200
+static uint8_t DRUM[18] = {
+  60, 60, 200, 60, 60, 200, 60, 60, 110,
+  50, 50, 200, 50, 50, 200, 60, 60, 110
 };
 
 GLFWwindow* openWindow(size_t width, size_t height)
@@ -237,8 +237,8 @@ int main()
   // create the sequencer
   TxFactory::initialize();
   sequencer = new TxSequencer(4);
-  sequencer->setLength(16);
-  for (size_t t = 0; t < 16; ++t) {
+  sequencer->setLength(18);
+  for (size_t t = 0; t < 18; ++t) {
     sequencer->setBeat(0, t, { 1, BASS[t] });
     sequencer->setBeat(1, t, { 4, DRUM[t] });
   }

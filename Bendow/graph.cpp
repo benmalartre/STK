@@ -156,7 +156,7 @@ void TxGraph::reset()
 
 stk::StkFloat TxGraph::tick(unsigned int channel)
 {
-  if(_current && _active) return _current->tick(channel) * _volumeToDb(_volume);
+  if(_current && _active) return _current->tick(channel) * _volume;
   return 0;
 }
 

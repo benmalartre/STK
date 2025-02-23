@@ -197,11 +197,6 @@ TxParameter* TxNode::parameter(const std::string& name)
   return NULL;
 }
 
-stk::StkFloat TxNode::_volumeToDb(float volume, double maxDb) 
-{
-  return maxDb * (1.0 - (std::log(volume) / std::log(0.5)));
-};
-
 void TxNode::_drawPopup(TxEditor* editor)
 {
 

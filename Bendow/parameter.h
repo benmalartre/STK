@@ -164,10 +164,10 @@ public:
   bool draw(TxEditor*) override;
   bool draw(TxEditor* editor, const ImVec2& pMin, const ImVec2& pMax, float scale, short channel);
 
-
 private:
   stk::StkFrames*    _frames;
   bool               _io;
-  int                _nChannels;};
+  int                _nChannels;
+};
 
 #endif // TX_PARAMETER_H
