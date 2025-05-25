@@ -404,6 +404,7 @@ void TxFilter::_drawImpl(TxEditor* editor, bool* modified)
 
     case ONEPOLE:
       if(_params[TxFilter::FLOAT1]->draw(editor) && modified)*modified = true;
+      ImGui::EndGroup();
       break;
   
     case DELAY:
