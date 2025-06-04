@@ -66,7 +66,7 @@ ClickCallback(GLFWwindow* window, int button, int action, int mods)
 void
 KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-  if (key == GLFW_KEY_DELETE && action == GLFW_PRESS)
+  if (action == GLFW_PRESS  && (key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE) )
     graphEditor->deleteSelectedNodes();
 
   else if(key == GLFW_KEY_SPACE && action == GLFW_PRESS)
