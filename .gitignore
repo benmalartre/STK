@@ -1,5 +1,8 @@
 # build folder
 *build*
 
+# macos file
+.DS_Store
+
 #vscode folder
 *.vscode*
